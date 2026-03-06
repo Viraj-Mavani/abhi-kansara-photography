@@ -24,16 +24,15 @@ export function HeroSection() {
             <span className="material-symbols-outlined text-lg">arrow_forward</span>
           </button>
         </div>
-        <div className="flex flex-wrap gap-4 pt-12 md:pt-14">
+        <div className="flex w-full flex-nowrap items-center gap-3 pt-12 md:gap-4 md:pt-14">
           {/* Instagram Button */}
           <a
             href="https://www.instagram.com/abhikansara_photography"
             target="_blank"
             rel="noopener noreferrer"
-            className="group relative flex items-center justify-center gap-3 overflow-hidden rounded-full border border-slate-200 bg-white px-8 py-3 transition-all duration-300 hover:border-transparent hover:shadow-xl hover:shadow-purple-500/20 active:scale-95"
+            className="group relative flex flex-1 items-center justify-center gap-3 rounded-[22px] border border-slate-200 bg-white py-3 transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)] hover:-translate-y-2 hover:border-[#ee2a7b] hover:bg-gradient-to-tr hover:from-[#f9ce34] hover:via-[#ee2a7b] hover:to-[#6228d7] hover:shadow-[0_15px_35px_-10px_rgba(238,42,123,0.6)] active:scale-95 md:px-8"
           >
-            <div className="absolute inset-0 -z-10 translate-y-full bg-gradient-to-tr from-yellow-500 via-purple-500 to-blue-500 transition-transform duration-500 ease-in-out group-hover:translate-y-0"></div>
-            <span className="font-mono text-xs font-bold uppercase tracking-widest text-slate-500 transition-colors duration-300 group-hover:text-[#D62976]">
+            <span className="whitespace-nowrap font-mono text-[10px] font-bold uppercase tracking-widest text-slate-500 transition-colors duration-300 group-hover:text-white md:text-xs">
               Instagram
             </span>
             <span className="material-symbols-outlined text-[16px] text-slate-400 transition-all duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-white">
@@ -46,10 +45,9 @@ export function HeroSection() {
             href="https://www.linkedin.com/in/abhikansaraphotography"
             target="_blank"
             rel="noopener noreferrer"
-            className="group relative flex items-center justify-center gap-3 overflow-hidden rounded-full border border-slate-200 bg-white px-8 py-3 transition-all duration-300 hover:border-transparent hover:shadow-xl hover:shadow-blue-500/20 active:scale-95"
+            className="group relative flex flex-1 items-center justify-center gap-3 rounded-[22px] border border-slate-200 bg-white py-3 transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)] hover:-translate-y-2 hover:border-[#0077b5] hover:bg-[#0077b5] hover:shadow-[0_15px_35px_-10px_rgba(0,119,181,0.6)] active:scale-95 md:px-8"
           >
-            <div className="absolute inset-0 -z-10 translate-y-full bg-[#0077B5] transition-transform duration-500 ease-in-out group-hover:translate-y-0"></div>
-            <span className="font-mono text-xs font-bold uppercase tracking-widest text-slate-500 transition-colors duration-300 group-hover:text-[#0077B5]">
+            <span className="whitespace-nowrap font-mono text-[10px] font-bold uppercase tracking-widest text-slate-500 transition-colors duration-300 group-hover:text-white md:text-xs">
               LinkedIn
             </span>
             <span className="material-symbols-outlined text-[16px] text-slate-400 transition-all duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-white">
@@ -57,6 +55,7 @@ export function HeroSection() {
             </span>
           </a>
         </div>
+
       </div>
 
       {/* Right Column: Hero Image */}
