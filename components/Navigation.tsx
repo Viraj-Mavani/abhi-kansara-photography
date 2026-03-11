@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils";
 
 const navLinks = [
   { name: "Home", href: "#home" },
-  { name: "About", href: "#about" },
+  { name: "About", href: "about" },
   { name: "Services", href: "#services" },
 ];
 
@@ -21,7 +21,7 @@ export default function Navigation() {
   // show when scrolling down, hide when scrolling up past threshold.
   useMotionValueEvent(scrollY, "change", (latest) => {
     const previous = scrollY.getPrevious() ?? 0;
-    
+
     // Always hide at the absolute top (hero section)
     if (latest < 100) {
       setHidden(true);
@@ -38,7 +38,7 @@ export default function Navigation() {
     if (latest > previous && latest > 150) {
       setHidden(false); // Can tweak this to hide on scroll down, but client wanted it "blending perfectly".
     } else {
-      setHidden(false); 
+      setHidden(false);
     }
   });
 
@@ -61,13 +61,15 @@ export default function Navigation() {
         )}
       >
         {/* Logo Area */}
-        <Link href="/" className="flex items-center gap-2 group">
-           <div className="relative w-8 h-8 rounded-full overflow-hidden bg-white/5 flex items-center justify-center border border-white/10 group-hover:border-accent-gold transition-colors duration-300">
-              <span className="font-serif font-bold text-accent-gold text-lg">AK</span>
-           </div>
-           <span className="font-serif font-medium text-lg tracking-wide hidden sm:block group-hover:text-accent-gold transition-colors duration-300">
-             Abhi Kansara
-           </span>
+        <Link href="/" className="flex items-center group">
+          <Image
+            alt="Abhi Kansara Photography"
+            src="/Logo.png"
+            width={100}
+            height={100}
+            className="h-8 w-auto invert transition-opacity duration-500 opacity-90 group-hover:opacity-100 mix-blend-difference"
+            priority
+          />
         </Link>
 
         {/* Links */}
@@ -86,7 +88,7 @@ export default function Navigation() {
 
         {/* CTA */}
         <Link
-          href="#contact"
+          href="contact"
           className="px-5 py-2 rounded-full bg-accent-gold text-black text-sm font-medium hover:bg-white transition-colors duration-300"
         >
           Book a Session
