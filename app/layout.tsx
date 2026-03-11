@@ -14,8 +14,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Abhi Kansara Photography",
-  description: "Professional photography portfolio by Abhi Kansara",
+  title: "Abhi Kansara | Photography",
+  description: "Visual Storyteller & Photographer",
 };
 
 export default function RootLayout({
