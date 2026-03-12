@@ -2,11 +2,13 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion, useScroll, useTransform } from "framer-motion";
 import { backgroundImages } from "@/lib/data";
 
 export default function BackgroundCarousel() {
   const [currentIndex, setCurrentIndex] = useState(0);
+  const { scrollY } = useScroll();
+  const overlayOpacity = useTransform(scrollY, [0, 400], [0, 0.5]);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -18,13 +20,13 @@ export default function BackgroundCarousel() {
 
   return (
     <div className="fixed top-0 left-0 w-screen h-screen z-0 bg-black overflow-hidden pointer-events-none">
-      <AnimatePresence mode="wait">
+      <AnimatePresence>
         <motion.div
           key={currentIndex}
-          initial={{ opacity: 0, scale: 1.05 }}
+          initial={{ opacity: 0, scale: 1.1 }}
           animate={{ opacity: 1, scale: 1 }}
           exit={{ opacity: 0 }}
-          transition={{ duration: 1.5, ease: "easeInOut" }}
+          transition={{ duration: 2.5, ease: "circOut" }}
           className="absolute inset-0 w-full h-full"
         >
           <Image
@@ -36,7 +38,10 @@ export default function BackgroundCarousel() {
           />
         </motion.div>
       </AnimatePresence>
-      <div className="absolute inset-0 bg-black/50" /> {/* Dark overlay overlay underneath foreground wrapper */}
+      <motion.div 
+        className="absolute inset-0 bg-black" 
+        style={{ opacity: overlayOpacity }}
+      />
     </div>
   );
 }

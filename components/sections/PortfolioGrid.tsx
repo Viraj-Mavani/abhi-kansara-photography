@@ -11,7 +11,7 @@ export default function PortfolioGrid() {
         <div className="text-left mb-16 sm:mb-24">
           <span className="uppercase tracking-[0.2em] text-xs mb-4 block font-bold text-accent-gold">Portfolio</span>
           <h2 className="font-serif text-5xl sm:text-7xl font-medium text-white mix-blend-difference">
-            Featured <span className="italic">Works</span>
+            Featured <span className="italic text-white/60">Works</span>
           </h2>
         </div>
 
