@@ -18,14 +18,14 @@ export const identity = {
       icon: Linkedin,
     },
     {
-      name: "Email",
-      href: "mailto:hello@abhikansaraphotography.com",
-      icon: Mail,
-    },
-    {
       name: "Tiktok",
       href: "https://www.tiktok.com/@abhikansara",
       icon: Music2,
+    },
+    {
+      name: "Email",
+      href: "mailto:hello@abhikansaraphotography.com",
+      icon: Mail,
     },
   ],
 };
