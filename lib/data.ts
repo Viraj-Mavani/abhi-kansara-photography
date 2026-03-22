@@ -1,3 +1,5 @@
+const R2_URL = "https://pub-576c3f4676204ddb823a5e2e2e27435e.r2.dev";
+
 // Centralized Data Layer
 
 export interface PortfolioImage {
@@ -16,20 +18,20 @@ export interface Service {
 
 // Pre-Wedding | Wedding | Baby Shower | Product | Photography | Editorial | Event
 export const servicesData: Service[] = [
-	{ id: "s0", title: "Wedding", image: "/images/work/work0.jpg" },
-	{ id: "s1", title: "Event", image: "/images/work/work1.jpg" },
-	{ id: "s2", title: "Product", image: "/images/work/work2.jpg" },
-	{ id: "s3", title: "Photography", image: "/images/work/work3.jpg" },
-	{ id: "s4", title: "Pre-Wedding", image: "/images/work/work4.jpg" },
-	{ id: "s5", title: "Photography", image: "/images/work/work5.jpg" },
-	{ id: "s6", title: "Event", image: "/images/work/work6.jpg" },
-	{ id: "s7", title: "Event", image: "/images/work/work7.jpg" },
-	{ id: "s8", title: "Event", image: "/images/work/work8.jpg" },
-	{ id: "s9", title: "Photography", image: "/images/work/work9.jpg" },
-	{ id: "s10", title: "Editorial", image: "/images/work/work10.jpg" },
-	{ id: "s11", title: "Pre-Wedding", image: "/images/work/work11.jpg" },
-	{ id: "s12", title: "Photography", image: "/images/work/work12.jpg" },
-	{ id: "s13", title: "Baby Shower", image: "/images/work/work13.jpg" },
+	{ id: "s0", title: "Wedding", image: `${R2_URL}/images/work/work0.webp` },
+	{ id: "s1", title: "Event", image: `${R2_URL}/images/work/work1.webp` },
+	{ id: "s2", title: "Product", image: `${R2_URL}/images/work/work2.webp` },
+	{ id: "s3", title: "Photography", image: `${R2_URL}/images/work/work3.webp` },
+	{ id: "s4", title: "Pre-Wedding", image: `${R2_URL}/images/work/work4.webp` },
+	{ id: "s5", title: "Photography", image: `${R2_URL}/images/work/work5.webp` },
+	{ id: "s6", title: "Event", image: `${R2_URL}/images/work/work6.webp` },
+	{ id: "s7", title: "Event", image: `${R2_URL}/images/work/work7.webp` },
+	{ id: "s8", title: "Event", image: `${R2_URL}/images/work/work8.webp` },
+	{ id: "s9", title: "Photography", image: `${R2_URL}/images/work/work9.webp` },
+	{ id: "s10", title: "Editorial", image: `${R2_URL}/images/work/work10.webp` },
+	{ id: "s11", title: "Pre-Wedding", image: `${R2_URL}/images/work/work11.webp` },
+	{ id: "s12", title: "Photography", image: `${R2_URL}/images/work/work12.webp` },
+	{ id: "s13", title: "Baby Shower", image: `${R2_URL}/images/work/work13.webp` },
 ];
 
 export const portfolioImages: PortfolioImage[] = [
@@ -37,64 +39,68 @@ export const portfolioImages: PortfolioImage[] = [
 		id: "p1",
 		title: "Aaina & Daideep",
 		category: "Wedding",
-		src: "/images/feature/feature0.jpg",
+		src: `${R2_URL}/images/feature/feature0.webp`,
 		span: "row-span-2 col-span-1",
 	},
 	{
 		id: "p2",
 		title: "Sapan & Sajnee",
 		category: "Pre-Wedding",
-		src: "/images/feature/feature1.jpg",
+		src: `${R2_URL}/images/feature/feature1.webp`,
 		span: "col-span-1 row-span-1",
 	},
 	{
 		id: "p3",
 		title: "Aditya Gadhvi",
 		category: "Events",
-		src: "/images/feature/feature2.jpg",
+		src: `${R2_URL}/images/feature/feature2.webp`,
 		span: "col-span-1 row-span-1",
 	},
 	{
 		id: "p4",
 		title: "Vidhi & Kashyap",
 		category: "Baby Shower",
-		src: "/images/feature/feature3.jpg",
+		src: `${R2_URL}/images/feature/feature3.webp`,
 		span: "col-span-2 row-span-2",
 	},
 	{
 		id: "p5",
 		title: "MV",
 		category: "Product",
-		src: "/images/feature/feature4.jpg",
+		src: `${R2_URL}/images/feature/feature4.webp`,
 		span: "col-span-1 row-span-1",
 	},
 	{
 		id: "p6",
 		title: "Vidhi & Rushi",
 		category: "Editorial",
-		src: "/images/feature/feature5.jpg",
+		src: `${R2_URL}/images/feature/feature5.webp`,
 		span: "col-span-1 row-span-1",
 	},
 ];
 
 export const backgroundImages = [
-	"/images/bg/bg1.jpg",
-	"/images/bg/bg0.jpg",
-	"/images/bg/bg2.jpg",
-	"/images/bg/bg3.jpg",
-	"/images/bg/bg4.jpg",
-	"/images/bg/bg5.jpg",
-	"/images/bg/bg6.jpg",
-	"/images/bg/bg7.jpg",
+	`${R2_URL}/images/bg/bg1.webp`,
+	`${R2_URL}/images/bg/bg0.webp`,
+	`${R2_URL}/images/bg/bg2.webp`,
+	`${R2_URL}/images/bg/bg3.webp`,
+	`${R2_URL}/images/bg/bg4.webp`,
+	`${R2_URL}/images/bg/bg5.webp`,
+	`${R2_URL}/images/bg/bg6.webp`,
+	`${R2_URL}/images/bg/bg7.webp`,
 ];
 
 export const videoSources = {
-	portrait0Poster: "/images/thumbnail/t-portrait-0.png",
-	portrait0: "", 
-	portrait1Poster: "/images/thumbnail/t-portrait-1.jpg",
-	portrait1: "",
-	landscape0Poster: "/images/thumbnail/t-landscape-0.png",
-	landscape0: "",
-	landscape1Poster: "/images/thumbnail/t-landscape-1.png",
-	landscape1: "",
+	portrait0Poster: `${R2_URL}/images/thumbnail/t-portrait-0.webp`,
+	portrait0:
+		`${R2_URL}/videos/portrait-0/portrait0.m3u8`,
+	portrait1Poster: `${R2_URL}/images/thumbnail/t-portrait-1.webp`,
+	portrait1:
+		`${R2_URL}/videos/portrait-1/portrait1.m3u8`,
+	landscape0Poster: `${R2_URL}/images/thumbnail/t-landscape-0.webp`,
+	landscape0:
+		`${R2_URL}/videos/landscape-0/landscape0.m3u8`,
+	landscape1Poster: `${R2_URL}/images/thumbnail/t-landscape-1.webp`,
+	landscape1:
+		`${R2_URL}/videos/landscape-1/landscape1.m3u8`,
 };
