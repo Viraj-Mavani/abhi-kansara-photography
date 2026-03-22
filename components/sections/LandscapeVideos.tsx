@@ -26,7 +26,7 @@ export default function LandscapeVideos() {
             className="w-full max-w-[1200px]"
           >
             <VideoPlayer
-              src={videoSources.landscape0 || ""}
+              src={videoSources.landscape0}
               poster={videoSources.landscape0Poster}
               aspectRatio="video"
             />
@@ -40,7 +40,7 @@ export default function LandscapeVideos() {
             className="w-full max-w-[1200px]"
           >
             <VideoPlayer
-              src={videoSources.landscape1 || ""}
+              src={videoSources.landscape1}
               poster={videoSources.landscape1Poster}
               aspectRatio="video"
             />

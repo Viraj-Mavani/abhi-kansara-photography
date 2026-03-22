@@ -34,6 +34,7 @@ export default function BackgroundCarousel() {
             alt="Photography Showcase"
             fill
             className="object-cover"
+            sizes="100vw"
             priority
           />
         </motion.div>
