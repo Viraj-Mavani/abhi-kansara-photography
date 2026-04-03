@@ -26,11 +26,11 @@ const stagger = {
 };
 
 const scaleIn = {
-  hidden: { opacity: 0, scale: 0.92 },
+  hidden: { opacity: 0, scale: 0.95 },
   visible: {
     opacity: 1,
     scale: 1,
-    transition: { duration: 1, ease: [0.25, 1, 0.5, 1] },
+    transition: { duration: 0.8, ease: [0.25, 1, 0.5, 1] },
   },
 } as any;
 
@@ -63,8 +63,8 @@ function ScrollTicker() {
   );
 }
 
-/* ─── Individual Service Card ─── */
-function ServiceCard({
+/* ─── Variant 1: Vertical Card with Image ─── */
+function ServiceCardImage({
   service,
   index,
   onClick,
@@ -74,8 +74,7 @@ function ServiceCard({
   onClick: () => void;
 }) {
   const cardRef = useRef<HTMLDivElement>(null);
-  const isInView = useInView(cardRef, { once: true, margin: "-15%" });
-  const isEven = index % 2 === 0;
+  const isInView = useInView(cardRef, { once: true, margin: "-10%" });
 
   return (
     <motion.div
@@ -83,13 +82,11 @@ function ServiceCard({
       initial="hidden"
       animate={isInView ? "visible" : "hidden"}
       variants={scaleIn}
-      className={`grid grid-cols-1 lg:grid-cols-2 gap-0 lg:gap-0 group cursor-pointer ${
-        isEven ? "" : "lg:direction-rtl"
-      }`}
+      className="group cursor-pointer bg-white rounded-[2rem] overflow-hidden shadow-sm hover:shadow-2xl hover:shadow-black/5 border border-slate-100 transition-all duration-500 flex flex-col h-full hover:-translate-y-2"
       onClick={onClick}
     >
-      {/* Image Side */}
-      <div className={`relative w-full aspect-4/5 lg:aspect-auto lg:min-h-[600px] overflow-hidden ${isEven ? "order-1" : "order-1 lg:order-2"}`}>
+      {/* Top: Image Area */}
+      <div className="relative w-full aspect-[4/3] sm:aspect-[3/2] lg:aspect-[4/3] overflow-hidden bg-slate-100">
         <Image
           src={service.coverImage}
           alt={service.title}
@@ -97,130 +94,163 @@ function ServiceCard({
           className="object-cover transition-transform duration-[2s] ease-[cubic-bezier(0.25,1,0.5,1)] group-hover:scale-110"
           sizes="(max-width: 1024px) 100vw, 50vw"
         />
-        {/* Hover overlay with gradient */}
-        <div className="absolute inset-0 bg-linear-to-t from-black/70 via-transparent to-transparent opacity-60 group-hover:opacity-90 transition-opacity duration-700" />
-
-        {/* Mobile title overlay */}
-        <div className="absolute bottom-0 left-0 right-0 p-6 lg:hidden">
-          <span className="text-accent-gold uppercase tracking-[0.2em] text-[10px] font-bold mb-2 block font-sans">
-            {service.category || "Service"}
-          </span>
-          <h3 className="font-serif text-3xl text-white mb-2 leading-tight">{service.title}</h3>
-        </div>
-
-        {/* Floating index number */}
-        <div className="absolute top-6 left-6 lg:top-8 lg:left-8">
-          <span className="text-white/10 font-serif text-7xl lg:text-9xl font-bold leading-none group-hover:text-white/20 transition-all duration-700 select-none">
+        <div className="absolute inset-0 bg-linear-to-t from-black/60 via-black/10 to-transparent opacity-60 group-hover:opacity-80 transition-opacity duration-700" />
+        
+        {/* Floating index */}
+        <div className="absolute top-6 left-6">
+          <span className="text-white/60 font-serif text-4xl sm:text-5xl font-bold leading-none drop-shadow-md select-none group-hover:text-white/80 transition-colors duration-500">
             {String(index + 1).padStart(2, "0")}
+          </span>
+        </div>
+        
+        {/* Category Overlay */}
+        <div className="absolute bottom-6 left-8 flex items-center gap-3">
+          {service.icon && (
+            <span
+              className="material-symbols-outlined text-accent-gold text-lg drop-shadow-md"
+              style={{ fontVariationSettings: "'FILL' 0, 'wght' 200" }}
+            >
+              {service.icon}
+            </span>
+          )}
+          <span className="text-accent-gold uppercase tracking-[0.2em] text-[10px] font-bold drop-shadow-md">
+            {service.category || "Service"}
           </span>
         </div>
       </div>
 
-      {/* Content Side */}
-      <div className={`relative flex flex-col justify-center p-8 sm:p-10 lg:p-14 xl:p-20 bg-white border-y border-slate-100 transition-colors duration-500 ${isEven ? "order-2" : "order-2 lg:order-1"}`}>
-        {/* Decorative corner accent */}
-        <div className="absolute top-0 right-0 w-24 h-24 opacity-0 group-hover:opacity-100 transition-opacity duration-700">
-          <div className="absolute top-6 right-6 w-12 h-px bg-accent-gold/40" />
-          <div className="absolute top-6 right-6 h-12 w-px bg-accent-gold/40" />
-        </div>
+      {/* Bottom: Content Area */}
+      <div className="relative flex flex-col flex-grow p-8 sm:p-10 transition-colors duration-500">
+         {/* Title area */}
+         <h3 className="font-serif text-3xl sm:text-4xl text-slate-900 mb-3 leading-tight transition-colors duration-500 group-hover:text-accent-gold">
+           {service.title}
+         </h3>
+         <p className="font-serif italic text-slate-500 text-sm mb-6 transition-colors duration-500">
+           {service.tagline}
+         </p>
+         
+         <div className="w-10 h-px bg-accent-gold/40 mb-6 group-hover:w-20 transition-all duration-700" />
+         
+         <p className="text-slate-600 text-sm font-light leading-relaxed mb-8 line-clamp-3 flex-grow">
+           {service.shortDescription}
+         </p>
 
-        <motion.div
-          variants={stagger}
-          initial="hidden"
-          animate={isInView ? "visible" : "hidden"}
-        >
-          {/* Category + Icon */}
-          <motion.div variants={fadeUp} className="flex items-center gap-3 mb-4">
-            {service.icon && (
-              <span
-                className="material-symbols-outlined text-accent-gold text-xl"
-                style={{ fontVariationSettings: "'FILL' 0, 'wght' 200" }}
-              >
-                {service.icon}
+         <div className="mt-auto">
+           {/* Quick Stats & CTA Split */}
+           <div className="flex items-center justify-between border-t border-slate-100 pt-6">
+              {service.startingPrice ? (
+                <div>
+                  <span className="text-slate-400 text-[9px] uppercase tracking-widest font-bold block mb-1">
+                    {service.priceNote || "From"}
+                  </span>
+                  <span className="text-slate-800 font-serif text-xl group-hover:text-accent-gold transition-colors duration-300">
+                    {service.startingPrice}
+                  </span>
+                </div>
+              ) : (
+                <div />
+              )}
+              <div className="inline-flex items-center gap-2 text-slate-900 text-[10px] uppercase tracking-[0.2em] font-bold group-hover:text-accent-gold transition-colors duration-300">
+                  <span>Details</span>
+                  <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform duration-300" />
+              </div>
+           </div>
+         </div>
+      </div>
+    </motion.div>
+  );
+}
+
+/* ─── Variant 2: Minimal Typographic Card (No Image) ─── */
+function ServiceCardMinimal({
+  service,
+  index,
+  onClick,
+}: {
+  service: DetailedService;
+  index: number;
+  onClick: () => void;
+}) {
+  const cardRef = useRef<HTMLDivElement>(null);
+  const isInView = useInView(cardRef, { once: true, margin: "-10%" });
+
+  return (
+    <motion.div
+      ref={cardRef}
+      initial="hidden"
+      animate={isInView ? "visible" : "hidden"}
+      variants={scaleIn}
+      className="relative group cursor-pointer bg-white rounded-[2rem] overflow-hidden shadow-[0_10px_40px_rgba(0,0,0,0.03)] hover:shadow-2xl hover:shadow-black/10 border border-slate-100 transition-all duration-700 flex flex-col h-full p-10 sm:p-14 xl:p-16 hover:-translate-y-2"
+      onClick={onClick}
+    >
+      {/* Background Watermark Index */}
+      <div className="absolute -bottom-10 -right-8 pointer-events-none select-none transition-transform duration-[2s] group-hover:scale-110 opacity-30 group-hover:opacity-60">
+        <span className="font-serif text-[180px] sm:text-[220px] font-bold leading-none text-slate-50 transition-colors duration-700 drop-shadow-xs">
+           {String(index + 1).padStart(2, "0")}
+        </span>
+      </div>
+
+      {/* Top Border Accent */}
+      <div className="absolute top-0 left-0 right-0 h-1 bg-linear-to-r from-transparent via-accent-gold/10 to-transparent group-hover:via-accent-gold/40 transition-colors duration-500" />
+
+      <div className="relative z-10 flex flex-col h-full">
+         <div className="flex items-center justify-between mb-10">
+            <div className="flex items-center gap-3">
+              {service.icon && (
+                <span className="material-symbols-outlined text-accent-gold text-xl" style={{ fontVariationSettings: "'FILL' 0, 'wght' 200" }}>
+                  {service.icon}
+                </span>
+              )}
+              <span className="text-accent-gold uppercase tracking-[0.2em] text-[10px] font-bold">
+                {service.category || "Service"}
               </span>
-            )}
-            <span className="text-accent-gold uppercase tracking-[0.2em] text-[10px] font-bold hidden lg:inline">
-              {service.category || "Service"}
+            </div>
+            {/* Minimal Index top right */}
+            <span className="text-slate-300 font-serif text-sm font-bold group-hover:text-accent-gold transition-colors duration-500">
+              No. {String(index + 1).padStart(2, "0")}
             </span>
-          </motion.div>
+         </div>
 
-          {/* Title */}
-          <motion.h3
-            variants={fadeUp}
-            className="font-serif text-3xl sm:text-4xl lg:text-5xl text-slate-900 mb-4 leading-tight hidden lg:block transition-colors duration-500"
-          >
-            {service.title}
-          </motion.h3>
+         <h3 className="font-serif text-4xl sm:text-5xl text-slate-900 mb-4 leading-tight transition-colors duration-500">
+           {service.title}
+         </h3>
 
-          {/* Tagline */}
-          <motion.p
-            variants={fadeUp}
-            className="font-serif italic text-slate-500 text-sm sm:text-base mb-6 transition-colors duration-500"
-          >
-            {service.tagline}
-          </motion.p>
+         <div className="w-12 h-[2px] bg-accent-gold/40 mb-6 group-hover:w-24 group-hover:bg-accent-gold transition-all duration-700" />
 
-          {/* Divider */}
-          <motion.div
-            variants={fadeUp}
-            className="w-10 h-px bg-accent-gold/40 mb-6 group-hover:w-20 transition-all duration-700"
-          />
-
-          {/* Short Description */}
-          <motion.p
-            variants={fadeUp}
-            className="text-slate-600 text-sm sm:text-base font-light leading-relaxed mb-8 max-w-md transition-colors duration-500"
-          >
-            {service.shortDescription}
-          </motion.p>
-
-          {/* Quick Stats */}
-          <motion.div variants={fadeUp} className="flex flex-wrap gap-x-6 gap-y-3 mb-8">
+         <p className="text-slate-600 text-sm sm:text-base font-light leading-relaxed mb-10 line-clamp-4 flex-grow">
+           {service.shortDescription}
+         </p>
+         
+         <div className="flex flex-wrap gap-x-8 gap-y-4 mb-12">
             {service.startingPrice && (
               <div>
-                <span className="text-slate-400 text-[9px] uppercase tracking-widest font-bold block mb-1">
-                  {service.priceNote || "Price"}
+                <span className="text-slate-400 text-[10px] uppercase tracking-widest font-bold block mb-1">
+                  {service.priceNote || "Investment"}
                 </span>
-                <span className="text-accent-gold font-serif text-xl">
+                <span className="text-slate-800 font-serif text-2xl group-hover:text-accent-gold transition-colors duration-500">
                   {service.startingPrice}
                 </span>
               </div>
             )}
             {service.minDuration && (
               <div>
-                <span className="text-slate-400 text-[9px] uppercase tracking-widest font-bold block mb-1">
+                <span className="text-slate-400 text-[10px] uppercase tracking-widest font-bold block mb-1">
                   Duration
                 </span>
-                <span className="text-slate-700 font-serif text-xl transition-colors duration-500">
+                <span className="text-slate-700 font-serif text-2xl transition-colors duration-500">
                   {service.minDuration}
                 </span>
               </div>
             )}
-            {service.packages.length > 0 && (
-              <div>
-                <span className="text-slate-400 text-[9px] uppercase tracking-widest font-bold block mb-1">
-                  Packages
-                </span>
-                <span className="text-slate-700 font-serif text-xl transition-colors duration-500">
-                  {service.packages.length}
-                </span>
-              </div>
-            )}
-          </motion.div>
+         </div>
 
-          {/* CTA */}
-          <motion.div variants={fadeUp}>
-            <div className="inline-flex items-center gap-3 text-accent-gold text-xs uppercase tracking-[0.2em] font-bold group/cta cursor-pointer">
-              <span className="group-hover/cta:tracking-[0.3em] transition-all duration-500">
-                Explore Details
-              </span>
-              <ArrowRight
-                size={14}
-                className="group-hover/cta:translate-x-2 transition-transform duration-300"
-              />
+         <div className="mt-auto pt-8 border-t border-slate-100 flex items-center justify-between">
+            <span className="text-slate-400 italic font-serif text-sm group-hover:text-slate-600 transition-colors duration-500">{service.tagline}</span>
+            <div className="inline-flex items-center gap-3 text-accent-gold text-[11px] uppercase tracking-[0.2em] font-bold group-hover:tracking-[0.25em] transition-all duration-500">
+              <span>Explore</span>
+              <ArrowRight size={16} className="group-hover:translate-x-2 transition-transform duration-300" />
             </div>
-          </motion.div>
-        </motion.div>
+         </div>
       </div>
     </motion.div>
   );
@@ -245,7 +275,6 @@ export default function ServicesShowcase() {
 
   const handleCloseModal = () => {
     setIsModalOpen(false);
-    // Delay nullifying service so exit animation can play
     setTimeout(() => setSelectedService(null), 500);
   };
 
@@ -253,7 +282,6 @@ export default function ServicesShowcase() {
     <>
       {/* ── Hero Section ── */}
       <section ref={heroRef} className="relative h-[90vh] sm:h-screen w-full overflow-hidden flex items-center justify-center transition-colors duration-500">
-        {/* Animated gradient background */}
         <div className="absolute inset-0 bg-accent-ivory transition-colors duration-500">
           <motion.div
             className="absolute inset-0 opacity-40"
@@ -308,7 +336,6 @@ export default function ServicesShowcase() {
             {servicesPageConfig.heroSubtitle}
           </motion.p>
 
-          {/* Scroll indicator */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -332,24 +359,72 @@ export default function ServicesShowcase() {
       {/* ── Ticker ── */}
       <ScrollTicker />
 
-      {/* ── Service Cards ── */}
-      <section className="relative w-full bg-accent-ivory transition-colors duration-500 pb-20">
-        <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 space-y-24 sm:space-y-32 lg:space-y-48">
-          {detailedServices
-            .sort((a, b) => (a.order ?? 99) - (b.order ?? 99))
-            .map((service, index) => (
-              <ServiceCard
-                key={service.id}
-                service={service}
-                index={index}
-                onClick={() => handleOpenService(service)}
-              />
-            ))}
+      {/* ── 2-Column Grid Variants for User Review ── */}
+      <div className="bg-accent-ivory pt-16 pb-10">
+        <div className="max-w-7xl mx-auto px-6 text-center">
+            <h2 className="font-sans text-xs uppercase tracking-[0.2em] font-bold text-accent-gold mb-2">Design Preview</h2>
+            <p className="text-slate-600 text-sm">Please review both layout variants sequentially below.</p>
+        </div>
+      </div>
+
+      {/* Variant 1: With Image */}
+      <section className="relative w-full bg-accent-ivory transition-colors duration-500 pb-24 border-b border-slate-200/50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="mb-16 text-center">
+             <h3 className="font-serif text-3xl text-slate-800">Variant 1: Image & Typography</h3>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12 justify-items-center">
+            {detailedServices
+              .sort((a, b) => (a.order ?? 99) - (b.order ?? 99))
+              .map((service, index, arr) => {
+                 const isOddLast = arr.length % 2 !== 0 && index === arr.length - 1;
+                 return (
+                  <div 
+                    key={`v1-${service.id}`} 
+                    className={`w-full ${isOddLast ? 'md:col-span-2 md:max-w-md lg:max-w-xl' : ''}`}
+                  >
+                    <ServiceCardImage
+                      service={service}
+                      index={index}
+                      onClick={() => handleOpenService(service)}
+                    />
+                  </div>
+                 );
+              })}
+          </div>
+        </div>
+      </section>
+
+      {/* Variant 2: Minimal Typography */}
+      <section className="relative w-full bg-accent-ivory transition-colors duration-500 pt-24 pb-32">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="mb-16 text-center">
+             <h3 className="font-serif text-3xl text-slate-800">Variant 2: Pure Typography</h3>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12 justify-items-center">
+            {detailedServices
+              .sort((a, b) => (a.order ?? 99) - (b.order ?? 99))
+              .map((service, index, arr) => {
+                 const isOddLast = arr.length % 2 !== 0 && index === arr.length - 1;
+                 return (
+                  <div 
+                    key={`v2-${service.id}`} 
+                    className={`w-full ${isOddLast ? 'md:col-span-2 md:max-w-md lg:max-w-xl xl:max-w-2xl' : ''}`}
+                  >
+                    <ServiceCardMinimal
+                      service={service}
+                      index={index}
+                      onClick={() => handleOpenService(service)}
+                    />
+                  </div>
+                 );
+              })}
+          </div>
         </div>
       </section>
 
       {/* ── Bottom CTA ── */}
-      <section className="relative w-full bg-accent-ivory py-20 sm:py-32 transition-colors duration-500">
+      <section className="relative w-full bg-slate-50 border-t border-slate-200/50 py-20 sm:py-32 transition-colors duration-500">
         <motion.div
           initial="hidden"
           whileInView="visible"
