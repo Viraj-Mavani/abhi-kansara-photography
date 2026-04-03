@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import Image from "next/image";
 import { motion, useScroll, useTransform, useInView } from "framer-motion";
 import { detailedServices, servicesPageConfig } from "@/lib/services";
@@ -8,6 +8,19 @@ import type { DetailedService } from "@/lib/services";
 import ServiceDetailsModal from "./ServiceDetailsModal";
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
+
+export function useIsMobile() {
+  const [isMobile, setIsMobile] = useState(false);
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const checkMobile = () => setIsMobile(window.innerWidth < 1024);
+      checkMobile();
+      window.addEventListener("resize", checkMobile);
+      return () => window.removeEventListener("resize", checkMobile);
+    }
+  }, []);
+  return isMobile;
+}
 
 /* ─── Animation Variants ─── */
 const fadeUp = {
@@ -75,6 +88,9 @@ function ServiceCardMinimal({
 }) {
   const cardRef = useRef<HTMLDivElement>(null);
   const isInView = useInView(cardRef, { once: true, margin: "-10%" });
+  const isMobile = useIsMobile();
+  const isCenter = useInView(cardRef, { margin: "-40% 0px -40% 0px" });
+  const triggerHover = isMobile && isCenter;
 
   return (
     <motion.div
@@ -82,18 +98,19 @@ function ServiceCardMinimal({
       initial="hidden"
       animate={isInView ? "visible" : "hidden"}
       variants={scaleIn}
-      className="relative group cursor-pointer bg-white rounded-[1.5rem] md:rounded-[2rem] overflow-hidden shadow-[0_10px_40px_rgba(0,0,0,0.03)] hover:shadow-2xl hover:shadow-black/10 border border-slate-100 transition-all duration-700 flex flex-col h-full p-8 md:p-12 lg:p-14 xl:p-16 hover:-translate-y-2 ring-1 ring-slate-100/50"
+      className={`relative group cursor-pointer bg-white rounded-[1.5rem] md:rounded-[2rem] overflow-hidden shadow-[0_10px_40px_rgba(0,0,0,0.03)] border border-slate-100 transition-all duration-700 flex flex-col h-full p-8 md:p-12 lg:p-14 xl:p-16 ring-1 ring-slate-100/50 hover:shadow-2xl hover:shadow-black/10 hover:-translate-y-2 data-[hovered=true]:shadow-2xl data-[hovered=true]:shadow-black/10 data-[hovered=true]:-translate-y-2`}
+      data-hovered={triggerHover}
       onClick={onClick}
     >
       {/* Background Watermark Index */}
-      <div className="absolute -bottom-6 -right-6 md:-bottom-10 md:-right-8 pointer-events-none select-none transition-transform duration-[2s] group-hover:scale-110 opacity-20 group-hover:opacity-40">
+      <div className="absolute -bottom-6 -right-6 md:-bottom-10 md:-right-8 pointer-events-none select-none transition-transform duration-[2s] group-hover:scale-110 group-data-[hovered=true]:scale-110 opacity-20 group-hover:opacity-40 group-data-[hovered=true]:opacity-40">
         <span className="font-serif text-[140px] sm:text-[180px] lg:text-[220px] font-bold leading-none text-slate-100 transition-colors duration-700 drop-shadow-xs">
            {String(index + 1).padStart(2, "0")}
         </span>
       </div>
 
       {/* Top Border Accent */}
-      <div className="absolute top-0 left-0 right-0 h-1 bg-linear-to-r from-transparent via-accent-gold/10 to-transparent group-hover:via-accent-gold/40 transition-colors duration-500" />
+      <div className="absolute top-0 left-0 right-0 h-1 bg-linear-to-r from-transparent via-accent-gold/10 to-transparent group-hover:via-accent-gold/40 group-data-[hovered=true]:via-accent-gold/40 transition-colors duration-500" />
 
       <div className="relative z-10 flex flex-col h-full">
          <div className="flex items-center justify-between mb-8 md:mb-10">
@@ -108,7 +125,7 @@ function ServiceCardMinimal({
               </span>
             </div>
             {/* Minimal Index top right */}
-            <span className="text-slate-300 font-serif text-xs md:text-sm font-bold group-hover:text-accent-gold transition-colors duration-500">
+            <span className="text-slate-300 font-serif text-xs md:text-sm font-bold group-hover:text-accent-gold group-data-[hovered=true]:text-accent-gold transition-colors duration-500">
               No. {String(index + 1).padStart(2, "0")}
             </span>
          </div>
@@ -117,7 +134,7 @@ function ServiceCardMinimal({
            {service.title}
          </h3>
 
-         <div className="w-12 h-[2px] bg-accent-gold/40 mb-6 group-hover:w-24 group-hover:bg-accent-gold transition-all duration-700" />
+         <div className="w-12 h-[2px] bg-accent-gold/40 mb-6 group-hover:w-24 group-data-[hovered=true]:w-24 group-hover:bg-accent-gold group-data-[hovered=true]:bg-accent-gold transition-all duration-700" />
 
          <p className="text-slate-600 text-sm sm:text-base font-light leading-relaxed mb-10 line-clamp-4 flex-grow">
            {service.shortDescription}
@@ -129,7 +146,7 @@ function ServiceCardMinimal({
                 <span className="text-slate-400 text-[9px] md:text-[10px] uppercase tracking-widest font-bold block mb-1">
                   {service.priceNote || "Investment"}
                 </span>
-                <span className="text-slate-800 font-serif text-xl md:text-2xl group-hover:text-accent-gold transition-colors duration-500">
+                <span className="text-slate-800 font-serif text-xl md:text-2xl group-hover:text-accent-gold group-data-[hovered=true]:text-accent-gold transition-colors duration-500">
                   {service.startingPrice}
                 </span>
               </div>
@@ -146,11 +163,13 @@ function ServiceCardMinimal({
             )}
          </div>
 
-         <div className="mt-auto pt-8 border-t border-slate-100 flex items-center justify-between">
-            <span className="text-slate-400 italic font-serif text-sm group-hover:text-slate-600 transition-colors duration-500">{service.tagline}</span>
-            <div className="inline-flex items-center gap-3 text-accent-gold text-[11px] uppercase tracking-[0.2em] font-bold group-hover:tracking-[0.25em] transition-all duration-500">
+         <div className="mt-auto pt-8 border-t border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-6">
+            <span className="text-slate-400 italic font-serif text-sm group-hover:text-slate-600 group-data-[hovered=true]:text-slate-600 transition-colors duration-500 max-w-[280px] sm:max-w-none">
+              {service.tagline}
+            </span>
+            <div className="inline-flex items-center self-end sm:self-auto gap-3 text-accent-gold text-[11px] uppercase tracking-[0.2em] font-bold group-hover:tracking-[0.25em] group-data-[hovered=true]:tracking-[0.25em] transition-all duration-500">
               <span>Explore</span>
-              <ArrowRight size={16} className="group-hover:translate-x-2 transition-transform duration-300" />
+              <ArrowRight size={16} className="group-hover:translate-x-2 group-data-[hovered=true]:translate-x-2 transition-transform duration-300" />
             </div>
          </div>
       </div>
@@ -169,6 +188,8 @@ export default function ServicesShowcase() {
   });
   const heroOpacity = useTransform(scrollYProgress, [0, 0.8], [1, 0]);
   const heroY = useTransform(scrollYProgress, [0, 1], ["0%", "30%"]);
+  
+  const isMobile = useIsMobile();
 
   const handleOpenService = (service: DetailedService) => {
     setSelectedService(service);
@@ -179,16 +200,6 @@ export default function ServicesShowcase() {
     setIsModalOpen(false);
     setTimeout(() => setSelectedService(null), 500);
   };
-
-  const [isMobile, setIsMobile] = useState(false);
-  useState(() => {
-    if (typeof window !== "undefined") {
-      const checkMobile = () => setIsMobile(window.innerWidth < 1024);
-      checkMobile();
-      window.addEventListener("resize", checkMobile);
-      return () => window.removeEventListener("resize", checkMobile);
-    }
-  });
 
   return (
     <>

@@ -140,7 +140,7 @@ export default function ServiceDetailsModal({
             animate="visible"
             exit="exit"
             onClick={(e) => e.stopPropagation()}
-            className="relative z-10 w-full max-w-5xl mx-4 max-h-[92vh] bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.1)] transition-colors duration-500"
+            className="relative z-10 w-full max-w-5xl mx-4 max-h-[90vh] bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.1)] transition-colors duration-500"
           >
             {/* Close Button */}
             <button
