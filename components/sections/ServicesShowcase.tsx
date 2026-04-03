@@ -63,105 +63,7 @@ function ScrollTicker() {
   );
 }
 
-/* ─── Variant 1: Vertical Card with Image ─── */
-function ServiceCardImage({
-  service,
-  index,
-  onClick,
-}: {
-  service: DetailedService;
-  index: number;
-  onClick: () => void;
-}) {
-  const cardRef = useRef<HTMLDivElement>(null);
-  const isInView = useInView(cardRef, { once: true, margin: "-10%" });
-
-  return (
-    <motion.div
-      ref={cardRef}
-      initial="hidden"
-      animate={isInView ? "visible" : "hidden"}
-      variants={scaleIn}
-      className="group cursor-pointer bg-white rounded-[2rem] overflow-hidden shadow-sm hover:shadow-2xl hover:shadow-black/5 border border-slate-100 transition-all duration-500 flex flex-col h-full hover:-translate-y-2"
-      onClick={onClick}
-    >
-      {/* Top: Image Area */}
-      <div className="relative w-full aspect-[4/3] sm:aspect-[3/2] lg:aspect-[4/3] overflow-hidden bg-slate-100">
-        <Image
-          src={service.coverImage}
-          alt={service.title}
-          fill
-          className="object-cover transition-transform duration-[2s] ease-[cubic-bezier(0.25,1,0.5,1)] group-hover:scale-110"
-          sizes="(max-width: 1024px) 100vw, 50vw"
-        />
-        <div className="absolute inset-0 bg-linear-to-t from-black/60 via-black/10 to-transparent opacity-60 group-hover:opacity-80 transition-opacity duration-700" />
-        
-        {/* Floating index */}
-        <div className="absolute top-6 left-6">
-          <span className="text-white/60 font-serif text-4xl sm:text-5xl font-bold leading-none drop-shadow-md select-none group-hover:text-white/80 transition-colors duration-500">
-            {String(index + 1).padStart(2, "0")}
-          </span>
-        </div>
-        
-        {/* Category Overlay */}
-        <div className="absolute bottom-6 left-8 flex items-center gap-3">
-          {service.icon && (
-            <span
-              className="material-symbols-outlined text-accent-gold text-lg drop-shadow-md"
-              style={{ fontVariationSettings: "'FILL' 0, 'wght' 200" }}
-            >
-              {service.icon}
-            </span>
-          )}
-          <span className="text-accent-gold uppercase tracking-[0.2em] text-[10px] font-bold drop-shadow-md">
-            {service.category || "Service"}
-          </span>
-        </div>
-      </div>
-
-      {/* Bottom: Content Area */}
-      <div className="relative flex flex-col flex-grow p-8 sm:p-10 transition-colors duration-500">
-         {/* Title area */}
-         <h3 className="font-serif text-3xl sm:text-4xl text-slate-900 mb-3 leading-tight transition-colors duration-500 group-hover:text-accent-gold">
-           {service.title}
-         </h3>
-         <p className="font-serif italic text-slate-500 text-sm mb-6 transition-colors duration-500">
-           {service.tagline}
-         </p>
-         
-         <div className="w-10 h-px bg-accent-gold/40 mb-6 group-hover:w-20 transition-all duration-700" />
-         
-         <p className="text-slate-600 text-sm font-light leading-relaxed mb-8 line-clamp-3 flex-grow">
-           {service.shortDescription}
-         </p>
-
-         <div className="mt-auto">
-           {/* Quick Stats & CTA Split */}
-           <div className="flex items-center justify-between border-t border-slate-100 pt-6">
-              {service.startingPrice ? (
-                <div>
-                  <span className="text-slate-400 text-[9px] uppercase tracking-widest font-bold block mb-1">
-                    {service.priceNote || "From"}
-                  </span>
-                  <span className="text-slate-800 font-serif text-xl group-hover:text-accent-gold transition-colors duration-300">
-                    {service.startingPrice}
-                  </span>
-                </div>
-              ) : (
-                <div />
-              )}
-              <div className="inline-flex items-center gap-2 text-slate-900 text-[10px] uppercase tracking-[0.2em] font-bold group-hover:text-accent-gold transition-colors duration-300">
-                  <span>Details</span>
-                  <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform duration-300" />
-              </div>
-           </div>
-         </div>
-      </div>
-    </motion.div>
-  );
-}
-
-/* ─── Variant 2: Minimal Typographic Card (No Image) ─── */
+/* ─── Minimal Typographic Card ─── */
 function ServiceCardMinimal({
   service,
   index,
@@ -180,12 +82,12 @@ function ServiceCardMinimal({
       initial="hidden"
       animate={isInView ? "visible" : "hidden"}
       variants={scaleIn}
-      className="relative group cursor-pointer bg-white rounded-[2rem] overflow-hidden shadow-[0_10px_40px_rgba(0,0,0,0.03)] hover:shadow-2xl hover:shadow-black/10 border border-slate-100 transition-all duration-700 flex flex-col h-full p-10 sm:p-14 xl:p-16 hover:-translate-y-2"
+      className="relative group cursor-pointer bg-white rounded-[1.5rem] md:rounded-[2rem] overflow-hidden shadow-[0_10px_40px_rgba(0,0,0,0.03)] hover:shadow-2xl hover:shadow-black/10 border border-slate-100 transition-all duration-700 flex flex-col h-full p-8 md:p-12 lg:p-14 xl:p-16 hover:-translate-y-2 ring-1 ring-slate-100/50"
       onClick={onClick}
     >
       {/* Background Watermark Index */}
-      <div className="absolute -bottom-10 -right-8 pointer-events-none select-none transition-transform duration-[2s] group-hover:scale-110 opacity-30 group-hover:opacity-60">
-        <span className="font-serif text-[180px] sm:text-[220px] font-bold leading-none text-slate-50 transition-colors duration-700 drop-shadow-xs">
+      <div className="absolute -bottom-6 -right-6 md:-bottom-10 md:-right-8 pointer-events-none select-none transition-transform duration-[2s] group-hover:scale-110 opacity-20 group-hover:opacity-40">
+        <span className="font-serif text-[140px] sm:text-[180px] lg:text-[220px] font-bold leading-none text-slate-100 transition-colors duration-700 drop-shadow-xs">
            {String(index + 1).padStart(2, "0")}
         </span>
       </div>
@@ -194,24 +96,24 @@ function ServiceCardMinimal({
       <div className="absolute top-0 left-0 right-0 h-1 bg-linear-to-r from-transparent via-accent-gold/10 to-transparent group-hover:via-accent-gold/40 transition-colors duration-500" />
 
       <div className="relative z-10 flex flex-col h-full">
-         <div className="flex items-center justify-between mb-10">
-            <div className="flex items-center gap-3">
+         <div className="flex items-center justify-between mb-8 md:mb-10">
+            <div className="flex items-center gap-2 md:gap-3">
               {service.icon && (
-                <span className="material-symbols-outlined text-accent-gold text-xl" style={{ fontVariationSettings: "'FILL' 0, 'wght' 200" }}>
+                <span className="material-symbols-outlined text-accent-gold text-lg md:text-xl" style={{ fontVariationSettings: "'FILL' 0, 'wght' 200" }}>
                   {service.icon}
                 </span>
               )}
-              <span className="text-accent-gold uppercase tracking-[0.2em] text-[10px] font-bold">
+              <span className="text-accent-gold uppercase tracking-[0.2em] text-[9px] md:text-[10px] font-bold">
                 {service.category || "Service"}
               </span>
             </div>
             {/* Minimal Index top right */}
-            <span className="text-slate-300 font-serif text-sm font-bold group-hover:text-accent-gold transition-colors duration-500">
+            <span className="text-slate-300 font-serif text-xs md:text-sm font-bold group-hover:text-accent-gold transition-colors duration-500">
               No. {String(index + 1).padStart(2, "0")}
             </span>
          </div>
 
-         <h3 className="font-serif text-4xl sm:text-5xl text-slate-900 mb-4 leading-tight transition-colors duration-500">
+         <h3 className="font-serif text-3xl md:text-4xl lg:text-5xl text-slate-900 mb-4 leading-tight transition-colors duration-500">
            {service.title}
          </h3>
 
@@ -221,23 +123,23 @@ function ServiceCardMinimal({
            {service.shortDescription}
          </p>
          
-         <div className="flex flex-wrap gap-x-8 gap-y-4 mb-12">
+         <div className="flex flex-wrap gap-x-6 md:gap-x-8 gap-y-4 mb-8 md:mb-12">
             {service.startingPrice && (
               <div>
-                <span className="text-slate-400 text-[10px] uppercase tracking-widest font-bold block mb-1">
+                <span className="text-slate-400 text-[9px] md:text-[10px] uppercase tracking-widest font-bold block mb-1">
                   {service.priceNote || "Investment"}
                 </span>
-                <span className="text-slate-800 font-serif text-2xl group-hover:text-accent-gold transition-colors duration-500">
+                <span className="text-slate-800 font-serif text-xl md:text-2xl group-hover:text-accent-gold transition-colors duration-500">
                   {service.startingPrice}
                 </span>
               </div>
             )}
             {service.minDuration && (
               <div>
-                <span className="text-slate-400 text-[10px] uppercase tracking-widest font-bold block mb-1">
+                <span className="text-slate-400 text-[9px] md:text-[10px] uppercase tracking-widest font-bold block mb-1">
                   Duration
                 </span>
-                <span className="text-slate-700 font-serif text-2xl transition-colors duration-500">
+                <span className="text-slate-700 font-serif text-xl md:text-2xl transition-colors duration-500">
                   {service.minDuration}
                 </span>
               </div>
@@ -278,6 +180,16 @@ export default function ServicesShowcase() {
     setTimeout(() => setSelectedService(null), 500);
   };
 
+  const [isMobile, setIsMobile] = useState(false);
+  useState(() => {
+    if (typeof window !== "undefined") {
+      const checkMobile = () => setIsMobile(window.innerWidth < 1024);
+      checkMobile();
+      window.addEventListener("resize", checkMobile);
+      return () => window.removeEventListener("resize", checkMobile);
+    }
+  });
+
   return (
     <>
       {/* ── Hero Section ── */}
@@ -299,55 +211,55 @@ export default function ServicesShowcase() {
 
         <motion.div
           style={{ opacity: heroOpacity, y: heroY }}
-          className="relative z-10 text-center px-6 max-w-4xl mx-auto"
+          className="relative z-10 text-center px-6 max-w-4xl mx-auto flex flex-col h-full w-full"
         >
-          <motion.span
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.2 }}
-            className="text-accent-gold uppercase tracking-[0.3em] text-[10px] sm:text-xs font-bold mb-6 block"
-          >
-            {servicesPageConfig.heroTagline}
-          </motion.span>
+          <div className="flex-grow flex flex-col justify-center items-center">
+            <motion.span
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.2 }}
+              className="text-accent-gold uppercase tracking-[0.3em] text-[10px] sm:text-xs font-bold mb-6 block"
+            >
+              {servicesPageConfig.heroTagline}
+            </motion.span>
 
-          <motion.h1
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1, delay: 0.4, ease: [0.25, 1, 0.5, 1] }}
-            className="font-serif text-5xl sm:text-7xl lg:text-8xl text-slate-900 leading-[1.05] mb-6 transition-colors duration-500"
-          >
-            {servicesPageConfig.heroTitle.split(" ").map((word, i, arr) =>
-              i === arr.length - 1 ? (
-                <span key={i} className="italic text-slate-400">
-                  {word}
-                </span>
-              ) : (
-                <span key={i}>{word} </span>
-              )
-            )}
-          </motion.h1>
+            <motion.h1
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 1, delay: 0.4, ease: [0.25, 1, 0.5, 1] }}
+              className="font-serif text-5xl sm:text-7xl lg:text-8xl text-slate-900 leading-[1.05] mb-6 transition-colors duration-500"
+            >
+              {servicesPageConfig.heroTitle.split(" ").map((word, i, arr) =>
+                i === arr.length - 1 ? (
+                  <span key={i} className="italic text-slate-400">{word}</span>
+                ) : (
+                  <span key={i}>{word} </span>
+                )
+              )}
+            </motion.h1>
 
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.6 }}
-            className="text-slate-600 text-sm sm:text-base max-w-lg mx-auto font-light leading-relaxed transition-colors duration-500"
-          >
-            {servicesPageConfig.heroSubtitle}
-          </motion.p>
+            <motion.p
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.6 }}
+              className="text-slate-600 text-sm sm:text-base max-w-lg mx-auto font-light leading-relaxed transition-colors duration-500"
+            >
+              {servicesPageConfig.heroSubtitle}
+            </motion.p>
+          </div>
 
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 1.2 }}
-            className="mt-16 flex flex-col items-center gap-3"
+            className="mt-auto pb-10 flex flex-col items-center gap-4"
           >
-            <span className="text-slate-500 text-[9px] uppercase tracking-[0.4em] font-bold transition-colors duration-500">
-              Explore
+            <span className="text-slate-500 text-[10px] uppercase tracking-[0.4em] font-bold transition-colors duration-500">
+              {isMobile ? "Swipe" : "Explore"}
             </span>
-            <div className="w-px h-10 bg-slate-200 relative overflow-hidden transition-colors duration-500">
+            <div className="w-px h-12 bg-slate-200 relative overflow-hidden transition-colors duration-500">
               <motion.div
-                className="absolute top-0 left-0 w-full h-1/3 bg-accent-gold/60"
+                className="absolute top-0 left-0 w-full h-1/3 bg-accent-gold"
                 animate={{ y: ["-100%", "300%"] }}
                 transition={{ repeat: Infinity, duration: 1.5, ease: "circInOut" }}
               />
@@ -359,49 +271,10 @@ export default function ServicesShowcase() {
       {/* ── Ticker ── */}
       <ScrollTicker />
 
-      {/* ── 2-Column Grid Variants for User Review ── */}
-      <div className="bg-accent-ivory pt-16 pb-10">
-        <div className="max-w-7xl mx-auto px-6 text-center">
-            <h2 className="font-sans text-xs uppercase tracking-[0.2em] font-bold text-accent-gold mb-2">Design Preview</h2>
-            <p className="text-slate-600 text-sm">Please review both layout variants sequentially below.</p>
-        </div>
-      </div>
-
-      {/* Variant 1: With Image */}
-      <section className="relative w-full bg-accent-ivory transition-colors duration-500 pb-24 border-b border-slate-200/50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="mb-16 text-center">
-             <h3 className="font-serif text-3xl text-slate-800">Variant 1: Image & Typography</h3>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12 justify-items-center">
-            {detailedServices
-              .sort((a, b) => (a.order ?? 99) - (b.order ?? 99))
-              .map((service, index, arr) => {
-                 const isOddLast = arr.length % 2 !== 0 && index === arr.length - 1;
-                 return (
-                  <div 
-                    key={`v1-${service.id}`} 
-                    className={`w-full ${isOddLast ? 'md:col-span-2 md:max-w-md lg:max-w-xl' : ''}`}
-                  >
-                    <ServiceCardImage
-                      service={service}
-                      index={index}
-                      onClick={() => handleOpenService(service)}
-                    />
-                  </div>
-                 );
-              })}
-          </div>
-        </div>
-      </section>
-
-      {/* Variant 2: Minimal Typography */}
+      {/* Our Services */}
       <section className="relative w-full bg-accent-ivory transition-colors duration-500 pt-24 pb-32">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="mb-16 text-center">
-             <h3 className="font-serif text-3xl text-slate-800">Variant 2: Pure Typography</h3>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12 justify-items-center">
+        <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-12">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-10 justify-items-center">
             {detailedServices
               .sort((a, b) => (a.order ?? 99) - (b.order ?? 99))
               .map((service, index, arr) => {
@@ -409,7 +282,7 @@ export default function ServicesShowcase() {
                  return (
                   <div 
                     key={`v2-${service.id}`} 
-                    className={`w-full ${isOddLast ? 'md:col-span-2 md:max-w-md lg:max-w-xl xl:max-w-2xl' : ''}`}
+                    className={`w-full max-w-sm md:max-w-none ${isOddLast ? 'md:col-span-2 md:max-w-lg lg:max-w-xl' : ''}`}
                   >
                     <ServiceCardMinimal
                       service={service}
