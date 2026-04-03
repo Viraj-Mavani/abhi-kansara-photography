@@ -48,7 +48,7 @@ export function Footer() {
             />
             <div className="flex flex-col gap-2 uppercase tracking-[0.15em] text-[10px] font-bold text-slate-500">
               <Link href="/about" className="hover:text-accent-gold transition-colors block">About The Artist</Link>
-              <Link href="/services" className="hover:text-accent-gold transition-colors block">Experiences</Link>
+              <Link href="/services" className="hover:text-accent-gold transition-colors block">Services</Link>
               <Link href="/#" className="hover:text-accent-gold transition-colors block">Works</Link>
               <Link href="/contact" className="hover:text-accent-gold transition-colors block">Inquire Now</Link>
             </div>
