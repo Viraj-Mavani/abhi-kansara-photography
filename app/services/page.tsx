@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 
 export default function ServicesPage() {
   return (
-    <main className="flex min-h-screen flex-col bg-[#0a0a0a] text-white selection:bg-accent-gold selection:text-black">
+    <main className="flex min-h-screen flex-col bg-accent-ivory text-black selection:bg-accent-gold selection:text-white">
       <Navigation />
       <BackButton />
       <ServicesShowcase />

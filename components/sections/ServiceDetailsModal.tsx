@@ -92,6 +92,28 @@ export default function ServiceDetailsModal({
     }
   }, [isOpen, service?.id]);
 
+  // Handle Back Button Interception
+  useEffect(() => {
+    if (!isOpen) return;
+
+    // Push state when modal opens
+    window.history.pushState({ modalOpen: true }, "");
+
+    const handlePopState = () => {
+      // If we are popping back, close the modal
+      onClose();
+    };
+
+    window.addEventListener("popstate", handlePopState);
+    return () => {
+      window.removeEventListener("popstate", handlePopState);
+      // If modal is unmounting but still has that history entry (e.g. closed via X)
+      if (window.history.state?.modalOpen) {
+        window.history.back();
+      }
+    };
+  }, [isOpen, onClose]);
+
   if (!service) return null;
 
   return (
@@ -107,8 +129,8 @@ export default function ServiceDetailsModal({
           className="fixed inset-0 z-[100] flex items-center justify-center"
           onClick={onClose}
         >
-          {/* Frosted backdrop */}
-          <div className="absolute inset-0 bg-black/80 backdrop-blur-xl" />
+          {/* Soft light backdrop */}
+          <div className="absolute inset-0 bg-white/40 backdrop-blur-md" />
 
           {/* Modal Container */}
           <motion.div
@@ -118,12 +140,12 @@ export default function ServiceDetailsModal({
             animate="visible"
             exit="exit"
             onClick={(e) => e.stopPropagation()}
-            className="relative z-10 w-full max-w-5xl mx-4 max-h-[92vh] bg-[#111111] border border-white/[0.06] rounded-2xl overflow-hidden shadow-2xl"
+            className="relative z-10 w-full max-w-5xl mx-4 max-h-[92vh] bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.1)] transition-colors duration-500"
           >
             {/* Close Button */}
             <button
               onClick={onClose}
-              className="absolute top-5 right-5 z-50 h-10 w-10 rounded-full bg-black/60 backdrop-blur-md border border-white/10 flex items-center justify-center text-white/60 hover:text-white hover:border-white/30 transition-all duration-300 hover:rotate-90"
+              className="absolute top-5 right-5 z-50 h-10 w-10 rounded-full bg-white/80 backdrop-blur-md border border-slate-200 shadow-sm flex items-center justify-center text-slate-400 hover:text-slate-900 hover:border-slate-400 transition-all duration-300 hover:rotate-90 group"
               aria-label="Close service details"
             >
               <X size={18} strokeWidth={1.5} />
@@ -145,8 +167,10 @@ export default function ServiceDetailsModal({
                   className="object-cover"
                   priority
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-[#111111] via-black/40 to-transparent" />
-                <div className="absolute inset-0 bg-gradient-to-r from-black/50 to-transparent" />
+                {/* Refined gradient for better text legibility on light theme */}
+                <div className="absolute inset-0 bg-linear-to-t from-white via-white/40 to-transparent" />
+                <div className="absolute inset-0 bg-linear-to-r from-white/60 via-transparent to-transparent" />
+                <div className="absolute inset-0 bg-black/5 mix-blend-multiply" /> {/* Subtle darkening overlay */}
 
                 {/* Hero Text */}
                 <motion.div
@@ -157,30 +181,30 @@ export default function ServiceDetailsModal({
                 >
                   <motion.span
                     variants={fadeUp}
-                    className="inline-block text-accent-gold uppercase tracking-[0.3em] text-[10px] sm:text-xs font-bold mb-3"
+                    className="inline-block text-accent-gold uppercase tracking-[0.3em] text-[10px] sm:text-xs font-bold mb-3 drop-shadow-[0_1px_2px_rgba(255,255,255,1)]"
                   >
                     {service.category || "Service"}
                   </motion.span>
                   <motion.h2
                     variants={fadeUp}
-                    className="font-serif text-4xl sm:text-5xl lg:text-6xl text-white leading-[1.1] mb-3"
+                    className="font-serif text-4xl sm:text-5xl lg:text-6xl text-slate-900 leading-[1.1] mb-3 transition-colors duration-500 drop-shadow-[0_1px_10px_rgba(255,255,255,0.8)]"
                   >
                     {service.title}
                   </motion.h2>
                   <motion.p
                     variants={fadeUp}
-                    className="text-white/50 text-sm sm:text-base max-w-xl italic font-serif"
+                    className="text-slate-600 text-sm sm:text-base max-w-xl italic font-serif transition-colors duration-500 drop-shadow-[0_1px_4px_rgba(255,255,255,0.8)]"
                   >
                     {service.tagline}
                   </motion.p>
                   {service.startingPrice && (
                     <motion.div variants={fadeUp} className="mt-4 flex items-baseline gap-2">
                       {service.priceNote && (
-                        <span className="text-white/40 text-[10px] uppercase tracking-widest font-bold">
+                        <span className="text-slate-400 text-[10px] uppercase tracking-widest font-bold font-sans transition-colors duration-500 drop-shadow-[0_1px_2px_rgba(255,255,255,1)]">
                           {service.priceNote}
                         </span>
                       )}
-                      <span className="text-accent-gold text-2xl sm:text-3xl font-serif">
+                      <span className="text-accent-gold text-2xl sm:text-3xl font-serif drop-shadow-[0_1px_2px_rgba(255,255,255,1)]">
                         {service.startingPrice}
                       </span>
                     </motion.div>
@@ -199,10 +223,10 @@ export default function ServiceDetailsModal({
                   className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16"
                 >
                   <motion.div variants={fadeUp}>
-                    <span className="text-accent-gold uppercase tracking-[0.2em] text-[10px] font-bold mb-4 block">
+                    <span className="text-accent-gold uppercase tracking-[0.2em] text-[10px] font-bold mb-4 block font-sans">
                       Overview
                     </span>
-                    <p className="text-white/70 text-sm sm:text-base leading-relaxed font-light">
+                    <p className="text-slate-600 text-sm sm:text-base leading-relaxed font-light transition-colors duration-500">
                       {service.detailedDescription}
                     </p>
 
@@ -212,10 +236,10 @@ export default function ServiceDetailsModal({
                         {service.highlights.map((h, i) => (
                           <div
                             key={i}
-                            className="flex items-center gap-3 bg-white/[0.03] border border-white/[0.06] rounded-lg px-4 py-3"
+                            className="flex items-center gap-3 bg-slate-50 border border-slate-100 rounded-lg px-4 py-3 transition-colors duration-500"
                           >
                             <div className="h-2 w-2 rounded-full bg-accent-gold shrink-0" />
-                            <span className="text-white/80 text-xs font-medium">{h}</span>
+                            <span className="text-slate-700 text-xs font-medium transition-colors duration-500">{h}</span>
                           </div>
                         ))}
                       </div>
@@ -223,7 +247,7 @@ export default function ServiceDetailsModal({
                   </motion.div>
 
                   <motion.div variants={fadeUp}>
-                    <span className="text-accent-gold uppercase tracking-[0.2em] text-[10px] font-bold mb-4 block">
+                    <span className="text-accent-gold uppercase tracking-[0.2em] text-[10px] font-bold mb-4 block font-sans">
                       What's Included
                     </span>
                     <ul className="space-y-3">
@@ -236,10 +260,10 @@ export default function ServiceDetailsModal({
                           transition={{ delay: i * 0.05 }}
                           className="flex items-start gap-3 group"
                         >
-                          <div className="mt-1 h-5 w-5 rounded-full border border-accent-gold/30 flex items-center justify-center group-hover:bg-accent-gold/20 transition-colors duration-300 shrink-0">
+                          <div className="mt-1 h-5 w-5 rounded-full border border-accent-gold/20 flex items-center justify-center group-hover:bg-accent-gold/10 transition-colors duration-300 shrink-0">
                             <Check size={10} className="text-accent-gold" strokeWidth={2.5} />
                           </div>
-                          <span className="text-white/70 text-sm font-light">{f}</span>
+                          <span className="text-slate-600 text-sm font-light transition-colors duration-500">{f}</span>
                         </motion.li>
                       ))}
                     </ul>
@@ -255,11 +279,11 @@ export default function ServiceDetailsModal({
                     viewport={{ once: true, margin: "-50px" }}
                   >
                     <motion.div variants={fadeUp} className="mb-10">
-                      <span className="text-accent-gold uppercase tracking-[0.2em] text-[10px] font-bold mb-3 block">
+                      <span className="text-accent-gold uppercase tracking-[0.2em] text-[10px] font-bold mb-3 block font-sans">
                         Packages
                       </span>
-                      <h3 className="font-serif text-3xl sm:text-4xl text-white">
-                        Choose Your <span className="italic text-white/50">Experience</span>
+                      <h3 className="font-serif text-3xl sm:text-4xl text-slate-900 transition-colors duration-500">
+                        Choose Your <span className="italic text-slate-500">Experience</span>
                       </h3>
                     </motion.div>
 
@@ -268,11 +292,11 @@ export default function ServiceDetailsModal({
                         <motion.div
                           key={pkg.name}
                           variants={fadeUp}
-                          className={`relative p-6 sm:p-8 rounded-xl border transition-all duration-500 group hover:border-accent-gold/40
+                          className={`relative p-6 sm:p-8 rounded-xl border transition-all duration-500 group hover:border-accent-gold/40 shadow-sm hover:shadow-md
                             ${
                               pkg.isPopular
-                                ? "bg-accent-gold/[0.04] border-accent-gold/20"
-                                : "bg-white/[0.02] border-white/[0.06]"
+                                ? "bg-accent-gold/2 border-accent-gold/30"
+                                : "bg-slate-50/50 border-slate-100"
                             }
                           `}
                         >
@@ -282,9 +306,9 @@ export default function ServiceDetailsModal({
                             </div>
                           )}
                           <div className="mb-6">
-                            <h4 className="text-white text-lg font-medium mb-1">{pkg.name}</h4>
+                            <h4 className="text-slate-900 text-lg font-medium mb-1 transition-colors duration-500">{pkg.name}</h4>
                             {pkg.duration && (
-                              <span className="text-white/30 text-xs uppercase tracking-widest font-bold">
+                              <span className="text-slate-500 text-xs uppercase tracking-widest font-bold font-sans transition-colors duration-500">
                                 {pkg.duration}
                               </span>
                             )}
@@ -297,18 +321,18 @@ export default function ServiceDetailsModal({
                             </div>
                           )}
                           {pkg.priceNote && (
-                            <span className="text-white/30 text-[10px] uppercase tracking-widest font-bold block mb-4">
+                            <span className="text-slate-500 text-[10px] uppercase tracking-widest font-bold block mb-4 font-sans transition-colors duration-500">
                               {pkg.priceNote}
                             </span>
                           )}
                           {pkg.description && (
-                            <p className="text-white/40 text-xs mb-6 font-light leading-relaxed">
+                            <p className="text-slate-600 text-xs mb-6 font-light leading-relaxed transition-colors duration-500">
                               {pkg.description}
                             </p>
                           )}
                           <ul className="space-y-2.5">
                             {pkg.deliverables.map((d, j) => (
-                              <li key={j} className="flex items-start gap-2.5 text-white/60 text-xs">
+                              <li key={j} className="flex items-start gap-2.5 text-slate-600 text-xs transition-colors duration-500">
                                 <Check
                                   size={12}
                                   className="text-accent-gold shrink-0 mt-0.5"
@@ -317,7 +341,7 @@ export default function ServiceDetailsModal({
                                 <span>
                                   {d.item}
                                   {d.detail && (
-                                    <span className="text-white/30 ml-1">— {d.detail}</span>
+                                    <span className="text-slate-500 ml-1 transition-colors duration-500">— {d.detail}</span>
                                   )}
                                 </span>
                               </li>
@@ -329,17 +353,17 @@ export default function ServiceDetailsModal({
 
                     {/* Add-Ons */}
                     {service.addOns && service.addOns.length > 0 && (
-                      <motion.div variants={fadeUp} className="mt-8">
-                        <span className="text-white/30 text-[10px] uppercase tracking-[0.2em] font-bold mb-4 block">
+                      <motion.div variants={fadeUp} className="mt-12">
+                        <span className="text-slate-400 text-[10px] uppercase tracking-[0.2em] font-bold mb-4 block font-sans transition-colors duration-500">
                           Available Add-Ons
                         </span>
                         <div className="flex flex-wrap gap-3">
                           {service.addOns.map((a, i) => (
                             <div
                               key={i}
-                              className="flex items-center gap-3 bg-white/[0.03] border border-white/[0.06] rounded-full px-5 py-2.5 hover:border-accent-gold/30 transition-colors duration-300"
+                              className="flex items-center gap-3 bg-white border border-slate-100 rounded-full px-5 py-2.5 hover:border-accent-gold/40 hover:shadow-sm transition-all duration-300"
                             >
-                              <span className="text-white/60 text-xs font-medium">{a.name}</span>
+                              <span className="text-slate-600 text-xs font-medium transition-colors duration-500">{a.name}</span>
                               {a.price && (
                                 <span className="text-accent-gold text-xs font-medium">
                                   +{a.price}
@@ -362,11 +386,11 @@ export default function ServiceDetailsModal({
                     viewport={{ once: true, margin: "-50px" }}
                   >
                     <motion.div variants={fadeUp} className="mb-10">
-                      <span className="text-accent-gold uppercase tracking-[0.2em] text-[10px] font-bold mb-3 block">
+                      <span className="text-accent-gold uppercase tracking-[0.2em] text-[10px] font-bold mb-3 block font-sans">
                         The Journey
                       </span>
-                      <h3 className="font-serif text-3xl sm:text-4xl text-white">
-                        How It <span className="italic text-white/50">Works</span>
+                      <h3 className="font-serif text-3xl sm:text-4xl text-slate-900 transition-colors duration-500">
+                        How It <span className="italic text-slate-500 transition-colors duration-500">Works</span>
                       </h3>
                     </motion.div>
 
@@ -383,7 +407,7 @@ export default function ServiceDetailsModal({
                           >
                             {/* Step circle */}
                             <div className="relative shrink-0">
-                              <div className="h-10 w-10 rounded-full border border-accent-gold/30 bg-[#111111] flex items-center justify-center group-hover:border-accent-gold group-hover:bg-accent-gold/10 transition-all duration-500">
+                              <div className="h-10 w-10 rounded-full border border-accent-gold/20 bg-white flex items-center justify-center group-hover:border-accent-gold group-hover:bg-accent-gold/5 transition-all duration-500 shadow-sm">
                                 {step.icon ? (
                                   <span className="material-symbols-outlined text-accent-gold text-lg" style={{ fontVariationSettings: "'FILL' 0, 'wght' 300" }}>
                                     {step.icon}
@@ -396,10 +420,10 @@ export default function ServiceDetailsModal({
                               </div>
                             </div>
                             <div className="-mt-0.5">
-                              <h4 className="text-white text-base sm:text-lg font-medium mb-1 group-hover:text-accent-gold transition-colors duration-300">
+                              <h4 className="text-slate-900 text-base sm:text-lg font-medium mb-1 group-hover:text-accent-gold transition-colors duration-300">
                                 {step.title}
                               </h4>
-                              <p className="text-white/40 text-xs sm:text-sm font-light leading-relaxed max-w-md">
+                              <p className="text-slate-600 text-xs sm:text-sm font-light leading-relaxed max-w-md transition-colors duration-500">
                                 {step.description}
                               </p>
                             </div>
@@ -419,11 +443,11 @@ export default function ServiceDetailsModal({
                     viewport={{ once: true, margin: "-50px" }}
                   >
                     <motion.div variants={fadeUp} className="mb-8">
-                      <span className="text-accent-gold uppercase tracking-[0.2em] text-[10px] font-bold mb-3 block">
+                      <span className="text-accent-gold uppercase tracking-[0.2em] text-[10px] font-bold mb-3 block font-sans">
                         Gallery
                       </span>
-                      <h3 className="font-serif text-3xl sm:text-4xl text-white">
-                        Recent <span className="italic text-white/50">Work</span>
+                      <h3 className="font-serif text-3xl sm:text-4xl text-slate-900 transition-colors duration-500">
+                        Recent <span className="italic text-slate-500 transition-colors duration-500">Work</span>
                       </h3>
                     </motion.div>
 
@@ -457,11 +481,11 @@ export default function ServiceDetailsModal({
                     viewport={{ once: true, margin: "-50px" }}
                   >
                     <motion.div variants={fadeUp} className="mb-8">
-                      <span className="text-accent-gold uppercase tracking-[0.2em] text-[10px] font-bold mb-3 block">
+                      <span className="text-accent-gold uppercase tracking-[0.2em] text-[10px] font-bold mb-3 block font-sans">
                         Kind Words
                       </span>
-                      <h3 className="font-serif text-3xl sm:text-4xl text-white">
-                        Client <span className="italic text-white/50">Love</span>
+                      <h3 className="font-serif text-3xl sm:text-4xl text-slate-900 transition-colors duration-500">
+                        Client <span className="italic text-slate-500 transition-colors duration-500">Love</span>
                       </h3>
                     </motion.div>
 
@@ -470,7 +494,7 @@ export default function ServiceDetailsModal({
                         <motion.div
                           key={i}
                           variants={fadeUp}
-                          className="p-6 sm:p-8 bg-white/[0.02] border border-white/[0.06] rounded-xl"
+                          className="p-6 sm:p-8 bg-slate-50/50 border border-slate-100 rounded-xl hover:bg-slate-50 transition-colors duration-500"
                         >
                           {t.rating && (
                             <div className="flex gap-1 mb-4">
@@ -483,15 +507,15 @@ export default function ServiceDetailsModal({
                               ))}
                             </div>
                           )}
-                          <p className="text-white/60 text-sm font-light leading-relaxed italic mb-4">
+                          <p className="text-slate-600 text-sm font-light leading-relaxed italic mb-4 transition-colors duration-500">
                             &ldquo;{t.quote}&rdquo;
                           </p>
                           <div>
-                            <span className="text-white text-sm font-medium">
+                            <span className="text-slate-900 text-sm font-medium transition-colors duration-500">
                               {t.clientName}
                             </span>
                             {t.event && (
-                              <span className="text-white/30 text-xs ml-2">{t.event}</span>
+                              <span className="text-slate-500 text-xs ml-2 transition-colors duration-500">{t.event}</span>
                             )}
                           </div>
                         </motion.div>
@@ -509,11 +533,11 @@ export default function ServiceDetailsModal({
                     viewport={{ once: true, margin: "-50px" }}
                   >
                     <motion.div variants={fadeUp} className="mb-8">
-                      <span className="text-accent-gold uppercase tracking-[0.2em] text-[10px] font-bold mb-3 block">
+                      <span className="text-accent-gold uppercase tracking-[0.2em] text-[10px] font-bold mb-3 block font-sans">
                         FAQ
                       </span>
-                      <h3 className="font-serif text-3xl sm:text-4xl text-white">
-                        Common <span className="italic text-white/50">Questions</span>
+                      <h3 className="font-serif text-3xl sm:text-4xl text-slate-900 transition-colors duration-500">
+                        Common <span className="italic text-slate-500 transition-colors duration-500">Questions</span>
                       </h3>
                     </motion.div>
 
@@ -522,13 +546,13 @@ export default function ServiceDetailsModal({
                         <motion.div
                           key={i}
                           variants={fadeUp}
-                          className="border border-white/[0.06] rounded-lg overflow-hidden"
+                          className="border border-slate-100 bg-white rounded-lg overflow-hidden mb-2 shadow-sm transition-colors duration-500"
                         >
                           <button
                             onClick={() => faqAccordion.toggle(i)}
-                            className="w-full flex items-center justify-between px-6 py-4 text-left hover:bg-white/[0.02] transition-colors duration-300"
+                            className="w-full flex items-center justify-between px-6 py-4 text-left hover:bg-slate-50 transition-colors duration-300"
                           >
-                            <span className="text-white/80 text-sm font-medium pr-4">
+                            <span className="text-slate-800 text-sm font-medium pr-4 transition-colors duration-500">
                               {faq.question}
                             </span>
                             <motion.div
@@ -537,7 +561,7 @@ export default function ServiceDetailsModal({
                             >
                               <ChevronDown
                                 size={16}
-                                className="text-accent-gold shrink-0"
+                                className="text-accent-gold shrink-0 transition-colors duration-500"
                                 strokeWidth={1.5}
                               />
                             </motion.div>
@@ -552,7 +576,7 @@ export default function ServiceDetailsModal({
                                 transition={{ duration: 0.3, ease: [0.25, 1, 0.5, 1] }}
                                 className="overflow-hidden"
                               >
-                                <div className="px-6 pb-5 text-white/40 text-sm font-light leading-relaxed">
+                                <div className="px-6 pb-5 text-slate-500 text-sm font-light leading-relaxed transition-colors duration-500">
                                   {faq.answer}
                                 </div>
                               </motion.div>
@@ -572,12 +596,12 @@ export default function ServiceDetailsModal({
                   viewport={{ once: true }}
                   className="text-center py-8"
                 >
-                  <p className="text-white/30 text-sm mb-6 font-light">
+                  <p className="text-slate-500 text-sm mb-6 font-light transition-colors duration-500">
                     Ready to create something beautiful?
                   </p>
                   <Link
                     href="/contact"
-                    className="inline-flex items-center gap-3 px-8 py-4 bg-accent-gold text-black text-xs uppercase tracking-[0.2em] font-bold rounded-full hover:bg-white transition-all duration-500 group"
+                    className="inline-flex items-center gap-3 px-8 py-4 bg-black text-white text-xs uppercase tracking-[0.2em] font-bold rounded-full hover:bg-accent-gold transition-all duration-500 shadow-xl shadow-black/10 hover:shadow-accent-gold/20 group"
                   >
                     Book This Experience
                     <ArrowRight
