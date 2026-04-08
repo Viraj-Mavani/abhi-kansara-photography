@@ -41,7 +41,10 @@ export default function MediaViewer({
 	onShare,
 	galleryName,
 }: MediaViewerProps) {
-	const [currentIndex, setCurrentIndex] = useState(initialIndex);
+	const [[page, direction], setPage] = useState([initialIndex, 0]);
+	const [isNavigating, setIsNavigating] = useState(false);
+	const [isClosing, setIsClosing] = useState(false);
+
 	const [isFullscreen, setIsFullscreen] = useState(false);
 	const [isSlideshow, setIsSlideshow] = useState(false);
 	const [showControls, setShowControls] = useState(true);
@@ -57,13 +60,16 @@ export default function MediaViewer({
 	const controlsTimerRef = useRef<ReturnType<typeof setTimeout>>(undefined);
 	const slideshowTimerRef = useRef<ReturnType<typeof setTimeout>>(undefined);
 
+	const currentIndex = page;
 	const currentItem = items[currentIndex];
 	const isVideo = currentItem?.type === "video";
 
 	// Reset index when opening
 	useEffect(() => {
 		if (isOpen) {
-			setCurrentIndex(initialIndex);
+			setPage([initialIndex, 0]);
+			setIsNavigating(false);
+			setIsClosing(false);
 			setShowControls(true);
 		}
 	}, [isOpen, initialIndex]);
@@ -138,7 +144,7 @@ export default function MediaViewer({
 					goNext();
 					break;
 				case "Escape":
-					onClose();
+					handleClose();
 					break;
 				case " ":
 					e.preventDefault();
@@ -172,12 +178,21 @@ export default function MediaViewer({
 	};
 
 	const goNext = useCallback(() => {
-		setCurrentIndex((i) => (i + 1) % items.length);
-	}, [items.length]);
+		setIsNavigating(true);
+		setPage([ (currentIndex + 1) % items.length, 1]);
+	}, [currentIndex, items.length]);
 
 	const goPrev = useCallback(() => {
-		setCurrentIndex((i) => (i - 1 + items.length) % items.length);
-	}, [items.length]);
+		setIsNavigating(true);
+		setPage([ (currentIndex - 1 + items.length) % items.length, -1]);
+	}, [currentIndex, items.length]);
+
+	const handleClose = () => {
+		setIsClosing(true);
+		// Delay to allow exit animation to begin if needed, 
+		// but onClose usually triggers unmount immediately via parent isOpen
+		onClose();
+	};
 
 	const toggleVideoPlay = () => {
 		if (!videoRef.current) return;
@@ -243,6 +258,35 @@ export default function MediaViewer({
 		return `${m}:${sec.toString().padStart(2, "0")}`;
 	};
 
+	// Variants for the directional carousel
+	const variants = {
+		enter: (direction: number) => ({
+			x: direction > 0 ? "20%" : direction < 0 ? "-20%" : 0,
+			opacity: 0,
+			scale: isNavigating ? 1 : 0.9,
+		}),
+		center: {
+			x: 0,
+			opacity: 1,
+			scale: 1,
+			transition: {
+				duration: 0.6,
+				ease: [0.16, 1, 0.3, 1],
+				opacity: { duration: 0.4 },
+				scale: { duration: 0.5 },
+			},
+		},
+		exit: (direction: number) => ({
+			x: direction > 0 ? "-20%" : direction < 0 ? "20%" : 0,
+			opacity: 0,
+			scale: 1,
+			transition: {
+				duration: 0.4,
+				ease: [0.4, 0, 0.2, 1],
+			},
+		}),
+	};
+
 	if (!isOpen || !currentItem) return null;
 
 	return (
@@ -253,8 +297,8 @@ export default function MediaViewer({
 					initial={{ opacity: 0 }}
 					animate={{ opacity: 1 }}
 					exit={{ opacity: 0 }}
-					transition={{ duration: 0.35 }}
-					className="fixed inset-0 z-[100] bg-black/95 backdrop-blur-2xl flex flex-col select-none"
+					transition={{ duration: 0.4 }}
+					className="fixed inset-0 z-[100] bg-black/95 backdrop-blur-22xl flex flex-col select-none"
 					onMouseMove={resetControlsTimer}
 					onClick={(e) => {
 						if (e.target === e.currentTarget) resetControlsTimer();
@@ -309,7 +353,7 @@ export default function MediaViewer({
 								)}
 							</button>
 							<button
-								onClick={onClose}
+								onClick={handleClose}
 								className="h-10 w-10 rounded-full bg-white/10 backdrop-blur-sm border border-white/10 flex items-center justify-center text-white/70 hover:text-white hover:border-white/30 transition-all duration-300"
 								title="Close"
 							>
@@ -319,7 +363,7 @@ export default function MediaViewer({
 					</motion.div>
 
 					{/* ── Main Content ── */}
-					<div className="flex-1 flex items-center justify-center relative px-4 sm:px-20">
+					<div className="flex-1 flex items-center justify-center relative px-2 sm:px-20 overflow-hidden">
 						{/* Prev Arrow */}
 						<motion.button
 							initial={false}
@@ -328,79 +372,85 @@ export default function MediaViewer({
 								e.stopPropagation();
 								goPrev();
 							}}
-							className="absolute left-2 sm:left-6 z-10 h-12 w-12 sm:h-14 sm:w-14 rounded-full bg-white/5 backdrop-blur-sm border border-white/10 flex items-center justify-center text-white/60 hover:text-white hover:bg-white/15 hover:border-white/20 transition-all duration-300"
+							className="absolute left-2 sm:left-6 z-20 h-12 w-12 sm:h-14 sm:w-14 rounded-full bg-white/5 backdrop-blur-sm border border-white/10 flex items-center justify-center text-white/60 hover:text-white hover:bg-white/15 hover:border-white/20 transition-all duration-300"
 						>
 							<ChevronLeft className="h-6 w-6" />
 						</motion.button>
 
-						{/* Media */}
-						<AnimatePresence mode="wait">
-							<motion.div
-								key={currentItem.id}
-								initial={{ opacity: 0, scale: 0.95 }}
-								animate={{ opacity: 1, scale: 1 }}
-								exit={{ opacity: 0, scale: 0.95 }}
-								transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-								className="relative w-full h-full flex items-center justify-center"
-							>
-								{isVideo ? (
-									<div className="relative max-w-full max-h-full flex items-center justify-center">
-										<video
-											ref={videoRef}
-											src={currentItem.url}
-											poster={currentItem.posterUrl}
-											className="max-h-[80vh] max-w-full rounded-sm object-contain"
-											loop
-											playsInline
-											muted={isMuted}
-											onClick={toggleVideoPlay}
-											onTimeUpdate={() => {
-												if (videoRef.current) {
-													setVideoProgress(videoRef.current.currentTime);
-												}
+						{/* Media Container with Directional Carousel */}
+						<div className="relative w-full h-full flex items-center justify-center">
+							<AnimatePresence mode="popLayout" custom={direction}>
+								<motion.div
+									key={currentIndex}
+									custom={direction}
+									variants={variants}
+									initial="enter"
+									animate="center"
+									exit="exit"
+									className="absolute inset-0 flex items-center justify-center"
+								>
+									{isVideo ? (
+										<div className="relative max-w-full max-h-full flex items-center justify-center">
+											<video
+												ref={videoRef}
+												src={currentItem.url}
+												poster={currentItem.posterUrl}
+												className="max-h-[80vh] max-w-full rounded-sm object-contain"
+												loop
+												playsInline
+												muted={isMuted}
+												onClick={toggleVideoPlay}
+												onTimeUpdate={() => {
+													if (videoRef.current) {
+														setVideoProgress(videoRef.current.currentTime);
+													}
+												}}
+												onLoadedMetadata={() => {
+													if (videoRef.current) {
+														setVideoDuration(videoRef.current.duration);
+													}
+												}}
+											/>
+											{/* Play/Pause overlay for video */}
+											<AnimatePresence>
+												{!isVideoPlaying && (
+													<motion.button
+														initial={{ opacity: 0, scale: 0.8 }}
+														animate={{ opacity: 1, scale: 1 }}
+														exit={{ opacity: 0, scale: 0.8 }}
+														onClick={toggleVideoPlay}
+														className="absolute inset-0 flex items-center justify-center"
+													>
+														<div className="h-20 w-20 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center transition-all duration-500 hover:bg-accent-gold hover:border-accent-gold hover:scale-110">
+															<Play className="h-8 w-8 text-white fill-white ml-1" />
+														</div>
+													</motion.button>
+												)}
+											</AnimatePresence>
+										</div>
+									) : (
+										<motion.div
+											layoutId={!isNavigating && !isClosing ? `media-${currentItem.id}` : undefined}
+											className="relative max-h-[85vh] max-w-full"
+											transition={{
+												duration: 0.6,
+												ease: [0.16, 1, 0.3, 1],
 											}}
-											onLoadedMetadata={() => {
-												if (videoRef.current) {
-													setVideoDuration(videoRef.current.duration);
-												}
-											}}
-										/>
-										{/* Play/Pause overlay for video */}
-										<AnimatePresence>
-											{!isVideoPlaying && (
-												<motion.button
-													initial={{ opacity: 0, scale: 0.8 }}
-													animate={{ opacity: 1, scale: 1 }}
-													exit={{ opacity: 0, scale: 0.8 }}
-													onClick={toggleVideoPlay}
-													className="absolute inset-0 flex items-center justify-center"
-												>
-													<div className="h-20 w-20 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center transition-all duration-500 hover:bg-accent-gold hover:border-accent-gold hover:scale-110">
-														<Play className="h-8 w-8 text-white fill-white ml-1" />
-													</div>
-												</motion.button>
-											)}
-										</AnimatePresence>
-									</div>
-								) : (
-									<motion.div
-										layoutId={`media-${currentItem.id}`}
-										className="relative max-h-[85vh] max-w-full"
-										transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-									>
-										<Image
-											src={currentItem.url}
-											alt={currentItem.alt || ""}
-											width={currentItem.width}
-											height={currentItem.height}
-											className="max-h-[85vh] w-auto object-contain rounded-sm"
-											quality={90}
-											priority
-										/>
-									</motion.div>
-								)}
-							</motion.div>
-						</AnimatePresence>
+										>
+											<Image
+												src={currentItem.url}
+												alt={currentItem.alt || ""}
+												width={currentItem.width}
+												height={currentItem.height}
+												className="max-h-[85vh] w-auto object-contain rounded-sm"
+												quality={90}
+												priority
+											/>
+										</motion.div>
+									)}
+								</motion.div>
+							</AnimatePresence>
+						</div>
 
 						{/* Next Arrow */}
 						<motion.button
@@ -410,7 +460,7 @@ export default function MediaViewer({
 								e.stopPropagation();
 								goNext();
 							}}
-							className="absolute right-2 sm:right-6 z-10 h-12 w-12 sm:h-14 sm:w-14 rounded-full bg-white/5 backdrop-blur-sm border border-white/10 flex items-center justify-center text-white/60 hover:text-white hover:bg-white/15 hover:border-white/20 transition-all duration-300"
+							className="absolute right-2 sm:right-6 z-20 h-12 w-12 sm:h-14 sm:w-14 rounded-full bg-white/5 backdrop-blur-sm border border-white/10 flex items-center justify-center text-white/60 hover:text-white hover:bg-white/15 hover:border-white/20 transition-all duration-300"
 						>
 							<ChevronRight className="h-6 w-6" />
 						</motion.button>
