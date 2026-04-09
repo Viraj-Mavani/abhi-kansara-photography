@@ -1,0 +1,6 @@
+@AbhiKansara.API_HostAddress = http://localhost:5027
+
+GET {{AbhiKansara.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
