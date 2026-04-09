@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("AbhiKansara.Infrastructure")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+84efac54afb275390a9a2391eeb24f6dcb9edf2d")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+f18adca39673c483e9b8efa786124a9af1245a14")]
 [assembly: System.Reflection.AssemblyProductAttribute("AbhiKansara.Infrastructure")]
 [assembly: System.Reflection.AssemblyTitleAttribute("AbhiKansara.Infrastructure")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
