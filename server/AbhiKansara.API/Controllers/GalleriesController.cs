@@ -87,4 +87,68 @@ public class GalleriesController : ControllerBase
 
         return Ok(categories);
     }
+
+    /// <summary>
+    /// POST /api/galleries
+    /// Creates a new gallery and its media items.
+    /// </summary>
+    [HttpPost]
+    [Microsoft.AspNetCore.Authorization.Authorize(Roles = "Admin")]
+    public async Task<IActionResult> Create([FromBody] AbhiKansara.Core.Entities.ProjectGallery gallery)
+    {
+        _context.ProjectGalleries.Add(gallery);
+        await _context.SaveChangesAsync();
+        return CreatedAtAction(nameof(GetBySlug), new { slug = gallery.Slug }, gallery);
+    }
+
+    /// <summary>
+    /// PUT /api/galleries/{id}
+    /// Full replace of a gallery and its media items.
+    /// </summary>
+    [HttpPut("{id}")]
+    [Microsoft.AspNetCore.Authorization.Authorize(Roles = "Admin")]
+    public async Task<IActionResult> Update(Guid id, [FromBody] AbhiKansara.Core.Entities.ProjectGallery updatedGallery)
+    {
+        if (id != updatedGallery.Id) return BadRequest(new { message = "ID mismatch." });
+
+        var existingGallery = await _context.ProjectGalleries
+            .Include(g => g.Media)
+            .FirstOrDefaultAsync(g => g.Id == id);
+
+        if (existingGallery == null) return NotFound();
+
+        // Remove existing media and replace with incoming media
+        _context.RemoveRange(existingGallery.Media);
+        _context.Entry(existingGallery).CurrentValues.SetValues(updatedGallery);
+        existingGallery.Media = updatedGallery.Media;
+
+        try
+        {
+            await _context.SaveChangesAsync();
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            if (!await _context.ProjectGalleries.AnyAsync(e => e.Id == id)) return NotFound();
+            throw;
+        }
+
+        return NoContent();
+    }
+
+    /// <summary>
+    /// DELETE /api/galleries/{id}
+    /// Deletes a gallery (cascade deletes media).
+    /// </summary>
+    [HttpDelete("{id}")]
+    [Microsoft.AspNetCore.Authorization.Authorize(Roles = "Admin")]
+    public async Task<IActionResult> Delete(Guid id)
+    {
+        var gallery = await _context.ProjectGalleries.FindAsync(id);
+        if (gallery == null) return NotFound();
+
+        _context.ProjectGalleries.Remove(gallery);
+        await _context.SaveChangesAsync();
+
+        return NoContent();
+    }
 }

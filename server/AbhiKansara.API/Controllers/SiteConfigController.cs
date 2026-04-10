@@ -68,4 +68,54 @@ public class SiteConfigController : ControllerBase
 
         return Ok(configs);
     }
+
+    /// <summary>
+    /// PUT /api/siteconfig/bio/{id}
+    /// Updates the site bio.
+    /// </summary>
+    [HttpPut("bio/{id}")]
+    [Microsoft.AspNetCore.Authorization.Authorize(Roles = "Admin")]
+    public async Task<IActionResult> UpdateBio(Guid id, [FromBody] AbhiKansara.Core.Entities.SiteBio updatedBio)
+    {
+        if (id != updatedBio.Id) return BadRequest(new { message = "ID mismatch." });
+
+        _context.Entry(updatedBio).State = EntityState.Modified;
+
+        try
+        {
+            await _context.SaveChangesAsync();
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            if (!await _context.SiteBios.AnyAsync(e => e.Id == id)) return NotFound();
+            throw;
+        }
+
+        return NoContent();
+    }
+
+    /// <summary>
+    /// PUT /api/siteconfig/page/{id}
+    /// Updates a specific page configuration.
+    /// </summary>
+    [HttpPut("page/{id}")]
+    [Microsoft.AspNetCore.Authorization.Authorize(Roles = "Admin")]
+    public async Task<IActionResult> UpdatePageConfig(Guid id, [FromBody] AbhiKansara.Core.Entities.PageConfig updatedConfig)
+    {
+        if (id != updatedConfig.Id) return BadRequest(new { message = "ID mismatch." });
+
+        _context.Entry(updatedConfig).State = EntityState.Modified;
+
+        try
+        {
+            await _context.SaveChangesAsync();
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            if (!await _context.PageConfigs.AnyAsync(e => e.Id == id)) return NotFound();
+            throw;
+        }
+
+        return NoContent();
+    }
 }
