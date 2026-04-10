@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import type { Gallery, GalleryCategory } from "@/lib/portfolio";
+import type { Gallery, GalleryCategory } from "@/lib/api";
 import GalleryCard from "./GalleryCard";
 
 // ─────────────────────────────────────────────────────────

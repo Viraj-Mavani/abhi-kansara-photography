@@ -16,7 +16,7 @@ import {
 	Volume2,
 	VolumeX,
 } from "lucide-react";
-import type { MediaItem } from "@/lib/portfolio";
+import type { MediaItem } from "@/lib/api";
 import { cn } from "@/lib/utils";
 import { useOverlay } from "@/hooks/useOverlay";
 
@@ -66,7 +66,7 @@ export default function MediaViewer({
 
 	const currentIndex = page;
 	const currentItem = items[currentIndex];
-	const isVideo = currentItem?.type === "video";
+	const isVideo = currentItem?.type?.toLowerCase() === "video";
 
 	// Reset index when opening
 	useEffect(() => {

@@ -1,7 +1,121 @@
-import type { DetailedService } from './services';
-import type { Gallery } from './portfolio';
+// ─────────────────────────────────────────────────────────
+//  Type Definitions — Services Domain
+// ─────────────────────────────────────────────────────────
 
-export type { DetailedService, Gallery };
+export interface ServiceDeliverable {
+  item: string;
+  detail?: string;
+}
+
+export interface ServicePackage {
+  id?: string;
+  name: string;
+  price?: string;
+  priceNote?: string;
+  duration?: string;
+  description?: string;
+  deliverables: ServiceDeliverable[];
+  isPopular?: boolean;
+}
+
+export interface ServiceFAQ {
+  id?: string;
+  question: string;
+  answer: string;
+}
+
+export interface ServiceProcess {
+  id?: string;
+  stepNumber: number;
+  title: string;
+  description: string;
+  icon?: string;
+}
+
+export interface ServiceTestimonial {
+  id?: string;
+  clientName: string;
+  event?: string;
+  quote: string;
+  rating?: number;
+  avatar?: string;
+}
+
+export interface ServiceAddOn {
+  id?: string;
+  name: string;
+  price?: string;
+  description?: string;
+}
+
+export interface DetailedService {
+  id: string;
+  slug: string;
+  title: string;
+  tagline: string;
+  coverImage: string;
+  icon?: string;
+  shortDescription: string;
+  detailedDescription: string;
+  startingPrice?: string;
+  priceNote?: string;
+  packages: ServicePackage[];
+  addOns?: ServiceAddOn[];
+  features: string[];
+  highlights?: string[];
+  process?: ServiceProcess[];
+  testimonials?: ServiceTestimonial[];
+  faqs: ServiceFAQ[];
+  galleryImages: string[];
+  category?: string;
+  tags?: string[];
+  minDuration?: string;
+  maxCapacity?: string;
+  travelAvailable?: boolean;
+  indoorOutdoor?: string;
+  order?: number;
+  isFeatured?: boolean;
+}
+
+// ─────────────────────────────────────────────────────────
+//  Type Definitions — Portfolio Domain
+// ─────────────────────────────────────────────────────────
+
+export type GalleryCategory =
+  | "Wedding"
+  | "Pre-Wedding"
+  | "Baby Shower"
+  | "Event"
+  | "Product"
+  | "Editorial"
+  | "Portrait";
+
+export interface MediaItem {
+  id: string;
+  type: "photo" | "video";
+  url: string;
+  width: number;
+  height: number;
+  alt?: string;
+  posterUrl?: string;
+  hlsUrl?: string;
+  duration?: string;
+}
+
+export interface Gallery {
+  id: string;
+  slug: string;
+  clientName: string;
+  category: GalleryCategory;
+  coverPhotoUrl: string;
+  shootDate?: string;
+  location?: string;
+  description?: string;
+  media: MediaItem[];
+  isFeatured?: boolean;
+  order?: number;
+}
+
 
 // Base API URL with fallback for local dev
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5027/api';

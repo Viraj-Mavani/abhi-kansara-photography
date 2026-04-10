@@ -3,12 +3,13 @@ import { notFound } from "next/navigation";
 import Navigation from "@/components/Navigation";
 import BackButton from "@/components/BackButton";
 import { Footer } from "@/components/Footer";
-import { getGalleryBySlug, getAllGallerySlugs } from "@/lib/portfolio";
+import { getGalleryBySlug, getGalleries } from "@/lib/api";
 import GalleryView from "./GalleryView";
 
 // Generate static params for all known gallery slugs
-export function generateStaticParams() {
-	return getAllGallerySlugs();
+export async function generateStaticParams() {
+	const galleries = await getGalleries();
+	return galleries.map((g) => ({ clientSlug: g.slug }));
 }
 
 // Dynamic metadata
@@ -18,7 +19,7 @@ export async function generateMetadata({
 	params: Promise<{ clientSlug: string }>;
 }): Promise<Metadata> {
 	const { clientSlug } = await params;
-	const gallery = getGalleryBySlug(clientSlug);
+	const gallery = await getGalleryBySlug(clientSlug);
 	if (!gallery) {
 		return { title: "Gallery Not Found | Abhi Kansara Photography" };
 	}
@@ -36,7 +37,7 @@ export default async function GalleryPage({
 	params: Promise<{ clientSlug: string }>;
 }) {
 	const { clientSlug } = await params;
-	const gallery = getGalleryBySlug(clientSlug);
+	const gallery = await getGalleryBySlug(clientSlug);
 
 	if (!gallery) {
 		notFound();

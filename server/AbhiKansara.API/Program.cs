@@ -76,8 +76,8 @@ builder.Services.AddControllers()
         // Use camelCase to match the frontend's JavaScript conventions
         options.JsonSerializerOptions.PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase;
 
-        // Serialize enums as strings (e.g., "Photo" instead of 0)
-        options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+        // Serialize enums as strings (e.g., "photo" instead of "Photo")
+        options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter(System.Text.Json.JsonNamingPolicy.CamelCase));
     });
 
 // ── Swagger / OpenAPI ──

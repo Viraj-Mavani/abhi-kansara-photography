@@ -5,16 +5,16 @@ import { motion } from "framer-motion";
 import Link from "next/link";
 import Image from "next/image";
 import { Play } from "lucide-react";
-import { getCuratedVideos } from "@/lib/portfolio";
+import { MediaItem } from "@/lib/api";
 import MediaViewer from "@/components/portfolio/MediaViewer";
 import JustifiedGrid from "@/components/portfolio/JustifiedGrid";
 
-export default function CinematographyView() {
-	const videos = getCuratedVideos();
+export default function CinematographyView({ initialVideos }: { initialVideos: MediaItem[] }) {
 	const [viewerOpen, setViewerOpen] = useState(false);
 	const [viewerIndex, setViewerIndex] = useState(0);
 
-	const handleVideoClick = (index: number) => {
+	const handleVideoClick = (item: MediaItem) => {
+    const index = initialVideos.findIndex(v => v.id === item.id);
 		setViewerIndex(index);
 		setViewerOpen(true);
 	};
@@ -87,12 +87,12 @@ export default function CinematographyView() {
 
 			{/* Video Cards Grid */}
 			<section className="px-4 sm:px-8 lg:px-12 pb-20 sm:pb-32 pt-4">
-				<JustifiedGrid items={videos} onItemClick={handleVideoClick} />
+				<JustifiedGrid items={initialVideos} onItemClick={handleVideoClick} />
 			</section>
 
 			{/* Lightbox */}
 			<MediaViewer
-				items={videos}
+				items={initialVideos}
 				initialIndex={viewerIndex}
 				isOpen={viewerOpen}
 				onClose={() => setViewerOpen(false)}

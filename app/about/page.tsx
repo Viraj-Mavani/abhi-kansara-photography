@@ -1,14 +1,13 @@
-"use client";
-
 import Navigation from "@/components/Navigation";
 import { Footer } from "@/components/Footer";
 import AnimatedSection from "@/components/AnimatedSection";
 import Image from "next/image";
 import BackButton from "@/components/BackButton";
+import { getBio } from "@/lib/api";
 
-import { bioData } from "@/lib/bio";
+export default async function AboutPage() {
+  const bioData = await getBio();
 
-export default function AboutPage() {
   return (
     <main className="flex min-h-screen flex-col bg-accent-ivory text-black selection:bg-accent-gold selection:text-white">
       <Navigation />

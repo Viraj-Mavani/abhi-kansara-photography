@@ -3,7 +3,7 @@
 import { motion } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
-import type { GalleryCategory } from "@/lib/portfolio";
+import type { GalleryCategory } from "@/lib/api";
 import type { PageConfig, Gallery } from "@/lib/api";
 import CategorySection from "@/components/portfolio/CategorySection";
 

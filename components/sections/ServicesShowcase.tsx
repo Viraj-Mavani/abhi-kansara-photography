@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import Image from "next/image";
 import { motion, useScroll, useTransform, useInView } from "framer-motion";
-import type { DetailedService } from "@/lib/services";
+import type { DetailedService } from "@/lib/api";
 import type { PageConfig } from "@/lib/api";
 import ServiceDetailsModal from "./ServiceDetailsModal";
 import { ArrowRight } from "lucide-react";

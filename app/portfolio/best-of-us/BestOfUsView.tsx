@@ -3,12 +3,11 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
-import { getCuratedPhotos } from "@/lib/portfolio";
+import { MediaItem } from "@/lib/api";
 import JustifiedGrid from "@/components/portfolio/JustifiedGrid";
 import MediaViewer from "@/components/portfolio/MediaViewer";
 
-export default function BestOfUsView() {
-	const photos = getCuratedPhotos();
+export default function BestOfUsView({ initialPhotos }: { initialPhotos: MediaItem[] }) {
 	const [viewerOpen, setViewerOpen] = useState(false);
 	const [viewerIndex, setViewerIndex] = useState(0);
 
@@ -85,12 +84,12 @@ export default function BestOfUsView() {
 
 			{/* Justified Grid */}
 			<section className="px-4 sm:px-8 lg:px-12 pb-20 sm:pb-32 pt-4">
-				<JustifiedGrid items={photos} onItemClick={handleItemClick} />
+				<JustifiedGrid items={initialPhotos} onItemClick={handleItemClick} />
 			</section>
 
 			{/* Lightbox */}
 			<MediaViewer
-				items={photos}
+				items={initialPhotos}
 				initialIndex={viewerIndex}
 				isOpen={viewerOpen}
 				onClose={() => setViewerOpen(false)}

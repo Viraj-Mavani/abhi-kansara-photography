@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
-import type { DetailedService } from "@/lib/services";
+import type { DetailedService } from "@/lib/api";
 import { X, ChevronDown, Check, ArrowRight, Star } from "lucide-react";
 import { useOverlay } from "@/hooks/useOverlay";
 

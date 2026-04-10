@@ -10,13 +10,20 @@ export const metadata: Metadata = {
 		"Experience our cinematic storytelling — curated highlight reels, wedding films, and editorial video content.",
 };
 
-export default function CinematographyPage() {
-	return (
-		<main className="flex min-h-screen flex-col bg-accent-ivory text-black selection:bg-accent-gold selection:text-white">
-			<Navigation />
-			<BackButton />
-			<CinematographyView />
-			<Footer />
-		</main>
-	);
+import { getGalleries } from "@/lib/api";
+
+export default async function CinematographyPage() {
+  const galleries = await getGalleries();
+  const videos = galleries
+    .flatMap((g) => g.media)
+    .filter((m) => m.type.toLowerCase() === "video");
+
+  return (
+    <main className="flex min-h-screen flex-col bg-accent-ivory text-black selection:bg-accent-gold selection:text-white">
+      <Navigation />
+      <BackButton />
+      <CinematographyView initialVideos={videos} />
+      <Footer />
+    </main>
+  );
 }
