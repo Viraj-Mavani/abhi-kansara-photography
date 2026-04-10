@@ -34,6 +34,7 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityR
     // ── Site Config ──
     public DbSet<SiteBio> SiteBios => Set<SiteBio>();
     public DbSet<PageConfig> PageConfigs => Set<PageConfig>();
+    public DbSet<CarouselItem> CarouselItems => Set<CarouselItem>();
 
     // ── Client Vault ──
     public DbSet<ClientVault> ClientVaults => Set<ClientVault>();

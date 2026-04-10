@@ -76,7 +76,20 @@ export async function getFeaturedGalleries(): Promise<Gallery[]> {
 export async function getGalleryBySlug(slug: string): Promise<Gallery> {
   return fetchWithFailFast(`${API_URL}/galleries/${slug}`);
 }
+// ─────────────────────────────────────────────────────────
+//  Carousel Items API
+// ─────────────────────────────────────────────────────────
 
+export interface CarouselItem {
+  id: string;
+  title: string;
+  imageUrl: string;
+  sortOrder: number;
+}
+
+export async function getCarouselItems(): Promise<CarouselItem[]> {
+  return fetchWithFailFast<CarouselItem[]>(`${API_URL}/carousel`);
+}
 export async function getBio(): Promise<SiteBio> {
   return fetchWithFailFast(`${API_URL}/siteconfig/bio`);
 }

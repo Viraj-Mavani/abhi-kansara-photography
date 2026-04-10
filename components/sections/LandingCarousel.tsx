@@ -2,11 +2,11 @@
 
 import Image from "next/image";
 import { motion, useMotionValue, useAnimationFrame, useMotionValueEvent } from "framer-motion";
-import { DetailedService } from "@/lib/services";
+import { CarouselItem } from "@/lib/api";
 import { useEffect, useState, useRef } from "react";
 
-export default function LandingCarousel({ services }: { services: DetailedService[] }) {
-  const duplicatedServices = [...services, ...services, ...services];
+export default function LandingCarousel({ items }: { items: CarouselItem[] }) {
+  const duplicatedServices = [...items, ...items, ...items];
   const containerRef = useRef<HTMLDivElement>(null);
   const x = useMotionValue(0);
   const [isInteracting, setIsInteracting] = useState(false);
@@ -81,14 +81,14 @@ export default function LandingCarousel({ services }: { services: DetailedServic
           onMouseEnter={handleInteractionStart}
           onMouseLeave={handleInteractionEnd}
         >
-          {duplicatedServices.map((service, index) => (
+          {duplicatedServices.map((item, index) => (
             <div
-              key={`${service.id}-${index}`}
+              key={`${item.id}-${index}`}
               className="relative w-[70vw] sm:w-[300px] h-[400px] sm:h-[450px] shrink-0 group overflow-hidden"
             >
               <Image
-                src={service.coverImage}
-                alt={service.title}
+                src={item.imageUrl}
+                alt={item.title}
                 fill
                 className="object-cover transition-transform duration-[2s] ease-[cubic-bezier(0.25,1,0.5,1)] group-hover:scale-105"
                 sizes="(max-width: 768px) 70vw, 400px"
@@ -96,7 +96,7 @@ export default function LandingCarousel({ services }: { services: DetailedServic
               <div className="absolute inset-0 bg-linear-to-t from-black/80 via-black/20 to-transparent opacity-60 group-hover:opacity-80 transition-opacity duration-500" />
               <div className="absolute bottom-10 left-10">
                 <h3 className="text-white font-serif text-3xl mb-2 translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
-                  {service.title}
+                  {item.title}
                 </h3>
                 <div className="w-8 h-px bg-accent-gold scale-x-0 origin-left group-hover:scale-x-100 transition-transform duration-500 delay-100" />
               </div>

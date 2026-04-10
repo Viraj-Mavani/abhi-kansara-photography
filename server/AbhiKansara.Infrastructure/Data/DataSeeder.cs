@@ -19,6 +19,7 @@ public static class DataSeeder
         await SeedGalleriesAsync(context, logger);
         await SeedSiteBioAsync(context, logger);
         await SeedPageConfigsAsync(context, logger);
+        await SeedCarouselItemsAsync(context, logger);
     }
 
     // ────────────────────────────────────────────────────────
@@ -672,5 +673,42 @@ public static class DataSeeder
         context.PageConfigs.AddRange(configs);
         await context.SaveChangesAsync();
         logger.LogInformation("Seeded {Count} page configs successfully.", configs.Count);
+    }
+
+    // ────────────────────────────────────────────────────────
+    //  CAROUSEL ITEMS
+    // ────────────────────────────────────────────────────────
+
+    private static async Task SeedCarouselItemsAsync(ApplicationDbContext context, ILogger logger)
+    {
+        if (await context.CarouselItems.AnyAsync())
+        {
+            logger.LogInformation("CarouselItems table already seeded. Skipping.");
+            return;
+        }
+
+        logger.LogInformation("Seeding CarouselItems...");
+
+        var items = new List<CarouselItem>
+        {
+            new CarouselItem { SortOrder = 1, Title = "Wedding", ImageUrl = $"{R2_URL}/images/work/work0.webp" },
+            new CarouselItem { SortOrder = 2, Title = "Event", ImageUrl = $"{R2_URL}/images/work/work1.webp" },
+            new CarouselItem { SortOrder = 3, Title = "Product", ImageUrl = $"{R2_URL}/images/work/work2.webp" },
+            new CarouselItem { SortOrder = 4, Title = "Photography", ImageUrl = $"{R2_URL}/images/work/work3.webp" },
+            new CarouselItem { SortOrder = 5, Title = "Pre-Wedding", ImageUrl = $"{R2_URL}/images/work/work4.webp" },
+            new CarouselItem { SortOrder = 6, Title = "Photography", ImageUrl = $"{R2_URL}/images/work/work5.webp" },
+            new CarouselItem { SortOrder = 7, Title = "Event", ImageUrl = $"{R2_URL}/images/work/work6.webp" },
+            new CarouselItem { SortOrder = 8, Title = "Event", ImageUrl = $"{R2_URL}/images/work/work7.webp" },
+            new CarouselItem { SortOrder = 9, Title = "Event", ImageUrl = $"{R2_URL}/images/work/work8.webp" },
+            new CarouselItem { SortOrder = 10, Title = "Photography", ImageUrl = $"{R2_URL}/images/work/work9.webp" },
+            new CarouselItem { SortOrder = 11, Title = "Editorial", ImageUrl = $"{R2_URL}/images/work/work10.webp" },
+            new CarouselItem { SortOrder = 12, Title = "Pre-Wedding", ImageUrl = $"{R2_URL}/images/work/work11.webp" },
+            new CarouselItem { SortOrder = 13, Title = "Photography", ImageUrl = $"{R2_URL}/images/work/work12.webp" },
+            new CarouselItem { SortOrder = 14, Title = "Baby Shower", ImageUrl = $"{R2_URL}/images/work/work13.webp" }
+        };
+
+        context.CarouselItems.AddRange(items);
+        await context.SaveChangesAsync();
+        logger.LogInformation("Seeded {Count} carousel items successfully.", items.Count);
     }
 }
