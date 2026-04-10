@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using AbhiKansara.Infrastructure.Data;
 using AbhiKansara.Infrastructure.Identity;
 using Microsoft.AspNetCore.Identity;
@@ -6,9 +7,15 @@ using Microsoft.EntityFrameworkCore;
 var builder = WebApplication.CreateBuilder(args);
 
 // ── Database (PostgreSQL via Npgsql) ──
+// Npgsql 8.x requires EnableDynamicJson() for JSONB serialization of CLR types (List<string>)
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")!;
+var dataSourceBuilder = new Npgsql.NpgsqlDataSourceBuilder(connectionString);
+dataSourceBuilder.EnableDynamicJson();
+var dataSource = dataSourceBuilder.Build();
+
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(
-        builder.Configuration.GetConnectionString("DefaultConnection"),
+        dataSource,
         npgsqlOptions => npgsqlOptions.MigrationsAssembly("AbhiKansara.Infrastructure")
     ));
 
@@ -28,8 +35,19 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole<Guid>>(options =>
 .AddEntityFrameworkStores<ApplicationDbContext>()
 .AddDefaultTokenProviders();
 
-// ── Controllers ──
-builder.Services.AddControllers();
+// ── Controllers with JSON cycle handling ──
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        // Prevent circular reference errors when returning EF Core entities with navigation properties
+        options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+
+        // Use camelCase to match the frontend's JavaScript conventions
+        options.JsonSerializerOptions.PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase;
+
+        // Serialize enums as strings (e.g., "Photo" instead of 0)
+        options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+    });
 
 // ── Swagger / OpenAPI ──
 builder.Services.AddEndpointsApiExplorer();
@@ -48,6 +66,21 @@ builder.Services.AddCors(options =>
 });
 
 var app = builder.Build();
+
+// ── Seed Database ──
+using (var scope = app.Services.CreateScope())
+{
+    var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+    var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
+    try
+    {
+        await DataSeeder.SeedAsync(context, logger);
+    }
+    catch (Exception ex)
+    {
+        logger.LogError(ex, "An error occurred while seeding the database.");
+    }
+}
 
 // ── Middleware Pipeline ──
 if (app.Environment.IsDevelopment())
