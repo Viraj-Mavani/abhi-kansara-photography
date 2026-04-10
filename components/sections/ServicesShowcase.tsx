@@ -3,8 +3,8 @@
 import { useState, useRef, useEffect } from "react";
 import Image from "next/image";
 import { motion, useScroll, useTransform, useInView } from "framer-motion";
-import { detailedServices, servicesPageConfig } from "@/lib/services";
 import type { DetailedService } from "@/lib/services";
+import type { PageConfig } from "@/lib/api";
 import ServiceDetailsModal from "./ServiceDetailsModal";
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
@@ -48,8 +48,8 @@ const scaleIn = {
 } as any;
 
 /* ─── Horizontal Scroll Ticker (for decorative effect) ─── */
-function ScrollTicker() {
-  const tickerItems = detailedServices.flatMap((s) => [s.title, "✦"]);
+function ScrollTicker({ services }: { services: DetailedService[] }) {
+  const tickerItems = services.flatMap((s) => [s.title, "✦"]);
   const doubled = [...tickerItems, ...tickerItems, ...tickerItems, ...tickerItems];
 
   return (
@@ -178,7 +178,7 @@ function ServiceCardMinimal({
 }
 
 /* ─── Main Services Showcase Component ─── */
-export default function ServicesShowcase() {
+export default function ServicesShowcase({ services, pageConfig }: { services: DetailedService[], pageConfig: PageConfig }) {
   const [selectedService, setSelectedService] = useState<DetailedService | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const heroRef = useRef<HTMLDivElement>(null);
@@ -231,7 +231,7 @@ export default function ServicesShowcase() {
               transition={{ duration: 0.8, delay: 0.2 }}
               className="text-accent-gold uppercase tracking-[0.3em] text-[10px] sm:text-xs font-bold mb-6 block"
             >
-              {servicesPageConfig.heroTagline}
+              {pageConfig?.heroTagline}
             </motion.span>
 
             <motion.h1
@@ -240,7 +240,7 @@ export default function ServicesShowcase() {
               transition={{ duration: 1, delay: 0.4, ease: [0.25, 1, 0.5, 1] }}
               className="font-serif text-5xl sm:text-7xl lg:text-8xl text-slate-900 leading-[1.05] mb-6 transition-colors duration-500"
             >
-              {servicesPageConfig.heroTitle.split(" ").map((word, i, arr) =>
+              {pageConfig?.heroTitle?.split(" ").map((word, i, arr) =>
                 i === arr.length - 1 ? (
                   <span key={i} className="italic text-slate-400">{word}</span>
                 ) : (
@@ -255,7 +255,7 @@ export default function ServicesShowcase() {
               transition={{ duration: 0.8, delay: 0.6 }}
               className="text-slate-600 text-sm sm:text-base max-w-lg mx-auto font-light leading-relaxed transition-colors duration-500"
             >
-              {servicesPageConfig.heroSubtitle}
+              {pageConfig?.heroSubtitle}
             </motion.p>
           </div>
 
@@ -280,13 +280,13 @@ export default function ServicesShowcase() {
       </section>
 
       {/* ── Ticker ── */}
-      <ScrollTicker />
+      <ScrollTicker services={services} />
 
       {/* Our Services */}
       <section className="relative w-full bg-accent-ivory transition-colors duration-500 pt-24 pb-32">
         <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-12">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-10 justify-items-center">
-            {detailedServices
+            {services
               .sort((a, b) => (a.order ?? 99) - (b.order ?? 99))
               .map((service, index, arr) => {
                  const isOddLast = arr.length % 2 !== 0 && index === arr.length - 1;
@@ -336,10 +336,10 @@ export default function ServicesShowcase() {
           </motion.p>
           <motion.div variants={fadeUp}>
             <Link
-              href={servicesPageConfig.ctaLink}
+              href={pageConfig?.ctaLink || "/contact"}
               className="inline-flex items-center gap-3 px-10 py-4 bg-black text-white text-xs uppercase tracking-[0.2em] font-bold rounded-full hover:bg-accent-gold transition-all duration-500 shadow-xl shadow-black/5 hover:shadow-accent-gold/20 group"
             >
-              {servicesPageConfig.ctaText}
+              {pageConfig?.ctaText || "Get in touch"}
               <ArrowRight
                 size={14}
                 className="group-hover:translate-x-1 transition-transform duration-300"

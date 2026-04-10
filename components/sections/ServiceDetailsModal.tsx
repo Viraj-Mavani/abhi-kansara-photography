@@ -238,7 +238,7 @@ export default function ServiceDetailsModal({
                 </motion.div>
 
                 {/* ── Packages / Pricing ── */}
-                {service.packages.length > 0 && (
+                {(service.packages?.length ?? 0) > 0 && (
                   <motion.div
                     variants={staggerContainer}
                     initial="hidden"
@@ -345,7 +345,7 @@ export default function ServiceDetailsModal({
                 )}
 
                 {/* ── Process / Timeline ── */}
-                {service.process.length > 0 && (
+                {(service.process?.length ?? 0) > 0 && (
                   <motion.div
                     variants={staggerContainer}
                     initial="hidden"
@@ -402,7 +402,7 @@ export default function ServiceDetailsModal({
                 )}
 
                 {/* ── Gallery ── */}
-                {service.galleryImages.length > 0 && (
+                {(service.galleryImages?.length ?? 0) > 0 && (
                   <motion.div
                     variants={staggerContainer}
                     initial="hidden"
@@ -492,7 +492,7 @@ export default function ServiceDetailsModal({
                 )}
 
                 {/* ── FAQs (Accordion) ── */}
-                {service.faqs.length > 0 && (
+                {(service.faqs?.length ?? 0) > 0 && (
                   <motion.div
                     variants={staggerContainer}
                     initial="hidden"

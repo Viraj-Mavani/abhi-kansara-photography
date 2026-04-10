@@ -32,7 +32,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <head>
         <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1" />
       </head>
-      <body className={`${geistSans.variable} ${geistMono.variable} ${cormorantGaramond.variable} antialiased`}>
+      <body suppressHydrationWarning={true} className={`${geistSans.variable} ${geistMono.variable} ${cormorantGaramond.variable} antialiased`}>
         <SmoothScrollProvider>
           <CustomScrollbar />
           {children}

@@ -2,11 +2,11 @@
 
 import Image from "next/image";
 import { motion, useMotionValue, useAnimationFrame, useMotionValueEvent } from "framer-motion";
-import { servicesData } from "@/lib/data";
+import { DetailedService } from "@/lib/services";
 import { useEffect, useState, useRef } from "react";
 
-export default function ServicesCarousel() {
-  const duplicatedServices = [...servicesData, ...servicesData, ...servicesData];
+export default function LandingCarousel({ services }: { services: DetailedService[] }) {
+  const duplicatedServices = [...services, ...services, ...services];
   const containerRef = useRef<HTMLDivElement>(null);
   const x = useMotionValue(0);
   const [isInteracting, setIsInteracting] = useState(false);
@@ -87,7 +87,7 @@ export default function ServicesCarousel() {
               className="relative w-[70vw] sm:w-[300px] h-[400px] sm:h-[450px] shrink-0 group overflow-hidden"
             >
               <Image
-                src={service.image}
+                src={service.coverImage}
                 alt={service.title}
                 fill
                 className="object-cover transition-transform duration-[2s] ease-[cubic-bezier(0.25,1,0.5,1)] group-hover:scale-105"

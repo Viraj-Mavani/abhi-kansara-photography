@@ -3,11 +3,8 @@
 import { motion } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
-import {
-	getGalleriesByCategory,
-	portfolioPageConfig,
-	type GalleryCategory,
-} from "@/lib/portfolio";
+import type { GalleryCategory } from "@/lib/portfolio";
+import type { PageConfig, Gallery } from "@/lib/api";
 import CategorySection from "@/components/portfolio/CategorySection";
 
 // ─────────────────────────────────────────────────────────
@@ -25,8 +22,12 @@ const categoryOrder: GalleryCategory[] = [
 	"Portrait",
 ];
 
-export default function ClientsHub() {
-	const grouped = getGalleriesByCategory();
+export default function ClientsHub({ galleries, pageConfig }: { galleries: Gallery[], pageConfig: PageConfig }) {
+	const grouped = galleries.reduce((acc, gallery) => {
+		if (!acc[gallery.category]) acc[gallery.category] = [];
+		acc[gallery.category].push(gallery);
+		return acc;
+	}, {} as Record<string, Gallery[]>);
 
 	return (
 		<>
@@ -45,7 +46,7 @@ export default function ClientsHub() {
 						transition={{ duration: 0.6, delay: 0.2 }}
 						className="text-accent-gold text-[10px] sm:text-xs uppercase tracking-[0.3em] font-bold block mb-4"
 					>
-						{portfolioPageConfig.heroTagline}
+						{pageConfig?.heroTagline}
 					</motion.span>
 
 					<motion.h1
@@ -58,7 +59,7 @@ export default function ClientsHub() {
 						}}
 						className="font-serif text-5xl sm:text-7xl lg:text-9xl text-slate-900 font-bold italic leading-[0.9] tracking-tight mb-6"
 					>
-						{portfolioPageConfig.heroTitle}
+						{pageConfig?.heroTitle}
 					</motion.h1>
 
 					<motion.p
@@ -67,7 +68,7 @@ export default function ClientsHub() {
 						transition={{ duration: 0.6, delay: 0.5 }}
 						className="text-slate-600 text-sm sm:text-base max-w-xl leading-relaxed font-light"
 					>
-						{portfolioPageConfig.heroSubtitle}
+						{pageConfig?.heroSubtitle}
 					</motion.p>
 
 					{/* Quick nav tabs */}

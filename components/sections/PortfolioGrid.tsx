@@ -2,9 +2,9 @@
 
 import Image from "next/image";
 import { motion } from "framer-motion";
-import { portfolioImages } from "@/lib/data";
+import { Gallery } from "@/lib/api";
 
-export default function PortfolioGrid() {
+export default function PortfolioGrid({ galleries }: { galleries: Gallery[] }) {
   return (
     <section id="works" className="relative w-full bg-transparent py-20 sm:py-32 z-10">
       <div className="max-w-7xl mx-auto px-6 sm:px-12">
@@ -20,7 +20,7 @@ export default function PortfolioGrid() {
           Using 2:3 ratio (aspect-[2/3] or h-full object-cover within controlled aspect ratio).
         */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
-          {portfolioImages.slice(0, 6).map((project, index) => (
+          {galleries.slice(0, 6).map((project, index) => (
             <motion.div
               key={project.id}
               initial={{ opacity: 0, y: 30 }}
@@ -30,8 +30,8 @@ export default function PortfolioGrid() {
               className="relative w-full aspect-2/3 overflow-hidden group rounded-sm"
             >
               <Image
-                src={project.src}
-                alt={project.title || "Portfolio Project"}
+                src={project.coverPhotoUrl}
+                alt={project.clientName || "Portfolio Project"}
                 fill
                 className="object-cover transition-transform duration-[2s] ease-[cubic-bezier(0.25,1,0.5,1)] group-hover:scale-105"
                 sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
@@ -43,7 +43,7 @@ export default function PortfolioGrid() {
                   {project.category}
                 </span>
                 <h3 className="text-white font-serif text-2xl sm:text-3xl translate-y-4 group-hover:translate-y-0 transition-transform duration-500 delay-75">
-                  {project.title}
+                  {project.clientName}
                 </h3>
               </div>
             </motion.div>
