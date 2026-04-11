@@ -128,21 +128,27 @@ public class GalleriesController : ControllerBase
 
         if (existingGallery == null) return NotFound();
 
-        // Remove existing media, flush, then re-add with wired FK references
-        _context.RemoveRange(existingGallery.Media);
-        await _context.SaveChangesAsync(); // Flush deletes first
+        // 1. Manually map scalar properties (don't overwrite Id or CreatedAt)
+        existingGallery.Slug = updatedGallery.Slug;
+        existingGallery.ClientName = updatedGallery.ClientName;
+        existingGallery.Category = updatedGallery.Category;
+        existingGallery.CoverPhotoUrl = updatedGallery.CoverPhotoUrl;
+        existingGallery.ShootDate = updatedGallery.ShootDate;
+        existingGallery.Location = updatedGallery.Location;
+        existingGallery.Description = updatedGallery.Description;
+        existingGallery.IsFeatured = updatedGallery.IsFeatured;
+        existingGallery.Order = updatedGallery.Order;
 
-        _context.Entry(existingGallery).CurrentValues.SetValues(updatedGallery);
+        // 2. Clear then re-add to the tracked collection (Single Transaction)
+        existingGallery.Media.Clear();
 
-        // Wire FK references for incoming media items
         foreach (var media in updatedGallery.Media)
         {
             media.Id = Guid.NewGuid();
             media.ProjectGalleryId = id;
             media.ProjectGallery = existingGallery;
+            existingGallery.Media.Add(media);
         }
-
-        existingGallery.Media = updatedGallery.Media;
 
         try
         {

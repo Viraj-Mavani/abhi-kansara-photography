@@ -30,5 +30,5 @@ public class MediaItem : BaseEntity
 
     // ── Foreign Key ──
     public Guid ProjectGalleryId { get; set; }
-    public ProjectGallery ProjectGallery { get; set; } = null!;
+    public ProjectGallery? ProjectGallery { get; set; }
 }
