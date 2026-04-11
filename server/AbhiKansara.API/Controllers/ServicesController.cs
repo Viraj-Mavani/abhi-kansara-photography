@@ -105,68 +105,87 @@ public class ServicesController : ControllerBase
     {
         if (id != updatedService.Id) return BadRequest(new { message = "ID mismatch." });
 
-        var existingService = await _context.Services
-            .Include(s => s.ProcessSteps)
-            .Include(s => s.Testimonials)
-            .Include(s => s.FAQs)
-            .FirstOrDefaultAsync(s => s.Id == id);
+        // Clear tracker to ensure no stale references or binder-tracked entities interfere
+        _context.ChangeTracker.Clear();
 
-        if (existingService == null) return NotFound();
-
-        // 1. Manually map scalar properties (don't overwrite Id or CreatedAt)
-        existingService.Title = updatedService.Title;
-        existingService.Slug = updatedService.Slug;
-        existingService.Tagline = updatedService.Tagline;
-        existingService.CoverImage = updatedService.CoverImage;
-        existingService.Icon = updatedService.Icon;
-        existingService.ShortDescription = updatedService.ShortDescription;
-        existingService.DetailedDescription = updatedService.DetailedDescription;
-        existingService.Features = updatedService.Features;
-        existingService.Highlights = updatedService.Highlights;
-        existingService.GalleryImages = updatedService.GalleryImages;
-        existingService.Category = updatedService.Category;
-        existingService.Order = updatedService.Order;
-        existingService.IsFeatured = updatedService.IsFeatured;
-
-        // 2. Clear then re-add to all collections in a single transaction
-        existingService.ProcessSteps.Clear();
-        foreach (var step in updatedService.ProcessSteps)
-        {
-            step.Id = Guid.NewGuid();
-            step.ServiceId = id;
-            step.Service = existingService;
-            existingService.ProcessSteps.Add(step);
-        }
-
-        existingService.Testimonials.Clear();
-        foreach (var testimonial in updatedService.Testimonials)
-        {
-            testimonial.Id = Guid.NewGuid();
-            testimonial.ServiceId = id;
-            testimonial.Service = existingService;
-            existingService.Testimonials.Add(testimonial);
-        }
-
-        existingService.FAQs.Clear();
-        foreach (var faq in updatedService.FAQs)
-        {
-            faq.Id = Guid.NewGuid();
-            faq.ServiceId = id;
-            faq.Service = existingService;
-            existingService.FAQs.Add(faq);
-        }
+        // Use a transaction to ensure atomicity for children replacement
+        using var transaction = await _context.Database.BeginTransactionAsync();
 
         try
         {
+            // 1. Update the main entity directly in the DB
+            var rowsAffected = await _context.Services
+                .Where(s => s.Id == id)
+                .ExecuteUpdateAsync(s => s
+                    .SetProperty(s => s.Title, updatedService.Title)
+                    .SetProperty(s => s.Slug, updatedService.Slug)
+                    .SetProperty(s => s.Tagline, updatedService.Tagline)
+                    .SetProperty(s => s.CoverImage, updatedService.CoverImage)
+                    .SetProperty(s => s.Icon, updatedService.Icon)
+                    .SetProperty(s => s.ShortDescription, updatedService.ShortDescription)
+                    .SetProperty(s => s.DetailedDescription, updatedService.DetailedDescription)
+                    .SetProperty(s => s.Features, updatedService.Features)
+                    .SetProperty(s => s.Highlights, updatedService.Highlights)
+                    .SetProperty(s => s.GalleryImages, updatedService.GalleryImages)
+                    .SetProperty(s => s.Category, updatedService.Category)
+                    .SetProperty(s => s.Order, updatedService.Order)
+                    .SetProperty(s => s.IsFeatured, updatedService.IsFeatured)
+                    .SetProperty(s => s.UpdatedAt, DateTime.UtcNow));
+
+            if (rowsAffected == 0) return NotFound();
+
+            // 2. Clear old children
+            await _context.ServiceProcesses.Where(p => p.ServiceId == id).ExecuteDeleteAsync();
+            await _context.ServiceTestimonials.Where(t => t.ServiceId == id).ExecuteDeleteAsync();
+            await _context.ServiceFAQs.Where(f => f.ServiceId == id).ExecuteDeleteAsync();
+
+            // 3. Add new children as fresh instances
+            var steps = updatedService.ProcessSteps.Select(s => new AbhiKansara.Core.Entities.ServiceProcess
+            {
+                Id = Guid.NewGuid(),
+                ServiceId = id,
+                StepNumber = s.StepNumber,
+                Title = s.Title,
+                Description = s.Description,
+                Icon = s.Icon,
+                Order = s.Order
+            }).ToList();
+
+            var testimonials = updatedService.Testimonials.Select(t => new AbhiKansara.Core.Entities.ServiceTestimonial
+            {
+                Id = Guid.NewGuid(),
+                ServiceId = id,
+                ClientName = t.ClientName,
+                Quote = t.Quote,
+                Event = t.Event,
+                Avatar = t.Avatar,
+                Rating = t.Rating,
+                Order = t.Order
+            }).ToList();
+
+            var faqs = updatedService.FAQs.Select(f => new AbhiKansara.Core.Entities.ServiceFAQ
+            {
+                Id = Guid.NewGuid(),
+                ServiceId = id,
+                Question = f.Question,
+                Answer = f.Answer,
+                Order = f.Order
+            }).ToList();
+
+            if (steps.Any()) await _context.ServiceProcesses.AddRangeAsync(steps);
+            if (testimonials.Any()) await _context.ServiceTestimonials.AddRangeAsync(testimonials);
+            if (faqs.Any()) await _context.ServiceFAQs.AddRangeAsync(faqs);
+
             await _context.SaveChangesAsync();
+            await transaction.CommitAsync();
+
+            return NoContent();
         }
-        catch (DbUpdateConcurrencyException)
+        catch (Exception)
         {
-            if (!await _context.Services.AnyAsync(e => e.Id == id)) return NotFound();
+            await transaction.RollbackAsync();
             throw;
         }
-
-        return NoContent();
     }
 
     /// <summary>

@@ -122,45 +122,62 @@ public class GalleriesController : ControllerBase
     {
         if (id != updatedGallery.Id) return BadRequest(new { message = "ID mismatch." });
 
-        var existingGallery = await _context.ProjectGalleries
-            .Include(g => g.Media)
-            .FirstOrDefaultAsync(g => g.Id == id);
+        // Clear tracker to ensure no stale references or binder-tracked entities interfere
+        _context.ChangeTracker.Clear();
 
-        if (existingGallery == null) return NotFound();
-
-        // 1. Manually map scalar properties (don't overwrite Id or CreatedAt)
-        existingGallery.Slug = updatedGallery.Slug;
-        existingGallery.ClientName = updatedGallery.ClientName;
-        existingGallery.Category = updatedGallery.Category;
-        existingGallery.CoverPhotoUrl = updatedGallery.CoverPhotoUrl;
-        existingGallery.ShootDate = updatedGallery.ShootDate;
-        existingGallery.Location = updatedGallery.Location;
-        existingGallery.Description = updatedGallery.Description;
-        existingGallery.IsFeatured = updatedGallery.IsFeatured;
-        existingGallery.Order = updatedGallery.Order;
-
-        // 2. Clear then re-add to the tracked collection (Single Transaction)
-        existingGallery.Media.Clear();
-
-        foreach (var media in updatedGallery.Media)
-        {
-            media.Id = Guid.NewGuid();
-            media.ProjectGalleryId = id;
-            media.ProjectGallery = existingGallery;
-            existingGallery.Media.Add(media);
-        }
-
+        using var transaction = await _context.Database.BeginTransactionAsync();
         try
         {
-            await _context.SaveChangesAsync();
+            // 1. Update the main entity directly in the DB
+            var rowsAffected = await _context.ProjectGalleries
+                .Where(g => g.Id == id)
+                .ExecuteUpdateAsync(s => s
+                    .SetProperty(g => g.Slug, updatedGallery.Slug)
+                    .SetProperty(g => g.ClientName, updatedGallery.ClientName)
+                    .SetProperty(g => g.Category, updatedGallery.Category)
+                    .SetProperty(g => g.CoverPhotoUrl, updatedGallery.CoverPhotoUrl)
+                    .SetProperty(g => g.ShootDate, updatedGallery.ShootDate)
+                    .SetProperty(g => g.Location, updatedGallery.Location)
+                    .SetProperty(g => g.Description, updatedGallery.Description)
+                    .SetProperty(g => g.IsFeatured, updatedGallery.IsFeatured)
+                    .SetProperty(g => g.Order, updatedGallery.Order)
+                    .SetProperty(g => g.UpdatedAt, DateTime.UtcNow));
+
+            if (rowsAffected == 0) return NotFound();
+
+            // 2. Clear old media items
+            await _context.MediaItems.Where(m => m.ProjectGalleryId == id).ExecuteDeleteAsync();
+
+            // 3. Add new media items as fresh tracked entities
+            var mediaToInsert = updatedGallery.Media.Select(m => new AbhiKansara.Core.Entities.MediaItem
+            {
+                Id = Guid.NewGuid(),
+                ProjectGalleryId = id,
+                Type = m.Type,
+                Url = m.Url,
+                Width = m.Width,
+                Height = m.Height,
+                Alt = m.Alt,
+                PosterUrl = m.PosterUrl,
+                HlsUrl = m.HlsUrl,
+                Duration = m.Duration,
+                Order = m.Order
+            }).ToList();
+
+            if (mediaToInsert.Any())
+            {
+                await _context.MediaItems.AddRangeAsync(mediaToInsert);
+                await _context.SaveChangesAsync();
+            }
+
+            await transaction.CommitAsync();
+            return NoContent();
         }
-        catch (DbUpdateConcurrencyException)
+        catch (Exception)
         {
-            if (!await _context.ProjectGalleries.AnyAsync(e => e.Id == id)) return NotFound();
+            await transaction.RollbackAsync();
             throw;
         }
-
-        return NoContent();
     }
 
     /// <summary>
