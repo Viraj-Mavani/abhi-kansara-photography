@@ -37,6 +37,17 @@ export async function deleteHeroBackground(id: string) {
   }
 }
 
+export async function reorderHeroBackgrounds(ids: string[]) {
+  try {
+    await adminHero.reorder(ids);
+    revalidatePath("/admin/hero");
+    revalidatePath("/");
+  } catch (error) {
+    console.error("Action error [reorderHeroBackgrounds]:", error);
+    throw error;
+  }
+}
+
 export async function updateHomeConfig(id: string, data: unknown) {
   try {
     await adminSiteConfig.updatePageConfig(id, data);

@@ -55,6 +55,36 @@ public class HeroBackgroundsController : ControllerBase
     }
 
     [Authorize(Roles = "Admin")]
+    [HttpPatch("reorder")]
+    public async Task<IActionResult> Reorder([FromBody] List<Guid> ids)
+    {
+        if (ids == null || ids.Count == 0) return BadRequest("IDs list is empty.");
+
+        using var transaction = await _context.Database.BeginTransactionAsync();
+        try
+        {
+            // Bulk update the Order for each ID in the sequence provided
+            for (int i = 0; i < ids.Count; i++)
+            {
+                var id = ids[i];
+                await _context.HeroBackgrounds
+                    .Where(b => b.Id == id)
+                    .ExecuteUpdateAsync(s => s.SetProperty(b => b.Order, i));
+            }
+
+            await transaction.CommitAsync();
+            return NoContent();
+        }
+        catch (Exception ex)
+        {
+            await transaction.RollbackAsync();
+            // Log the error (simplified for this context)
+            Console.WriteLine($"Error reordering HeroBackgrounds: {ex.Message}");
+            return StatusCode(500, new { message = "An error occurred during reordering.", detail = ex.Message });
+        }
+    }
+
+    [Authorize(Roles = "Admin")]
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(Guid id)
     {

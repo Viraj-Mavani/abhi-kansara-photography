@@ -144,4 +144,10 @@ export const adminHero = {
 
   delete: (id: string) =>
     adminFetch(`/HeroBackgrounds/${id}`, { method: "DELETE" }),
+
+  reorder: (ids: string[]) =>
+    adminFetch("/HeroBackgrounds/reorder", {
+      method: "PATCH",
+      body: JSON.stringify(ids),
+    }),
 };
