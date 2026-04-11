@@ -91,11 +91,21 @@ public class GalleriesController : ControllerBase
     /// <summary>
     /// POST /api/galleries
     /// Creates a new gallery and its media items.
+    /// Manually wires FK navigation references to bypass EF Core model validation.
     /// </summary>
     [HttpPost]
     [Microsoft.AspNetCore.Authorization.Authorize(Roles = "Admin")]
     public async Task<IActionResult> Create([FromBody] AbhiKansara.Core.Entities.ProjectGallery gallery)
     {
+        gallery.Id = Guid.NewGuid();
+
+        foreach (var media in gallery.Media)
+        {
+            media.Id = Guid.NewGuid();
+            media.ProjectGalleryId = gallery.Id;
+            media.ProjectGallery = gallery;
+        }
+
         _context.ProjectGalleries.Add(gallery);
         await _context.SaveChangesAsync();
         return CreatedAtAction(nameof(GetBySlug), new { slug = gallery.Slug }, gallery);
@@ -104,6 +114,7 @@ public class GalleriesController : ControllerBase
     /// <summary>
     /// PUT /api/galleries/{id}
     /// Full replace of a gallery and its media items.
+    /// Manually wires FK navigation references to bypass EF Core model validation.
     /// </summary>
     [HttpPut("{id}")]
     [Microsoft.AspNetCore.Authorization.Authorize(Roles = "Admin")]
@@ -117,9 +128,20 @@ public class GalleriesController : ControllerBase
 
         if (existingGallery == null) return NotFound();
 
-        // Remove existing media and replace with incoming media
+        // Remove existing media, flush, then re-add with wired FK references
         _context.RemoveRange(existingGallery.Media);
+        await _context.SaveChangesAsync(); // Flush deletes first
+
         _context.Entry(existingGallery).CurrentValues.SetValues(updatedGallery);
+
+        // Wire FK references for incoming media items
+        foreach (var media in updatedGallery.Media)
+        {
+            media.Id = Guid.NewGuid();
+            media.ProjectGalleryId = id;
+            media.ProjectGallery = existingGallery;
+        }
+
         existingGallery.Media = updatedGallery.Media;
 
         try

@@ -67,12 +67,59 @@ public class ServicesController : ControllerBase
 
     /// <summary>
     /// POST /api/services
-    /// Creates a new service and all nested nested items.
+    /// Creates a new service and all nested items.
+    /// Manually wires FK navigation references to bypass EF Core model validation.
     /// </summary>
     [HttpPost]
     [Microsoft.AspNetCore.Authorization.Authorize(Roles = "Admin")]
     public async Task<IActionResult> Create([FromBody] AbhiKansara.Core.Entities.Service service)
     {
+        // Assign a fresh Id for the root entity
+        service.Id = Guid.NewGuid();
+
+        // Wire FK references for all nested collections so EF Core model validation passes
+        foreach (var package in service.Packages)
+        {
+            package.Id = Guid.NewGuid();
+            package.ServiceId = service.Id;
+            package.Service = service;
+
+            foreach (var deliverable in package.Deliverables)
+            {
+                deliverable.Id = Guid.NewGuid();
+                deliverable.ServicePackageId = package.Id;
+                deliverable.ServicePackage = package;
+            }
+        }
+
+        foreach (var addOn in service.AddOns)
+        {
+            addOn.Id = Guid.NewGuid();
+            addOn.ServiceId = service.Id;
+            addOn.Service = service;
+        }
+
+        foreach (var step in service.ProcessSteps)
+        {
+            step.Id = Guid.NewGuid();
+            step.ServiceId = service.Id;
+            step.Service = service;
+        }
+
+        foreach (var testimonial in service.Testimonials)
+        {
+            testimonial.Id = Guid.NewGuid();
+            testimonial.ServiceId = service.Id;
+            testimonial.Service = service;
+        }
+
+        foreach (var faq in service.FAQs)
+        {
+            faq.Id = Guid.NewGuid();
+            faq.ServiceId = service.Id;
+            faq.Service = service;
+        }
+
         _context.Services.Add(service);
         await _context.SaveChangesAsync();
         return CreatedAtAction(nameof(GetBySlug), new { slug = service.Slug }, service);
@@ -81,6 +128,7 @@ public class ServicesController : ControllerBase
     /// <summary>
     /// PUT /api/services/{id}
     /// Full replace of a service and its nested children.
+    /// Manually wires FK navigation references to bypass EF Core model validation.
     /// </summary>
     [HttpPut("{id}")]
     [Microsoft.AspNetCore.Authorization.Authorize(Roles = "Admin")]
@@ -98,18 +146,62 @@ public class ServicesController : ControllerBase
 
         if (existingService == null) return NotFound();
 
-        // Standard trick for a massive object tree update: Remove all existing collections and add the ones from payload.
-        // EF Core handles the tracking. For real production, mapping specific IDs is optimal, but full replacement is best for headless CMS.
+        // Remove all existing nested collections — full replace strategy
+        _context.RemoveRange(existingService.Packages.SelectMany(p => p.Deliverables));
         _context.RemoveRange(existingService.Packages);
         _context.RemoveRange(existingService.AddOns);
         _context.RemoveRange(existingService.ProcessSteps);
         _context.RemoveRange(existingService.Testimonials);
         _context.RemoveRange(existingService.FAQs);
 
-        // Update scalars
+        await _context.SaveChangesAsync(); // Flush deletes before re-adding
+
+        // Update scalar fields
         _context.Entry(existingService).CurrentValues.SetValues(updatedService);
 
-        // Add back new lists
+        // Wire FK references for incoming nested items
+        foreach (var package in updatedService.Packages)
+        {
+            package.Id = Guid.NewGuid();
+            package.ServiceId = id;
+            package.Service = existingService;
+
+            foreach (var deliverable in package.Deliverables)
+            {
+                deliverable.Id = Guid.NewGuid();
+                deliverable.ServicePackageId = package.Id;
+                deliverable.ServicePackage = package;
+            }
+        }
+
+        foreach (var addOn in updatedService.AddOns)
+        {
+            addOn.Id = Guid.NewGuid();
+            addOn.ServiceId = id;
+            addOn.Service = existingService;
+        }
+
+        foreach (var step in updatedService.ProcessSteps)
+        {
+            step.Id = Guid.NewGuid();
+            step.ServiceId = id;
+            step.Service = existingService;
+        }
+
+        foreach (var testimonial in updatedService.Testimonials)
+        {
+            testimonial.Id = Guid.NewGuid();
+            testimonial.ServiceId = id;
+            testimonial.Service = existingService;
+        }
+
+        foreach (var faq in updatedService.FAQs)
+        {
+            faq.Id = Guid.NewGuid();
+            faq.ServiceId = id;
+            faq.Service = existingService;
+        }
+
         existingService.Packages = updatedService.Packages;
         existingService.AddOns = updatedService.AddOns;
         existingService.ProcessSteps = updatedService.ProcessSteps;
