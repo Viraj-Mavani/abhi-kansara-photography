@@ -2,22 +2,6 @@
 //  Type Definitions — Services Domain
 // ─────────────────────────────────────────────────────────
 
-export interface ServiceDeliverable {
-  item: string;
-  detail?: string;
-}
-
-export interface ServicePackage {
-  id?: string;
-  name: string;
-  price?: string;
-  priceNote?: string;
-  duration?: string;
-  description?: string;
-  deliverables: ServiceDeliverable[];
-  isPopular?: boolean;
-}
-
 export interface ServiceFAQ {
   id?: string;
   question: string;
@@ -41,13 +25,6 @@ export interface ServiceTestimonial {
   avatar?: string;
 }
 
-export interface ServiceAddOn {
-  id?: string;
-  name: string;
-  price?: string;
-  description?: string;
-}
-
 export interface DetailedService {
   id: string;
   slug: string;
@@ -57,22 +34,13 @@ export interface DetailedService {
   icon?: string;
   shortDescription: string;
   detailedDescription: string;
-  startingPrice?: string;
-  priceNote?: string;
-  packages: ServicePackage[];
-  addOns?: ServiceAddOn[];
   features: string[];
   highlights?: string[];
-  process?: ServiceProcess[];
+  processSteps: ServiceProcess[]; // Renamed from process to match C# property
   testimonials?: ServiceTestimonial[];
   faqs: ServiceFAQ[];
   galleryImages: string[];
   category?: string;
-  tags?: string[];
-  minDuration?: string;
-  maxCapacity?: string;
-  travelAvailable?: boolean;
-  indoorOutdoor?: string;
   order?: number;
   isFeatured?: boolean;
 }
@@ -128,12 +96,12 @@ const FETCH_CONFIG: RequestInit = {
 };
 
 /** Ensure API errors throw so we fail fast locally */
-async function fetchWithFailFast(url: string, options?: RequestInit) {
+async function fetchWithFailFast<T>(url: string, options?: RequestInit): Promise<T> {
   const res = await fetch(url, { ...FETCH_CONFIG, ...options });
   
   if (!res.ok) {
     const errorText = await res.text().catch(() => 'No error text');
-    throw new Error(`API Fetch failed: ${res.status} ${res.statusText} at ${url}\n${errorText}`);
+    throw new Error(`Admin API error: ${res.status} ${res.statusText} at ${url}\n${errorText}`);
   }
   
   return res.json();
@@ -172,23 +140,23 @@ export interface PageConfig {
 // ─────────────────────────────────────────────────────────
 
 export async function getServices(): Promise<DetailedService[]> {
-  return fetchWithFailFast(`${API_URL}/services`);
+  return fetchWithFailFast<DetailedService[]>(`${API_URL}/services`);
 }
 
 export async function getServiceBySlug(slug: string): Promise<DetailedService> {
-  return fetchWithFailFast(`${API_URL}/services/${slug}`);
+  return fetchWithFailFast<DetailedService>(`${API_URL}/services/${slug}`);
 }
 
 export async function getGalleries(): Promise<Gallery[]> {
-  return fetchWithFailFast(`${API_URL}/galleries`);
+  return fetchWithFailFast<Gallery[]>(`${API_URL}/galleries`);
 }
 
 export async function getFeaturedGalleries(): Promise<Gallery[]> {
-  return fetchWithFailFast(`${API_URL}/galleries/featured`);
+  return fetchWithFailFast<Gallery[]>(`${API_URL}/galleries/featured`);
 }
 
 export async function getGalleryBySlug(slug: string): Promise<Gallery> {
-  return fetchWithFailFast(`${API_URL}/galleries/${slug}`);
+  return fetchWithFailFast<Gallery>(`${API_URL}/galleries/${slug}`);
 }
 // ─────────────────────────────────────────────────────────
 //  Carousel Items API
@@ -205,9 +173,9 @@ export async function getCarouselItems(): Promise<CarouselItem[]> {
   return fetchWithFailFast<CarouselItem[]>(`${API_URL}/carousel`);
 }
 export async function getBio(): Promise<SiteBio> {
-  return fetchWithFailFast(`${API_URL}/siteconfig/bio`);
+  return fetchWithFailFast<SiteBio>(`${API_URL}/siteconfig/bio`);
 }
 
 export async function getPageConfig(pageKey: string): Promise<PageConfig> {
-  return fetchWithFailFast(`${API_URL}/siteconfig/page/${pageKey}`);
+  return fetchWithFailFast<PageConfig>(`${API_URL}/siteconfig/page/${pageKey}`);
 }

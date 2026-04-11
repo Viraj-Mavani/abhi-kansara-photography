@@ -140,28 +140,7 @@ function ServiceCardMinimal({
            {service.shortDescription}
          </p>
          
-         <div className="flex flex-wrap gap-x-6 md:gap-x-8 gap-y-4 mb-8 md:mb-12">
-            {service.startingPrice && (
-              <div>
-                <span className="text-slate-400 text-[9px] md:text-[10px] uppercase tracking-widest font-bold block mb-1">
-                  {service.priceNote || "Investment"}
-                </span>
-                <span className="text-slate-800 font-serif text-xl md:text-2xl group-hover:text-accent-gold group-data-[hovered=true]:text-accent-gold transition-colors duration-500">
-                  {service.startingPrice}
-                </span>
-              </div>
-            )}
-            {service.minDuration && (
-              <div>
-                <span className="text-slate-400 text-[9px] md:text-[10px] uppercase tracking-widest font-bold block mb-1">
-                  Duration
-                </span>
-                <span className="text-slate-700 font-serif text-xl md:text-2xl transition-colors duration-500">
-                  {service.minDuration}
-                </span>
-              </div>
-            )}
-         </div>
+         {/* Removed Price and Duration for minimalist premium design */}
 
          <div className="mt-auto pt-8 border-t border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-6">
             <span className="text-slate-400 italic font-serif text-sm group-hover:text-slate-600 group-data-[hovered=true]:text-slate-600 transition-colors duration-500 max-w-[280px] sm:max-w-none">

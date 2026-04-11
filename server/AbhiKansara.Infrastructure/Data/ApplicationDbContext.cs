@@ -20,9 +20,6 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityR
 
     // ── Services Domain ──
     public DbSet<Service> Services => Set<Service>();
-    public DbSet<ServicePackage> ServicePackages => Set<ServicePackage>();
-    public DbSet<ServiceDeliverable> ServiceDeliverables => Set<ServiceDeliverable>();
-    public DbSet<ServiceAddOn> ServiceAddOns => Set<ServiceAddOn>();
     public DbSet<ServiceProcess> ServiceProcesses => Set<ServiceProcess>();
     public DbSet<ServiceTestimonial> ServiceTestimonials => Set<ServiceTestimonial>();
     public DbSet<ServiceFAQ> ServiceFAQs => Set<ServiceFAQ>();
@@ -60,17 +57,6 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityR
             entity.Property(s => s.Features).HasColumnType("jsonb");
             entity.Property(s => s.Highlights).HasColumnType("jsonb");
             entity.Property(s => s.GalleryImages).HasColumnType("jsonb");
-            entity.Property(s => s.Tags).HasColumnType("jsonb");
-
-            entity.HasMany(s => s.Packages)
-                  .WithOne(p => p.Service)
-                  .HasForeignKey(p => p.ServiceId)
-                  .OnDelete(DeleteBehavior.Cascade);
-
-            entity.HasMany(s => s.AddOns)
-                  .WithOne(a => a.Service)
-                  .HasForeignKey(a => a.ServiceId)
-                  .OnDelete(DeleteBehavior.Cascade);
 
             entity.HasMany(s => s.ProcessSteps)
                   .WithOne(p => p.Service)
@@ -85,14 +71,6 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityR
             entity.HasMany(s => s.FAQs)
                   .WithOne(f => f.Service)
                   .HasForeignKey(f => f.ServiceId)
-                  .OnDelete(DeleteBehavior.Cascade);
-        });
-
-        builder.Entity<ServicePackage>(entity =>
-        {
-            entity.HasMany(p => p.Deliverables)
-                  .WithOne(d => d.ServicePackage)
-                  .HasForeignKey(d => d.ServicePackageId)
                   .OnDelete(DeleteBehavior.Cascade);
         });
 

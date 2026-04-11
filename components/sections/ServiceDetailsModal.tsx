@@ -164,18 +164,7 @@ export default function ServiceDetailsModal({
                   >
                     {service.tagline}
                   </motion.p>
-                  {service.startingPrice && (
-                    <motion.div variants={fadeUp} className="mt-4 flex items-baseline gap-2">
-                      {service.priceNote && (
-                        <span className="text-slate-400 text-[10px] uppercase tracking-widest font-bold font-sans transition-colors duration-500 drop-shadow-[0_1px_2px_rgba(255,255,255,1)]">
-                          {service.priceNote}
-                        </span>
-                      )}
-                      <span className="text-accent-gold text-2xl sm:text-3xl font-serif drop-shadow-[0_1px_2px_rgba(255,255,255,1)]">
-                        {service.startingPrice}
-                      </span>
-                    </motion.div>
-                  )}
+                  {/* Removed Starting Price display for minimalist design */}
                 </motion.div>
               </div>
 
@@ -237,115 +226,10 @@ export default function ServiceDetailsModal({
                   </motion.div>
                 </motion.div>
 
-                {/* ── Packages / Pricing ── */}
-                {(service.packages?.length ?? 0) > 0 && (
-                  <motion.div
-                    variants={staggerContainer}
-                    initial="hidden"
-                    whileInView="visible"
-                    viewport={{ once: true, margin: "-50px" }}
-                  >
-                    <motion.div variants={fadeUp} className="mb-10">
-                      <span className="text-accent-gold uppercase tracking-[0.2em] text-[10px] font-bold mb-3 block font-sans">
-                        Packages
-                      </span>
-                      <h3 className="font-serif text-3xl sm:text-4xl text-slate-900 transition-colors duration-500">
-                        Choose Your <span className="italic text-slate-500">Experience</span>
-                      </h3>
-                    </motion.div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
-                      {service.packages.map((pkg, i) => (
-                        <motion.div
-                          key={pkg.name}
-                          variants={fadeUp}
-                          className={`relative p-6 sm:p-8 rounded-xl border transition-all duration-500 group hover:border-accent-gold/40 shadow-sm hover:shadow-md
-                            ${
-                              pkg.isPopular
-                                ? "bg-accent-gold/2 border-accent-gold/30"
-                                : "bg-slate-50/50 border-slate-100"
-                            }
-                          `}
-                        >
-                          {pkg.isPopular && (
-                            <div className="absolute -top-3 left-6 px-3 py-1 bg-accent-gold text-black text-[9px] uppercase tracking-[0.2em] font-bold rounded-full">
-                              Most Popular
-                            </div>
-                          )}
-                          <div className="mb-6">
-                            <h4 className="text-slate-900 text-lg font-medium mb-1 transition-colors duration-500">{pkg.name}</h4>
-                            {pkg.duration && (
-                              <span className="text-slate-500 text-xs uppercase tracking-widest font-bold font-sans transition-colors duration-500">
-                                {pkg.duration}
-                              </span>
-                            )}
-                          </div>
-                          {pkg.price && (
-                            <div className="mb-1">
-                              <span className="text-accent-gold font-serif text-3xl">
-                                {pkg.price}
-                              </span>
-                            </div>
-                          )}
-                          {pkg.priceNote && (
-                            <span className="text-slate-500 text-[10px] uppercase tracking-widest font-bold block mb-4 font-sans transition-colors duration-500">
-                              {pkg.priceNote}
-                            </span>
-                          )}
-                          {pkg.description && (
-                            <p className="text-slate-600 text-xs mb-6 font-light leading-relaxed transition-colors duration-500">
-                              {pkg.description}
-                            </p>
-                          )}
-                          <ul className="space-y-2.5">
-                            {pkg.deliverables.map((d, j) => (
-                              <li key={j} className="flex items-start gap-2.5 text-slate-600 text-xs transition-colors duration-500">
-                                <Check
-                                  size={12}
-                                  className="text-accent-gold shrink-0 mt-0.5"
-                                  strokeWidth={2.5}
-                                />
-                                <span>
-                                  {d.item}
-                                  {d.detail && (
-                                    <span className="text-slate-500 ml-1 transition-colors duration-500">— {d.detail}</span>
-                                  )}
-                                </span>
-                              </li>
-                            ))}
-                          </ul>
-                        </motion.div>
-                      ))}
-                    </div>
-
-                    {/* Add-Ons */}
-                    {service.addOns && service.addOns.length > 0 && (
-                      <motion.div variants={fadeUp} className="mt-12">
-                        <span className="text-slate-400 text-[10px] uppercase tracking-[0.2em] font-bold mb-4 block font-sans transition-colors duration-500">
-                          Available Add-Ons
-                        </span>
-                        <div className="flex flex-wrap gap-3">
-                          {service.addOns.map((a, i) => (
-                            <div
-                              key={i}
-                              className="flex items-center gap-3 bg-white border border-slate-100 rounded-full px-5 py-2.5 hover:border-accent-gold/40 hover:shadow-sm transition-all duration-300"
-                            >
-                              <span className="text-slate-600 text-xs font-medium transition-colors duration-500">{a.name}</span>
-                              {a.price && (
-                                <span className="text-accent-gold text-xs font-medium">
-                                  +{a.price}
-                                </span>
-                              )}
-                            </div>
-                          ))}
-                        </div>
-                      </motion.div>
-                    )}
-                  </motion.div>
-                )}
+                {/* Removed Packages and Add-Ons sections for minimalist design */}
 
                 {/* ── Process / Timeline ── */}
-                {(service.process?.length ?? 0) > 0 && (
+                {(service.processSteps?.length ?? 0) > 0 && (
                   <motion.div
                     variants={staggerContainer}
                     initial="hidden"
@@ -366,9 +250,9 @@ export default function ServiceDetailsModal({
                       <div className="absolute left-[19px] top-0 bottom-0 w-px bg-gradient-to-b from-accent-gold/40 via-accent-gold/20 to-transparent hidden sm:block" />
 
                       <div className="space-y-8 sm:space-y-10">
-                        {service.process.map((step, i) => (
+                        {service.processSteps.map((step, i) => (
                           <motion.div
-                            key={step.step}
+                            key={step.id || i}
                             variants={fadeUp}
                             className="flex items-start gap-5 sm:gap-8 group"
                           >
@@ -381,7 +265,7 @@ export default function ServiceDetailsModal({
                                   </span>
                                 ) : (
                                   <span className="text-accent-gold text-xs font-bold">
-                                    {String(step.step).padStart(2, "0")}
+                                    {String(step.stepNumber || i + 1).padStart(2, "0")}
                                   </span>
                                 )}
                               </div>

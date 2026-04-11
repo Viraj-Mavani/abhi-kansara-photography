@@ -22,16 +22,13 @@ public class ServicesController : ControllerBase
     /// <summary>
     /// GET /api/services
     /// Returns all services ordered by display order.
-    /// Includes nested packages, add-ons, process, testimonials, and FAQs.
+    /// Includes nested process, testimonials, and FAQs.
     /// </summary>
     [HttpGet]
     public async Task<IActionResult> GetAll()
     {
         var services = await _context.Services
             .OrderBy(s => s.Order)
-            .Include(s => s.Packages.OrderBy(p => p.Order))
-                .ThenInclude(p => p.Deliverables.OrderBy(d => d.Order))
-            .Include(s => s.AddOns.OrderBy(a => a.Order))
             .Include(s => s.ProcessSteps.OrderBy(p => p.Order))
             .Include(s => s.Testimonials.OrderBy(t => t.Order))
             .Include(s => s.FAQs.OrderBy(f => f.Order))
@@ -50,9 +47,6 @@ public class ServicesController : ControllerBase
     {
         var service = await _context.Services
             .Where(s => s.Slug == slug)
-            .Include(s => s.Packages.OrderBy(p => p.Order))
-                .ThenInclude(p => p.Deliverables.OrderBy(d => d.Order))
-            .Include(s => s.AddOns.OrderBy(a => a.Order))
             .Include(s => s.ProcessSteps.OrderBy(p => p.Order))
             .Include(s => s.Testimonials.OrderBy(t => t.Order))
             .Include(s => s.FAQs.OrderBy(f => f.Order))
@@ -68,36 +62,12 @@ public class ServicesController : ControllerBase
     /// <summary>
     /// POST /api/services
     /// Creates a new service and all nested items.
-    /// Manually wires FK navigation references to bypass EF Core model validation.
     /// </summary>
     [HttpPost]
     [Microsoft.AspNetCore.Authorization.Authorize(Roles = "Admin")]
     public async Task<IActionResult> Create([FromBody] AbhiKansara.Core.Entities.Service service)
     {
-        // Assign a fresh Id for the root entity
         service.Id = Guid.NewGuid();
-
-        // Wire FK references for all nested collections so EF Core model validation passes
-        foreach (var package in service.Packages)
-        {
-            package.Id = Guid.NewGuid();
-            package.ServiceId = service.Id;
-            package.Service = service;
-
-            foreach (var deliverable in package.Deliverables)
-            {
-                deliverable.Id = Guid.NewGuid();
-                deliverable.ServicePackageId = package.Id;
-                deliverable.ServicePackage = package;
-            }
-        }
-
-        foreach (var addOn in service.AddOns)
-        {
-            addOn.Id = Guid.NewGuid();
-            addOn.ServiceId = service.Id;
-            addOn.Service = service;
-        }
 
         foreach (var step in service.ProcessSteps)
         {
@@ -128,7 +98,6 @@ public class ServicesController : ControllerBase
     /// <summary>
     /// PUT /api/services/{id}
     /// Full replace of a service and its nested children.
-    /// Manually wires FK navigation references to bypass EF Core model validation.
     /// </summary>
     [HttpPut("{id}")]
     [Microsoft.AspNetCore.Authorization.Authorize(Roles = "Admin")]
@@ -137,8 +106,6 @@ public class ServicesController : ControllerBase
         if (id != updatedService.Id) return BadRequest(new { message = "ID mismatch." });
 
         var existingService = await _context.Services
-            .Include(s => s.Packages).ThenInclude(p => p.Deliverables)
-            .Include(s => s.AddOns)
             .Include(s => s.ProcessSteps)
             .Include(s => s.Testimonials)
             .Include(s => s.FAQs)
@@ -146,67 +113,48 @@ public class ServicesController : ControllerBase
 
         if (existingService == null) return NotFound();
 
-        // Remove all existing nested collections — full replace strategy
-        _context.RemoveRange(existingService.Packages.SelectMany(p => p.Deliverables));
-        _context.RemoveRange(existingService.Packages);
-        _context.RemoveRange(existingService.AddOns);
-        _context.RemoveRange(existingService.ProcessSteps);
-        _context.RemoveRange(existingService.Testimonials);
-        _context.RemoveRange(existingService.FAQs);
+        // 1. Manually map scalar properties (don't overwrite Id or CreatedAt)
+        existingService.Title = updatedService.Title;
+        existingService.Slug = updatedService.Slug;
+        existingService.Tagline = updatedService.Tagline;
+        existingService.CoverImage = updatedService.CoverImage;
+        existingService.Icon = updatedService.Icon;
+        existingService.ShortDescription = updatedService.ShortDescription;
+        existingService.DetailedDescription = updatedService.DetailedDescription;
+        existingService.Features = updatedService.Features;
+        existingService.Highlights = updatedService.Highlights;
+        existingService.GalleryImages = updatedService.GalleryImages;
+        existingService.Category = updatedService.Category;
+        existingService.Order = updatedService.Order;
+        existingService.IsFeatured = updatedService.IsFeatured;
 
-        await _context.SaveChangesAsync(); // Flush deletes before re-adding
-
-        // Update scalar fields
-        _context.Entry(existingService).CurrentValues.SetValues(updatedService);
-
-        // Wire FK references for incoming nested items
-        foreach (var package in updatedService.Packages)
-        {
-            package.Id = Guid.NewGuid();
-            package.ServiceId = id;
-            package.Service = existingService;
-
-            foreach (var deliverable in package.Deliverables)
-            {
-                deliverable.Id = Guid.NewGuid();
-                deliverable.ServicePackageId = package.Id;
-                deliverable.ServicePackage = package;
-            }
-        }
-
-        foreach (var addOn in updatedService.AddOns)
-        {
-            addOn.Id = Guid.NewGuid();
-            addOn.ServiceId = id;
-            addOn.Service = existingService;
-        }
-
+        // 2. Clear then re-add to all collections in a single transaction
+        existingService.ProcessSteps.Clear();
         foreach (var step in updatedService.ProcessSteps)
         {
             step.Id = Guid.NewGuid();
             step.ServiceId = id;
             step.Service = existingService;
+            existingService.ProcessSteps.Add(step);
         }
 
+        existingService.Testimonials.Clear();
         foreach (var testimonial in updatedService.Testimonials)
         {
             testimonial.Id = Guid.NewGuid();
             testimonial.ServiceId = id;
             testimonial.Service = existingService;
+            existingService.Testimonials.Add(testimonial);
         }
 
+        existingService.FAQs.Clear();
         foreach (var faq in updatedService.FAQs)
         {
             faq.Id = Guid.NewGuid();
             faq.ServiceId = id;
             faq.Service = existingService;
+            existingService.FAQs.Add(faq);
         }
-
-        existingService.Packages = updatedService.Packages;
-        existingService.AddOns = updatedService.AddOns;
-        existingService.ProcessSteps = updatedService.ProcessSteps;
-        existingService.Testimonials = updatedService.Testimonials;
-        existingService.FAQs = updatedService.FAQs;
 
         try
         {

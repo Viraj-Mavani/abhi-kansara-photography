@@ -15,10 +15,4 @@ public class PageConfig : BaseEntity
     public required string HeroSubtitle { get; set; }
     public string? CtaText { get; set; }
     public string? CtaLink { get; set; }
-
-    // ── Optional section headers (for pages like services) ──
-    public string? SectionTitle1 { get; set; }         // e.g., "How We Work"
-    public string? SectionSubtitle1 { get; set; }
-    public string? SectionTitle2 { get; set; }         // e.g., "Questions & Answers"
-    public string? SectionSubtitle2 { get; set; }
 }

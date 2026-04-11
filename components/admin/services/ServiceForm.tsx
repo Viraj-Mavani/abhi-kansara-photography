@@ -1,6 +1,6 @@
 "use client";
 
-import { useForm, useFieldArray, Controller } from "react-hook-form";
+import { useForm, useFieldArray } from "react-hook-form";
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import AdminInput from "@/components/admin/ui/AdminInput";
@@ -8,11 +8,9 @@ import AdminButton from "@/components/admin/ui/AdminButton";
 import { createService, updateService } from "@/app/actions/services";
 import type { DetailedService } from "@/lib/api";
 import { Plus, Trash2, ChevronDown, ChevronRight, GripVertical } from "lucide-react";
-import { cn } from "@/lib/utils";
 
 // ─────────────────────────────────────────────────────────
-//  ServiceForm — Deep Nested Form for Service CRUD
-//  Uses useFieldArray for all dynamic collections.
+//  ServiceForm — Simplified deep form for Service CRUD
 // ─────────────────────────────────────────────────────────
 
 interface ServiceFormValues {
@@ -23,30 +21,12 @@ interface ServiceFormValues {
   icon: string;
   shortDescription: string;
   detailedDescription: string;
-  startingPrice: string;
-  priceNote: string;
   category: string;
-  minDuration: string;
-  maxCapacity: string;
-  travelAvailable: boolean;
-  indoorOutdoor: string;
   order: number;
   isFeatured: boolean;
   features: { value: string }[];
   highlights: { value: string }[];
-  tags: { value: string }[];
   galleryImages: { value: string }[];
-  packages: {
-    name: string;
-    price: string;
-    priceNote: string;
-    duration: string;
-    description: string;
-    isPopular: boolean;
-    order: number;
-    deliverables: { item: string; detail: string; order: number }[];
-  }[];
-  addOns: { name: string; price: string; description: string; order: number }[];
   processSteps: { stepNumber: number; title: string; description: string; icon: string; order: number }[];
   testimonials: { clientName: string; event: string; quote: string; rating: number; avatar: string; order: number }[];
   faqs: { question: string; answer: string; order: number }[];
@@ -119,40 +99,13 @@ export default function ServiceForm({ initialData }: ServiceFormProps) {
             icon: initialData.icon || "",
             shortDescription: initialData.shortDescription,
             detailedDescription: initialData.detailedDescription,
-            startingPrice: initialData.startingPrice || "",
-            priceNote: initialData.priceNote || "",
             category: initialData.category || "",
-            minDuration: initialData.minDuration || "",
-            maxCapacity: initialData.maxCapacity || "",
-            travelAvailable: initialData.travelAvailable || false,
-            indoorOutdoor: initialData.indoorOutdoor || "",
             order: initialData.order || 0,
             isFeatured: initialData.isFeatured || false,
             features: (initialData.features || []).map((v) => ({ value: v })),
             highlights: (initialData.highlights || []).map((v) => ({ value: v })),
-            tags: (initialData.tags || []).map((v) => ({ value: v })),
             galleryImages: (initialData.galleryImages || []).map((v) => ({ value: v })),
-            packages: (initialData.packages || []).map((p, pi) => ({
-              name: p.name,
-              price: p.price || "",
-              priceNote: p.priceNote || "",
-              duration: p.duration || "",
-              description: p.description || "",
-              isPopular: p.isPopular || false,
-              order: pi,
-              deliverables: (p.deliverables || []).map((d, di) => ({
-                item: d.item,
-                detail: d.detail || "",
-                order: di,
-              })),
-            })),
-            addOns: (initialData.addOns || []).map((a, i) => ({
-              name: a.name,
-              price: a.price || "",
-              description: a.description || "",
-              order: i,
-            })),
-            processSteps: (initialData.process || []).map((p, i) => ({
+            processSteps: (initialData.processSteps || []).map((p, i) => ({
               stepNumber: p.stepNumber,
               title: p.title,
               description: p.description,
@@ -181,40 +134,25 @@ export default function ServiceForm({ initialData }: ServiceFormProps) {
             icon: "",
             shortDescription: "",
             detailedDescription: "",
-            startingPrice: "",
-            priceNote: "",
             category: "",
-            minDuration: "",
-            maxCapacity: "",
-            travelAvailable: false,
-            indoorOutdoor: "",
             order: 0,
             isFeatured: false,
             features: [],
             highlights: [],
-            tags: [],
             galleryImages: [],
-            packages: [],
-            addOns: [],
             processSteps: [],
             testimonials: [],
             faqs: [],
           },
     });
 
-  // Field arrays for all nested collections
+  // Field arrays for nested collections
   const featuresField = useFieldArray({ control, name: "features" });
   const highlightsField = useFieldArray({ control, name: "highlights" });
-  const tagsField = useFieldArray({ control, name: "tags" });
   const galleryImagesField = useFieldArray({ control, name: "galleryImages" });
-  const packagesField = useFieldArray({ control, name: "packages" });
-  const addOnsField = useFieldArray({ control, name: "addOns" });
   const processField = useFieldArray({ control, name: "processSteps" });
   const testimonialsField = useFieldArray({ control, name: "testimonials" });
   const faqsField = useFieldArray({ control, name: "faqs" });
-
-  // Auto-slug from title
-  const watchTitle = watch("title");
 
   const onSubmit = (formData: ServiceFormValues) => {
     setError("");
@@ -229,39 +167,12 @@ export default function ServiceForm({ initialData }: ServiceFormProps) {
       icon: formData.icon || null,
       shortDescription: formData.shortDescription,
       detailedDescription: formData.detailedDescription,
-      startingPrice: formData.startingPrice || null,
-      priceNote: formData.priceNote || null,
       category: formData.category || null,
-      minDuration: formData.minDuration || null,
-      maxCapacity: formData.maxCapacity || null,
-      travelAvailable: formData.travelAvailable,
-      indoorOutdoor: formData.indoorOutdoor || null,
       order: formData.order,
       isFeatured: formData.isFeatured,
       features: formData.features.map((f) => f.value).filter(Boolean),
       highlights: formData.highlights.map((h) => h.value).filter(Boolean),
-      tags: formData.tags.map((t) => t.value).filter(Boolean),
       galleryImages: formData.galleryImages.map((g) => g.value).filter(Boolean),
-      packages: formData.packages.map((pkg, i) => ({
-        name: pkg.name,
-        price: pkg.price || null,
-        priceNote: pkg.priceNote || null,
-        duration: pkg.duration || null,
-        description: pkg.description || null,
-        isPopular: pkg.isPopular,
-        order: i,
-        deliverables: pkg.deliverables.map((d, j) => ({
-          item: d.item,
-          detail: d.detail || null,
-          order: j,
-        })),
-      })),
-      addOns: formData.addOns.map((a, i) => ({
-        name: a.name,
-        price: a.price || null,
-        description: a.description || null,
-        order: i,
-      })),
       processSteps: formData.processSteps.map((p, i) => ({
         stepNumber: p.stepNumber || i + 1,
         title: p.title,
@@ -287,9 +198,9 @@ export default function ServiceForm({ initialData }: ServiceFormProps) {
     startTransition(async () => {
       try {
         if (isEditing) {
-          await updateService(initialData.id, payload);
+          await updateService(initialData.id, payload as any);
         } else {
-          await createService(payload);
+          await createService(payload as any);
         }
       } catch (e: unknown) {
         setError(e instanceof Error ? e.message : "Failed to save service");
@@ -355,6 +266,22 @@ export default function ServiceForm({ initialData }: ServiceFormProps) {
           <AdminInput label="Cover Image URL" placeholder="https://..." {...register("coverImage", { required: "Cover image is required" })} error={errors.coverImage?.message} />
           <AdminInput label="Icon (Material Symbols)" placeholder="photo_camera" {...register("icon")} />
         </div>
+        
+        {/* Consolidated Metadata Fields */}
+        <div className="grid grid-cols-3 gap-4 border-t border-white/[0.06] pt-4 mt-2">
+          <AdminInput label="Category" placeholder="Wedding" {...register("category")} />
+          <AdminInput label="Display Order" type="number" {...register("order", { valueAsNumber: true })} />
+          <div className="flex flex-col gap-1.5">
+            <label className="text-[11px] font-bold uppercase tracking-[0.15em] text-white/50">Featured</label>
+            <div className="flex items-center h-11">
+              <label className="flex items-center gap-2 text-sm text-white/60 cursor-pointer">
+                <input type="checkbox" {...register("isFeatured")} className="accent-[#c9a96e]" />
+                Show on Homepage
+              </label>
+            </div>
+          </div>
+        </div>
+
         <div>
           <label className="text-[11px] font-bold uppercase tracking-[0.15em] text-white/50 mb-1.5 block">
             Short Description
@@ -377,15 +304,7 @@ export default function ServiceForm({ initialData }: ServiceFormProps) {
         </div>
       </Section>
 
-      {/* ── Pricing ── */}
-      <Section title="Pricing">
-        <div className="grid grid-cols-2 gap-4">
-          <AdminInput label="Starting Price" placeholder="$3,500" {...register("startingPrice")} />
-          <AdminInput label="Price Note" placeholder="Starting from" {...register("priceNote")} />
-        </div>
-      </Section>
-
-      {/* ── Features (string array) ── */}
+      {/* ── Features ── */}
       <Section title="Features" count={featuresField.fields.length}>
         {featuresField.fields.map((field, index) => (
           <div key={field.id} className="flex items-center gap-2">
@@ -401,7 +320,7 @@ export default function ServiceForm({ initialData }: ServiceFormProps) {
         </AdminButton>
       </Section>
 
-      {/* ── Highlights (string array) ── */}
+      {/* ── Highlights ── */}
       <Section title="Highlights" count={highlightsField.fields.length}>
         {highlightsField.fields.map((field, index) => (
           <div key={field.id} className="flex items-center gap-2">
@@ -417,23 +336,8 @@ export default function ServiceForm({ initialData }: ServiceFormProps) {
         </AdminButton>
       </Section>
 
-      {/* ── Tags (string array) ── */}
-      <Section title="Tags" count={tagsField.fields.length}>
-        {tagsField.fields.map((field, index) => (
-          <div key={field.id} className="flex items-center gap-2">
-            <AdminInput placeholder="Tag..." className="flex-1" {...register(`tags.${index}.value`)} />
-            <button type="button" onClick={() => tagsField.remove(index)} className="p-2 text-white/20 hover:text-red-400 transition-colors">
-              <Trash2 className="h-4 w-4" />
-            </button>
-          </div>
-        ))}
-        <AdminButton type="button" variant="ghost" size="sm" onClick={() => tagsField.append({ value: "" })}>
-          <Plus className="h-3.5 w-3.5" /> Add Tag
-        </AdminButton>
-      </Section>
-
-      {/* ── Gallery Images (string array) ── */}
-      <Section title="Gallery Images" count={galleryImagesField.fields.length}>
+      {/* ── Gallery Images ── */}
+      <Section title="Gallery Content" count={galleryImagesField.fields.length}>
         {galleryImagesField.fields.map((field, index) => (
           <div key={field.id} className="flex items-center gap-2">
             <GripVertical className="h-4 w-4 text-white/15 flex-shrink-0" />
@@ -445,58 +349,6 @@ export default function ServiceForm({ initialData }: ServiceFormProps) {
         ))}
         <AdminButton type="button" variant="ghost" size="sm" onClick={() => galleryImagesField.append({ value: "" })}>
           <Plus className="h-3.5 w-3.5" /> Add Image URL
-        </AdminButton>
-      </Section>
-
-      {/* ── Packages (nested: Package → Deliverables) ── */}
-      <Section title="Packages" count={packagesField.fields.length}>
-        {packagesField.fields.map((pkgField, pkgIdx) => (
-          <PackageCard
-            key={pkgField.id}
-            index={pkgIdx}
-            register={register}
-            control={control}
-            onRemove={() => packagesField.remove(pkgIdx)}
-          />
-        ))}
-        <AdminButton
-          type="button"
-          variant="ghost"
-          size="sm"
-          onClick={() =>
-            packagesField.append({
-              name: "",
-              price: "",
-              priceNote: "",
-              duration: "",
-              description: "",
-              isPopular: false,
-              order: packagesField.fields.length,
-              deliverables: [],
-            })
-          }
-        >
-          <Plus className="h-3.5 w-3.5" /> Add Package
-        </AdminButton>
-      </Section>
-
-      {/* ── Add-Ons ── */}
-      <Section title="Add-Ons" count={addOnsField.fields.length}>
-        {addOnsField.fields.map((field, index) => (
-          <div key={field.id} className="rounded-lg border border-white/[0.06] bg-white/[0.01] p-4 space-y-3">
-            <div className="flex items-center justify-between">
-              <span className="text-xs text-white/30 font-mono">Add-On {index + 1}</span>
-              <button type="button" onClick={() => addOnsField.remove(index)} className="p-1 text-white/20 hover:text-red-400"><Trash2 className="h-3.5 w-3.5" /></button>
-            </div>
-            <div className="grid grid-cols-2 gap-3">
-              <AdminInput placeholder="Name" {...register(`addOns.${index}.name`)} />
-              <AdminInput placeholder="Price" {...register(`addOns.${index}.price`)} />
-            </div>
-            <AdminInput placeholder="Description" {...register(`addOns.${index}.description`)} />
-          </div>
-        ))}
-        <AdminButton type="button" variant="ghost" size="sm" onClick={() => addOnsField.append({ name: "", price: "", description: "", order: addOnsField.fields.length })}>
-          <Plus className="h-3.5 w-3.5" /> Add Add-On
         </AdminButton>
       </Section>
 
@@ -574,32 +426,6 @@ export default function ServiceForm({ initialData }: ServiceFormProps) {
         </AdminButton>
       </Section>
 
-      {/* ── Metadata ── */}
-      <Section title="Metadata & Display">
-        <div className="grid grid-cols-3 gap-4">
-          <AdminInput label="Category" placeholder="Wedding" {...register("category")} />
-          <AdminInput label="Min Duration" placeholder="4 Hours" {...register("minDuration")} />
-          <AdminInput label="Max Capacity" placeholder="200 Guests" {...register("maxCapacity")} />
-        </div>
-        <div className="grid grid-cols-3 gap-4">
-          <AdminInput label="Indoor/Outdoor" placeholder="Both" {...register("indoorOutdoor")} />
-          <AdminInput label="Display Order" type="number" {...register("order", { valueAsNumber: true })} />
-          <div className="flex flex-col gap-1.5">
-            <label className="text-[11px] font-bold uppercase tracking-[0.15em] text-white/50">Options</label>
-            <div className="flex items-center gap-6 h-11">
-              <label className="flex items-center gap-2 text-sm text-white/60 cursor-pointer">
-                <input type="checkbox" {...register("travelAvailable")} className="accent-[#c9a96e]" />
-                Travel Available
-              </label>
-              <label className="flex items-center gap-2 text-sm text-white/60 cursor-pointer">
-                <input type="checkbox" {...register("isFeatured")} className="accent-[#c9a96e]" />
-                Featured
-              </label>
-            </div>
-          </div>
-        </div>
-      </Section>
-
       {/* ── Sticky Save Bar ── */}
       <div className="fixed bottom-0 left-64 right-0 bg-[#0a0a0f]/95 backdrop-blur-xl border-t border-white/[0.06] px-8 py-4 flex items-center justify-between z-50">
         <p className="text-xs text-white/30">
@@ -615,78 +441,5 @@ export default function ServiceForm({ initialData }: ServiceFormProps) {
         </div>
       </div>
     </form>
-  );
-}
-
-// ─────────────────────────────────────────────────────────
-//  PackageCard — Nested component for Package + Deliverables
-// ─────────────────────────────────────────────────────────
-
-function PackageCard({
-  index,
-  register,
-  control,
-  onRemove,
-}: {
-  index: number;
-  register: ReturnType<typeof useForm<ServiceFormValues>>["register"];
-  control: ReturnType<typeof useForm<ServiceFormValues>>["control"];
-  onRemove: () => void;
-}) {
-  const deliverables = useFieldArray({
-    control,
-    name: `packages.${index}.deliverables`,
-  });
-
-  return (
-    <div className="rounded-lg border border-white/[0.08] bg-white/[0.015] p-5 space-y-4">
-      <div className="flex items-center justify-between">
-        <span className="text-xs font-bold uppercase tracking-[0.15em] text-[#c9a96e]/60">
-          Package {index + 1}
-        </span>
-        <button type="button" onClick={onRemove} className="p-1 text-white/20 hover:text-red-400 transition-colors">
-          <Trash2 className="h-4 w-4" />
-        </button>
-      </div>
-
-      <div className="grid grid-cols-2 gap-3">
-        <AdminInput placeholder="Package Name" {...register(`packages.${index}.name`)} />
-        <AdminInput placeholder="Price (e.g. $5,500)" {...register(`packages.${index}.price`)} />
-      </div>
-      <div className="grid grid-cols-3 gap-3">
-        <AdminInput placeholder="Price Note" {...register(`packages.${index}.priceNote`)} />
-        <AdminInput placeholder="Duration" {...register(`packages.${index}.duration`)} />
-        <div className="flex items-center h-11">
-          <label className="flex items-center gap-2 text-sm text-white/60 cursor-pointer">
-            <input type="checkbox" {...register(`packages.${index}.isPopular`)} className="accent-[#c9a96e]" />
-            Popular
-          </label>
-        </div>
-      </div>
-      <AdminInput placeholder="Description" {...register(`packages.${index}.description`)} />
-
-      {/* Nested Deliverables */}
-      <div className="pl-4 border-l-2 border-white/[0.06] space-y-2 mt-3">
-        <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-white/30">
-          Deliverables ({deliverables.fields.length})
-        </span>
-        {deliverables.fields.map((delField, delIdx) => (
-          <div key={delField.id} className="flex items-center gap-2">
-            <AdminInput placeholder="Item" className="flex-1" {...register(`packages.${index}.deliverables.${delIdx}.item`)} />
-            <AdminInput placeholder="Detail" className="flex-1" {...register(`packages.${index}.deliverables.${delIdx}.detail`)} />
-            <button type="button" onClick={() => deliverables.remove(delIdx)} className="p-1 text-white/20 hover:text-red-400">
-              <Trash2 className="h-3.5 w-3.5" />
-            </button>
-          </div>
-        ))}
-        <button
-          type="button"
-          onClick={() => deliverables.append({ item: "", detail: "", order: deliverables.fields.length })}
-          className="text-xs text-[#c9a96e]/60 hover:text-[#c9a96e] flex items-center gap-1 transition-colors"
-        >
-          <Plus className="h-3 w-3" /> Add Deliverable
-        </button>
-      </div>
-    </div>
   );
 }

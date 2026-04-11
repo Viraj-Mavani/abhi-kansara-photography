@@ -16,5 +16,5 @@ public class ServiceProcess : BaseEntity
 
     // ── Foreign Key ──
     public Guid ServiceId { get; set; }
-    public Service Service { get; set; } = null!;
+    public Service? Service { get; set; }
 }

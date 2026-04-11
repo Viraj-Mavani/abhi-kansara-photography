@@ -30,5 +30,7 @@ public class MediaItem : BaseEntity
 
     // ── Foreign Key ──
     public Guid ProjectGalleryId { get; set; }
+    
+    [System.Text.Json.Serialization.JsonIgnore]
     public ProjectGallery? ProjectGallery { get; set; }
 }

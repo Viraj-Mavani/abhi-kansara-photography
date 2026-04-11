@@ -12,7 +12,8 @@ export const metadata: Metadata = {
 };
 
 export default async function ServicesPage() {
-  const services = await getServices();
+  const allServices = await getServices();
+  const services = allServices.filter(s => s.isFeatured !== false); // Default to true if somehow null
   const pageConfig = await getPageConfig('services');
 
   return (
