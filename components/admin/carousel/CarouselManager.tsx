@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState, useTransition, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import Image from "next/image";
 import AdminInput from "@/components/admin/ui/AdminInput";
 import AdminButton from "@/components/admin/ui/AdminButton";
@@ -22,7 +23,13 @@ interface CarouselManagerProps {
 }
 
 export default function CarouselManager({ items: initialItems }: CarouselManagerProps) {
+  const router = useRouter();
   const [items, setItems] = useState(initialItems);
+
+  // Sync state with props when server data refreshes
+  useEffect(() => {
+    setItems(initialItems);
+  }, [initialItems]);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editTitle, setEditTitle] = useState("");
   const [editImageUrl, setEditImageUrl] = useState("");
@@ -107,8 +114,7 @@ export default function CarouselManager({ items: initialItems }: CarouselManager
         setNewTitle("");
         setNewImageUrl("");
         setNewSortOrder(items.length);
-        // Page revalidates, but local update for immediate feedback
-        window.location.reload(); 
+        router.refresh();
       } catch (e: unknown) {
         setError(e instanceof Error ? e.message : "Failed to create");
       }

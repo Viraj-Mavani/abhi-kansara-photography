@@ -146,6 +146,8 @@ export default function GalleryForm({ initialData }: GalleryFormProps) {
         } else {
           await createGallery(payload);
         }
+        router.push("/admin/galleries");
+        router.refresh();
       } catch (e: unknown) {
         setError(e instanceof Error ? e.message : "Failed to save gallery");
       }

@@ -202,6 +202,8 @@ export default function ServiceForm({ initialData }: ServiceFormProps) {
         } else {
           await createService(payload as any);
         }
+        router.push("/admin/services");
+        router.refresh();
       } catch (e: unknown) {
         setError(e instanceof Error ? e.message : "Failed to save service");
       }

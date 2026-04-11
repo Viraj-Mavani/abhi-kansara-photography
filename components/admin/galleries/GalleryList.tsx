@@ -144,7 +144,7 @@ export default function GalleryList({ initialGalleries }: GalleryListProps) {
                         )}
                       </div>
                       <Link 
-                        href={`/portfolio/${gallery.slug}`} 
+                        href={`/portfolio/clients/${gallery.slug}`} 
                         target="_blank"
                         className="p-1.5 rounded-lg hover:bg-white/5 text-white/20 hover:text-[#c9a96e] transition-all"
                         title="View Public Link"
