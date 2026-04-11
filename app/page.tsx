@@ -8,18 +8,23 @@ import PortraitVideos from "@/components/sections/PortraitVideos";
 import LandscapeVideos from "@/components/sections/LandscapeVideos";
 import { Analytics } from "@vercel/analytics/next"
 import { SpeedInsights } from "@vercel/speed-insights/next"
-import { getFeaturedGalleries, getCarouselItems } from "@/lib/api";
+import { getFeaturedGalleries, getCarouselItems, getHeroBackgrounds, getPageConfig } from "@/lib/api";
 
 export default async function Home() {
-  const [featuredGalleries, carouselItems] = await Promise.all([
+  const [featuredGalleries, carouselItems, heroBackgrounds, homeConfig] = await Promise.all([
     getFeaturedGalleries(),
-    getCarouselItems()
+    getCarouselItems(),
+    getHeroBackgrounds(),
+    getPageConfig("home"),
   ]);
 
   return (
     <main className="flex min-h-screen flex-col selection:bg-accent-gold selection:text-black bg-transparent">
       {/* Absolute zero fixed background */}
-      <BackgroundCarousel />
+      <BackgroundCarousel 
+        backgrounds={heroBackgrounds} 
+        interval={homeConfig?.heroInterval ?? 4.5} 
+      />
       
       {/* Floating Navigation */}
       <Navigation />

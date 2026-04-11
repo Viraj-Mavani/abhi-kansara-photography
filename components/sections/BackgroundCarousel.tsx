@@ -3,20 +3,30 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import { AnimatePresence, motion, useScroll, useTransform } from "framer-motion";
-import { backgroundImages } from "@/lib/data";
+import { fallbackBackgroundImages } from "@/lib/data";
+import { HeroBackground } from "@/lib/api";
 
-export default function BackgroundCarousel() {
+interface BackgroundCarouselProps {
+  backgrounds?: HeroBackground[];
+  interval?: number;
+}
+
+export default function BackgroundCarousel({ backgrounds = [], interval = 4.5 }: BackgroundCarouselProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const { scrollY } = useScroll();
   const overlayOpacity = useTransform(scrollY, [0, 400], [0, 0.5]);
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentIndex((prev) => (prev + 1) % backgroundImages.length);
-    }, 4500); // 4.5 seconds for cinematic pacing
+  const images = backgrounds.length > 0 ? backgrounds.map(b => b.imageUrl) : fallbackBackgroundImages;
 
-    return () => clearInterval(interval);
-  }, []);
+  useEffect(() => {
+    if (images.length <= 1) return;
+
+    const timer = setInterval(() => {
+      setCurrentIndex((prev) => (prev + 1) % images.length);
+    }, (interval || 4.5) * 1000);
+
+    return () => clearInterval(timer);
+  }, [images.length, interval]);
 
   return (
     <div className="fixed top-0 left-0 w-screen h-screen z-0 bg-black overflow-hidden pointer-events-none">
@@ -30,7 +40,7 @@ export default function BackgroundCarousel() {
           className="absolute inset-0 w-full h-full"
         >
           <Image
-            src={backgroundImages[currentIndex]}
+            src={images[currentIndex]}
             alt="Photography Showcase"
             fill
             className="object-cover"

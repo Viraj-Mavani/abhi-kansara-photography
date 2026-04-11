@@ -15,4 +15,7 @@ public class PageConfig : BaseEntity
     public required string HeroSubtitle { get; set; }
     public string? CtaText { get; set; }
     public string? CtaLink { get; set; }
+
+    // ── Hero Background Settings (only for "home" page key) ──
+    public double HeroInterval { get; set; } = 5; // Default 5 seconds
 }

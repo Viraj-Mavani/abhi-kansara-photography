@@ -79,7 +79,12 @@ export const portfolioImages: PortfolioImage[] = [
 	},
 ];
 
-export const backgroundImages = [
+/**
+ * Legacy Fallback Backgrounds
+ * These are used only if the database is unseeded or the API is unreachable.
+ * The primary backgrounds are now managed in the Admin CMS under "Hero Manager".
+ */
+export const fallbackBackgroundImages = [
 	`${R2_URL}/images/bg/bg1.webp`,
 	`${R2_URL}/images/bg/bg0.webp`,
 	`${R2_URL}/images/bg/bg2.webp`,

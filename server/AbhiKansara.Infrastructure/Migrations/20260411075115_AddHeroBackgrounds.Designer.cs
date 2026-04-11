@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using AbhiKansara.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -12,9 +13,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace AbhiKansara.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260411075115_AddHeroBackgrounds")]
+    partial class AddHeroBackgrounds
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -118,67 +121,67 @@ namespace AbhiKansara.Infrastructure.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("b1de7a47-f69a-419f-b87f-3345e82dc771"),
-                            CreatedAt = new DateTime(2026, 4, 11, 8, 23, 36, 558, DateTimeKind.Utc).AddTicks(7263),
+                            Id = new Guid("80729096-ce94-4e5d-97f4-f3a47fa2f94e"),
+                            CreatedAt = new DateTime(2026, 4, 11, 7, 51, 14, 975, DateTimeKind.Utc).AddTicks(3805),
                             ImageUrl = "https://pub-576c3f4676204ddb823a5e2e2e27435e.r2.dev/images/bg/bg1.webp",
                             Order = 0,
-                            UpdatedAt = new DateTime(2026, 4, 11, 8, 23, 36, 558, DateTimeKind.Utc).AddTicks(7264)
+                            UpdatedAt = new DateTime(2026, 4, 11, 7, 51, 14, 975, DateTimeKind.Utc).AddTicks(3805)
                         },
                         new
                         {
-                            Id = new Guid("55bb7db1-05b9-4631-8dee-c3ba9d8d09b0"),
-                            CreatedAt = new DateTime(2026, 4, 11, 8, 23, 36, 558, DateTimeKind.Utc).AddTicks(7283),
+                            Id = new Guid("d8d848c9-241c-4e52-aa9e-daf019c7462b"),
+                            CreatedAt = new DateTime(2026, 4, 11, 7, 51, 14, 975, DateTimeKind.Utc).AddTicks(3809),
                             ImageUrl = "https://pub-576c3f4676204ddb823a5e2e2e27435e.r2.dev/images/bg/bg0.webp",
                             Order = 1,
-                            UpdatedAt = new DateTime(2026, 4, 11, 8, 23, 36, 558, DateTimeKind.Utc).AddTicks(7283)
+                            UpdatedAt = new DateTime(2026, 4, 11, 7, 51, 14, 975, DateTimeKind.Utc).AddTicks(3809)
                         },
                         new
                         {
-                            Id = new Guid("c7ccc139-6d00-431a-9c7f-2b269cc5eefd"),
-                            CreatedAt = new DateTime(2026, 4, 11, 8, 23, 36, 558, DateTimeKind.Utc).AddTicks(7286),
+                            Id = new Guid("90eeca4a-4335-4fc9-856b-7c8efffb576b"),
+                            CreatedAt = new DateTime(2026, 4, 11, 7, 51, 14, 975, DateTimeKind.Utc).AddTicks(3812),
                             ImageUrl = "https://pub-576c3f4676204ddb823a5e2e2e27435e.r2.dev/images/bg/bg2.webp",
                             Order = 2,
-                            UpdatedAt = new DateTime(2026, 4, 11, 8, 23, 36, 558, DateTimeKind.Utc).AddTicks(7286)
+                            UpdatedAt = new DateTime(2026, 4, 11, 7, 51, 14, 975, DateTimeKind.Utc).AddTicks(3812)
                         },
                         new
                         {
-                            Id = new Guid("380713d6-3d09-423e-9a21-74ab4e62c5ea"),
-                            CreatedAt = new DateTime(2026, 4, 11, 8, 23, 36, 558, DateTimeKind.Utc).AddTicks(7288),
+                            Id = new Guid("03afa131-db6d-4f80-b184-8e330d5bd330"),
+                            CreatedAt = new DateTime(2026, 4, 11, 7, 51, 14, 975, DateTimeKind.Utc).AddTicks(3823),
                             ImageUrl = "https://pub-576c3f4676204ddb823a5e2e2e27435e.r2.dev/images/bg/bg3.webp",
                             Order = 3,
-                            UpdatedAt = new DateTime(2026, 4, 11, 8, 23, 36, 558, DateTimeKind.Utc).AddTicks(7289)
+                            UpdatedAt = new DateTime(2026, 4, 11, 7, 51, 14, 975, DateTimeKind.Utc).AddTicks(3823)
                         },
                         new
                         {
-                            Id = new Guid("e608a2b6-4545-459b-86f5-1742f66a1473"),
-                            CreatedAt = new DateTime(2026, 4, 11, 8, 23, 36, 558, DateTimeKind.Utc).AddTicks(7292),
+                            Id = new Guid("6eaf147b-ccf3-42ba-b75c-34b4711d739a"),
+                            CreatedAt = new DateTime(2026, 4, 11, 7, 51, 14, 975, DateTimeKind.Utc).AddTicks(3825),
                             ImageUrl = "https://pub-576c3f4676204ddb823a5e2e2e27435e.r2.dev/images/bg/bg4.webp",
                             Order = 4,
-                            UpdatedAt = new DateTime(2026, 4, 11, 8, 23, 36, 558, DateTimeKind.Utc).AddTicks(7292)
+                            UpdatedAt = new DateTime(2026, 4, 11, 7, 51, 14, 975, DateTimeKind.Utc).AddTicks(3826)
                         },
                         new
                         {
-                            Id = new Guid("8a9365d8-8862-492f-be77-3f619e6d7898"),
-                            CreatedAt = new DateTime(2026, 4, 11, 8, 23, 36, 558, DateTimeKind.Utc).AddTicks(7297),
+                            Id = new Guid("d9292c5d-d7b7-4418-86f1-a9dc1198b6de"),
+                            CreatedAt = new DateTime(2026, 4, 11, 7, 51, 14, 975, DateTimeKind.Utc).AddTicks(3827),
                             ImageUrl = "https://pub-576c3f4676204ddb823a5e2e2e27435e.r2.dev/images/bg/bg5.webp",
                             Order = 5,
-                            UpdatedAt = new DateTime(2026, 4, 11, 8, 23, 36, 558, DateTimeKind.Utc).AddTicks(7297)
+                            UpdatedAt = new DateTime(2026, 4, 11, 7, 51, 14, 975, DateTimeKind.Utc).AddTicks(3828)
                         },
                         new
                         {
-                            Id = new Guid("f2e21509-7ce2-478e-af72-0217352d19e4"),
-                            CreatedAt = new DateTime(2026, 4, 11, 8, 23, 36, 558, DateTimeKind.Utc).AddTicks(7299),
+                            Id = new Guid("fb5e5345-bb1e-4a6e-99d3-d33afdcc483b"),
+                            CreatedAt = new DateTime(2026, 4, 11, 7, 51, 14, 975, DateTimeKind.Utc).AddTicks(3830),
                             ImageUrl = "https://pub-576c3f4676204ddb823a5e2e2e27435e.r2.dev/images/bg/bg6.webp",
                             Order = 6,
-                            UpdatedAt = new DateTime(2026, 4, 11, 8, 23, 36, 558, DateTimeKind.Utc).AddTicks(7300)
+                            UpdatedAt = new DateTime(2026, 4, 11, 7, 51, 14, 975, DateTimeKind.Utc).AddTicks(3830)
                         },
                         new
                         {
-                            Id = new Guid("d2169c97-9d04-4db9-b510-0f851fad71d1"),
-                            CreatedAt = new DateTime(2026, 4, 11, 8, 23, 36, 558, DateTimeKind.Utc).AddTicks(7302),
+                            Id = new Guid("46dd6233-0615-48a2-b11f-e59f137b3300"),
+                            CreatedAt = new DateTime(2026, 4, 11, 7, 51, 14, 975, DateTimeKind.Utc).AddTicks(3835),
                             ImageUrl = "https://pub-576c3f4676204ddb823a5e2e2e27435e.r2.dev/images/bg/bg7.webp",
                             Order = 7,
-                            UpdatedAt = new DateTime(2026, 4, 11, 8, 23, 36, 558, DateTimeKind.Utc).AddTicks(7302)
+                            UpdatedAt = new DateTime(2026, 4, 11, 7, 51, 14, 975, DateTimeKind.Utc).AddTicks(3835)
                         });
                 });
 
@@ -255,8 +258,8 @@ namespace AbhiKansara.Infrastructure.Migrations
                     b.Property<string>("CtaText")
                         .HasColumnType("text");
 
-                    b.Property<double>("HeroInterval")
-                        .HasColumnType("double precision");
+                    b.Property<int>("HeroInterval")
+                        .HasColumnType("integer");
 
                     b.Property<string>("HeroSubtitle")
                         .IsRequired()
@@ -288,13 +291,13 @@ namespace AbhiKansara.Infrastructure.Migrations
                         new
                         {
                             Id = new Guid("11111111-1111-1111-1111-111111111111"),
-                            CreatedAt = new DateTime(2026, 4, 11, 8, 23, 36, 558, DateTimeKind.Utc).AddTicks(7033),
-                            HeroInterval = 4.5,
+                            CreatedAt = new DateTime(2026, 4, 11, 7, 51, 14, 975, DateTimeKind.Utc).AddTicks(3573),
+                            HeroInterval = 4,
                             HeroSubtitle = "Capturing the essence of your most precious moments with a cinematic and timeless touch.",
                             HeroTagline = "STORYTELLER",
                             HeroTitle = "ABHI KANSARA",
                             PageKey = "home",
-                            UpdatedAt = new DateTime(2026, 4, 11, 8, 23, 36, 558, DateTimeKind.Utc).AddTicks(7035)
+                            UpdatedAt = new DateTime(2026, 4, 11, 7, 51, 14, 975, DateTimeKind.Utc).AddTicks(3577)
                         });
                 });
 

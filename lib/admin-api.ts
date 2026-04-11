@@ -127,3 +127,21 @@ export const adminSiteConfig = {
       body: JSON.stringify(data),
     }),
 };
+
+// ─────────────────────────────────────────────────────────
+//  Hero Backgrounds
+// ─────────────────────────────────────────────────────────
+
+export const adminHero = {
+  create: (data: unknown) =>
+    adminFetch("/HeroBackgrounds", { method: "POST", body: JSON.stringify(data) }),
+
+  update: (id: string, data: unknown) =>
+    adminFetch(`/HeroBackgrounds/${id}`, {
+      method: "PUT",
+      body: JSON.stringify(data),
+    }),
+
+  delete: (id: string) =>
+    adminFetch(`/HeroBackgrounds/${id}`, { method: "DELETE" }),
+};

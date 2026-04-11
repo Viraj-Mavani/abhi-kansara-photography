@@ -32,6 +32,7 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityR
     public DbSet<SiteBio> SiteBios => Set<SiteBio>();
     public DbSet<PageConfig> PageConfigs => Set<PageConfig>();
     public DbSet<CarouselItem> CarouselItems => Set<CarouselItem>();
+    public DbSet<HeroBackground> HeroBackgrounds => Set<HeroBackground>();
 
     // ── Client Vault ──
     public DbSet<ClientVault> ClientVaults => Set<ClientVault>();
@@ -104,6 +105,31 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityR
         builder.Entity<PageConfig>(entity =>
         {
             entity.HasIndex(p => p.PageKey).IsUnique();
+
+            // Seed initial home page config with requested 4.5s pacing
+            entity.HasData(new PageConfig
+            {
+                Id = Guid.Parse("11111111-1111-1111-1111-111111111111"),
+                PageKey = "home",
+                HeroTitle = "ABHI KANSARA",
+                HeroTagline = "STORYTELLER",
+                HeroSubtitle = "Capturing the essence of your most precious moments with a cinematic and timeless touch.",
+                HeroInterval = 4.5
+            });
+        });
+
+        builder.Entity<HeroBackground>(entity =>
+        {
+            entity.HasData(
+                new HeroBackground { Id = Guid.NewGuid(), Order = 0, ImageUrl = "https://pub-576c3f4676204ddb823a5e2e2e27435e.r2.dev/images/bg/bg1.webp" },
+                new HeroBackground { Id = Guid.NewGuid(), Order = 1, ImageUrl = "https://pub-576c3f4676204ddb823a5e2e2e27435e.r2.dev/images/bg/bg0.webp" },
+                new HeroBackground { Id = Guid.NewGuid(), Order = 2, ImageUrl = "https://pub-576c3f4676204ddb823a5e2e2e27435e.r2.dev/images/bg/bg2.webp" },
+                new HeroBackground { Id = Guid.NewGuid(), Order = 3, ImageUrl = "https://pub-576c3f4676204ddb823a5e2e2e27435e.r2.dev/images/bg/bg3.webp" },
+                new HeroBackground { Id = Guid.NewGuid(), Order = 4, ImageUrl = "https://pub-576c3f4676204ddb823a5e2e2e27435e.r2.dev/images/bg/bg4.webp" },
+                new HeroBackground { Id = Guid.NewGuid(), Order = 5, ImageUrl = "https://pub-576c3f4676204ddb823a5e2e2e27435e.r2.dev/images/bg/bg5.webp" },
+                new HeroBackground { Id = Guid.NewGuid(), Order = 6, ImageUrl = "https://pub-576c3f4676204ddb823a5e2e2e27435e.r2.dev/images/bg/bg6.webp" },
+                new HeroBackground { Id = Guid.NewGuid(), Order = 7, ImageUrl = "https://pub-576c3f4676204ddb823a5e2e2e27435e.r2.dev/images/bg/bg7.webp" }
+            );
         });
 
         // ────────────────────────────────────────────

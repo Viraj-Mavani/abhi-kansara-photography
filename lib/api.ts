@@ -129,10 +129,14 @@ export interface PageConfig {
   heroSubtitle: string;
   ctaText?: string;
   ctaLink?: string;
-  sectionTitle1?: string;
-  sectionSubtitle1?: string;
-  sectionTitle2?: string;
-  sectionSubtitle2?: string;
+  heroInterval?: number; // Added for landing page pacing
+}
+
+export interface HeroBackground {
+  id: string;
+  imageUrl: string;
+  altText?: string;
+  order: number;
 }
 
 // ─────────────────────────────────────────────────────────
@@ -178,4 +182,8 @@ export async function getBio(): Promise<SiteBio> {
 
 export async function getPageConfig(pageKey: string): Promise<PageConfig> {
   return fetchWithFailFast<PageConfig>(`${API_URL}/siteconfig/page/${pageKey}`);
+}
+
+export async function getHeroBackgrounds(): Promise<HeroBackground[]> {
+  return fetchWithFailFast<HeroBackground[]>(`${API_URL}/HeroBackgrounds`).catch(() => []);
 }
