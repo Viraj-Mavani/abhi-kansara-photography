@@ -23,8 +23,8 @@ export default function Home() {
         <HeroSection />       {/* Section 0: Transparent */}
         <ServicesCarousel />  {/* Section 1 */}
         <PortfolioGrid />     {/* Section 2 */}
-        <PortraitVideos />    {/* Section 3 */}
-        <LandscapeVideos />   {/* Section 4 */}
+        <LandscapeVideos />   {/* Section 3 */}
+        <PortraitVideos />    {/* Section 4 */}
       </div>
 
       <Footer />

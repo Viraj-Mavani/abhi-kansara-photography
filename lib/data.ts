@@ -8,34 +8,34 @@ export interface Service {
 	image: string;
 }
 
-// Pre-Wedding | Wedding | Baby Shower | Product | Photography | Editorial | Event
+// Pre-Wedding | Wedding | Baby Shower | Product | Portrait | Editorial | Event
 export const servicesData: Service[] = [
 	{ id: "s0", title: "Wedding", image: `${R2_URL}/images/work/work0.webp` },
 	{ id: "s1", title: "Event", image: `${R2_URL}/images/work/work1.webp` },
-	{ id: "s2", title: "Product", image: `${R2_URL}/images/work/work2.webp` },
-	{ id: "s3", title: "Photography", image: `${R2_URL}/images/work/work3.webp` },
+	{ id: "s2", title: "Portrait", image: `${R2_URL}/images/work/work2.webp` },
+	{ id: "s3", title: "Portrait", image: `${R2_URL}/images/work/work3.webp` },
 	{ id: "s4", title: "Pre-Wedding", image: `${R2_URL}/images/work/work4.webp` },
-	{ id: "s5", title: "Photography", image: `${R2_URL}/images/work/work5.webp` },
+	{ id: "s5", title: "Portrait", image: `${R2_URL}/images/work/work5.webp` },
 	{ id: "s6", title: "Event", image: `${R2_URL}/images/work/work6.webp` },
 	{ id: "s7", title: "Event", image: `${R2_URL}/images/work/work7.webp` },
 	{ id: "s8", title: "Event", image: `${R2_URL}/images/work/work8.webp` },
-	{ id: "s9", title: "Photography", image: `${R2_URL}/images/work/work9.webp` },
-	{ id: "s10", title: "Editorial", image: `${R2_URL}/images/work/work10.webp` },
+	{ id: "s9", title: "Portrait", image: `${R2_URL}/images/work/work9.webp` },
+	{ id: "s10", title: "Pre-Wedding", image: `${R2_URL}/images/work/work10.webp` },
 	{ id: "s11", title: "Pre-Wedding", image: `${R2_URL}/images/work/work11.webp` },
-	{ id: "s12", title: "Photography", image: `${R2_URL}/images/work/work12.webp` },
+	{ id: "s12", title: "Portrait", image: `${R2_URL}/images/work/work12.webp` },
 	{ id: "s13", title: "Baby Shower", image: `${R2_URL}/images/work/work13.webp` },
 ];
 
 
 export const backgroundImages = [
+	`${R2_URL}/images/bg/bg4.webp`,
 	`${R2_URL}/images/bg/bg1.webp`,
 	`${R2_URL}/images/bg/bg0.webp`,
 	`${R2_URL}/images/bg/bg2.webp`,
 	`${R2_URL}/images/bg/bg3.webp`,
-	`${R2_URL}/images/bg/bg4.webp`,
 	`${R2_URL}/images/bg/bg5.webp`,
 	`${R2_URL}/images/bg/bg6.webp`,
-	`${R2_URL}/images/bg/bg7.webp`,
+	// `${R2_URL}/images/bg/bg7.webp`,
 ];
 
 export const videoSources = {
