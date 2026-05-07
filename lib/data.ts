@@ -27,7 +27,12 @@ export const servicesData: Service[] = [
 ];
 
 
-export const backgroundImages = [
+/**
+ * Legacy Fallback Backgrounds
+ * These are used only if the database is unseeded or the API is unreachable.
+ * The primary backgrounds are now managed in the Admin CMS under "Hero Manager".
+ */
+export const fallbackBackgroundImages = [
 	getR2Url("/images/bg/bg4.webp"),
 	getR2Url("/images/bg/bg1.webp"),
 	getR2Url("/images/bg/bg0.webp"),

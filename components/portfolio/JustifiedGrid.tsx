@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import Image from "next/image";
-import type { MediaItem } from "@/lib/portfolio";
+import type { MediaItem } from "@/lib/api";
 import { cn } from "@/lib/utils";
 import { Play } from "lucide-react";
 
@@ -148,7 +148,7 @@ export default function JustifiedGrid({
 									},
 								}}
 							>
-								{item.type === "photo" ? (
+								{item.type.toLowerCase() === "photo" ? (
 									<Image
 										src={item.url}
 										alt={item.alt || ""}

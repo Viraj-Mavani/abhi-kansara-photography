@@ -40,3 +40,16 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# .NET / Visual Studio
+/server/**/bin/
+/server/**/obj/
+/server/**/*.user
+/server/**/*.userosscache
+/server/**/*.sln.docstates
+/server/.vs/
+/server/.vscode/
+*.db
+*.suo
+UserSecretsId
+appsettings.Development.json

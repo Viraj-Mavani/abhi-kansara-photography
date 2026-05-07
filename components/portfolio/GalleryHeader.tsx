@@ -69,7 +69,7 @@ export default function GalleryHeader({
 					className="flex items-center gap-2 mt-32 sm:mt-28"
 				>
 					{breadcrumbs.map((crumb, idx) => (
-						<span key={crumb.href} className="flex items-center gap-2">
+						<span key={`${crumb.href}-${idx}`} className="flex items-center gap-2">
 							<Link
 								href={crumb.href}
 								className="text-white/50 text-[10px] sm:text-xs uppercase tracking-[0.2em] font-bold hover:text-accent-gold transition-colors duration-300"

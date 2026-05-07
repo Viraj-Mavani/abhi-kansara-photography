@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import type { Gallery } from "@/lib/portfolio";
+import type { Gallery } from "@/lib/api";
 import GalleryHeader from "@/components/portfolio/GalleryHeader";
 import JustifiedGrid from "@/components/portfolio/JustifiedGrid";
 import MediaViewer from "@/components/portfolio/MediaViewer";
@@ -24,11 +24,11 @@ export default function GalleryView({ gallery }: GalleryViewProps) {
 
 	// Separate photos and videos
 	const photos = useMemo(
-		() => gallery.media.filter((m) => m.type === "photo"),
+		() => gallery.media.filter((m) => m.type.toLowerCase() === "photo"),
 		[gallery.media]
 	);
 	const videos = useMemo(
-		() => gallery.media.filter((m) => m.type === "video"),
+		() => gallery.media.filter((m) => m.type.toLowerCase() === "video"),
 		[gallery.media]
 	);
 

@@ -10,13 +10,20 @@ export const metadata: Metadata = {
 		"A curated selection of our finest photographs — the moments that define our craft and passion for visual storytelling.",
 };
 
-export default function BestOfUsPage() {
-	return (
-		<main className="flex min-h-screen flex-col bg-accent-ivory text-black selection:bg-accent-gold selection:text-white">
-			<Navigation />
-			<BackButton />
-			<BestOfUsView />
-			<Footer />
-		</main>
-	);
+import { getFeaturedGalleries } from "@/lib/api";
+
+export default async function BestOfUsPage() {
+  const featuredGalleries = await getFeaturedGalleries();
+  const photos = featuredGalleries
+    .flatMap((g) => g.media)
+    .filter((m) => m.type.toLowerCase() === "photo");
+
+  return (
+    <main className="flex min-h-screen flex-col bg-accent-ivory text-black selection:bg-accent-gold selection:text-white">
+      <Navigation />
+      <BackButton />
+      <BestOfUsView initialPhotos={photos} />
+      <Footer />
+    </main>
+  );
 }
