@@ -11,6 +11,7 @@ import {
   Settings,
   LogOut,
   GalleryHorizontalEnd,
+  CalendarDays
 } from "lucide-react";
 import { useState } from "react";
 
@@ -84,6 +85,17 @@ export default function AdminSidebar() {
           );
         })}
       </nav>
+
+      {/* ── Scheduling Hub (Standalone App Link) ── */}
+      <div className="px-3 pb-2 pt-2">
+        <Link
+          href="/admin/calendar"
+          className="flex items-center gap-3 w-full px-3 py-2.5 rounded-lg text-sm font-medium text-[#c9a96e] bg-[#c9a96e]/[0.08] hover:bg-[#c9a96e]/15 border border-[#c9a96e]/20 hover:border-[#c9a96e]/30 transition-all duration-300 group"
+        >
+          <CalendarDays className="h-[18px] w-[18px] group-hover:scale-110 transition-transform duration-300" />
+          <span>Scheduling Hub</span>
+        </Link>
+      </div>
 
       {/* ── Logout ── */}
       <div className="px-3 pb-4 border-t border-white/[0.06] pt-4">

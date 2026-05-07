@@ -38,6 +38,9 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityR
     public DbSet<ClientVault> ClientVaults => Set<ClientVault>();
     public DbSet<UserVaultAccess> UserVaultAccess => Set<UserVaultAccess>();
 
+    // ── Scheduling Hub ──
+    public DbSet<Booking> Bookings => Set<Booking>();
+
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder); // MUST call base for Identity table configuration
@@ -154,6 +157,18 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityR
                   .WithMany()
                   .HasForeignKey(u => u.UserId)
                   .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        // ────────────────────────────────────────────
+        //  Scheduling Hub
+        // ────────────────────────────────────────────
+
+        builder.Entity<Booking>(entity =>
+        {
+            entity.HasIndex(b => b.StartDateTime);
+            entity.Property(b => b.Status).HasConversion<string>(); // Store enum as string
+            entity.Property(b => b.AmountProposed).HasColumnType("numeric(18,2)");
+            entity.Property(b => b.PaymentReceived).HasColumnType("numeric(18,2)");
         });
     }
 

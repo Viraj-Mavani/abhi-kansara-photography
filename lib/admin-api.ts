@@ -151,3 +151,32 @@ export const adminHero = {
       body: JSON.stringify(ids),
     }),
 };
+
+// ─────────────────────────────────────────────────────────
+//  Scheduling Hub (Bookings)
+// ─────────────────────────────────────────────────────────
+
+export const adminBookings = {
+  getAll: (start?: string, end?: string) => {
+    const params = new URLSearchParams();
+    if (start) params.append("start", start);
+    if (end) params.append("end", end);
+    const query = params.toString();
+    return adminFetch(`/bookings${query ? `?${query}` : ""}`, { method: "GET" });
+  },
+
+  getById: (id: string) =>
+    adminFetch(`/bookings/${id}`, { method: "GET" }),
+
+  create: (data: unknown) =>
+    adminFetch("/bookings", { method: "POST", body: JSON.stringify(data) }),
+
+  update: (id: string, data: unknown) =>
+    adminFetch(`/bookings/${id}`, {
+      method: "PUT",
+      body: JSON.stringify(data),
+    }),
+
+  delete: (id: string) =>
+    adminFetch(`/bookings/${id}`, { method: "DELETE" }),
+};
