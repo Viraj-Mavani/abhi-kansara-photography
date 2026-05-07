@@ -1,4 +1,4 @@
-const R2_URL = "https://pub-576c3f4676204ddb823a5e2e2e27435e.r2.dev";
+import { getR2Url } from "./r2-config";
 
 // ─────────────────────────────────────────────────────────
 //  Type Definitions — Services Data Layer
@@ -138,7 +138,7 @@ export const detailedServices: DetailedService[] = [
 		id: "wedding",
 		title: "Wedding Photography",
 		tagline: "Your love story, told through light",
-		coverImage: `${R2_URL}/images/coverImages/cover0.webp`,
+		coverImage: getR2Url("/images/coverImages/cover0.webp"),
 		icon: "favorite",
 		shortDescription:
 			"Timeless, cinematic wedding coverage that captures every stolen glance, joyful tear, and spontaneous dance move — so you can relive the magic for generations.",
@@ -306,12 +306,12 @@ export const detailedServices: DetailedService[] = [
 			},
 		],
 		galleryImages: [
-			`${R2_URL}/images/work/work0.webp`,
-			// `${R2_URL}/images/work/work4.webp`,
-			// `${R2_URL}/images/work/work11.webp`,
-			`${R2_URL}/images/feature/feature0.webp`,
-			`${R2_URL}/images/feature/feature1.webp`,
-			// `${R2_URL}/images/feature/feature3.webp`,
+			getR2Url("/images/work/work0.webp"),
+			// getR2Url("/images/work/work4.webp"),
+			// getR2Url("/images/work/work11.webp"),
+			getR2Url("/images/feature/feature0.webp"),
+			getR2Url("/images/feature/feature1.webp"),
+			// getR2Url("/images/feature/feature3.webp"),
 		],
 		category: "Wedding",
 		tags: ["wedding", "bridal", "ceremony", "reception", "engagement"],
@@ -326,7 +326,7 @@ export const detailedServices: DetailedService[] = [
 		id: "events",
 		title: "Event Coverage",
 		tagline: "The energy, the crowd, the spectacle",
-		coverImage: `${R2_URL}/images/coverImages/cover1.webp`,
+		coverImage: getR2Url("/images/coverImages/cover1.webp"),
 		icon: "celebration",
 		shortDescription:
 			"From corporate galas to live concerts, we document the pulse and personality of every event with editorial precision.",
@@ -404,41 +404,84 @@ export const detailedServices: DetailedService[] = [
 				description:
 					"Visit the venue to plan lighting, angles, and logistics.",
 				icon: "location_on",
-			},
+		details: [
 			{
-				step: 3,
-				title: "Capture",
+				title: "Full Day Coverage",
 				description:
-					"On the day — discreet, professional, and thorough.",
-				icon: "camera",
+					"From getting ready at dawn to the last dance at night.",
 			},
 			{
-				step: 4,
-				title: "Fast Delivery",
-				description: "Curated gallery delivered within 48–72 hours.",
-				icon: "bolt",
+				title: "Cinematic Editing",
+				description: "Hand-edited photos with a timeless, film-inspired aesthetic.",
+			},
+			{
+				title: "Digital & Print",
+				description: "High-resolution digital gallery + physical keepsake album.",
 			},
 		],
-		faqs: [
+		packages: [
 			{
-				question: "Can you provide same-day photos for social media?",
-				answer: "Yes! We can deliver 5–10 edited highlights within a few hours of the event for immediate posting.",
+				name: "Intimate",
+				price: "From $2,499",
+				features: [
+					"6 Hours Coverage",
+					"1 Photographer",
+					"Online Gallery",
+					"400+ Edited Photos",
+				],
 			},
 			{
-				question: "Do you cover corporate branding requirements?",
-				answer: "Absolutely. We follow brand guidelines for composition, ensuring logos and backdrops are featured appropriately.",
+				name: "Classic",
+				price: "From $3,999",
+				features: [
+					"10 Hours Coverage",
+					"2 Photographers",
+					"Online Gallery",
+					"600+ Edited Photos",
+					"Engagment Session",
+				],
+				isPopular: true,
 			},
+		],
+	},
+	{
+		id: "event-photography",
+		title: "Event Photography",
+		tagline: "Capture the Electric Energy",
+		description:
+			"From high-octane concerts to intimate corporate gatherings, we capture the atmosphere and the energy that makes your event unique.",
+		coverImage: getR2Url("/images/coverImages/cover1.webp"),
+		galleryImages: [
+			getR2Url("/images/work/work1.webp"),
+			getR2Url("/images/work/work6.webp"),
+			getR2Url("/images/work/work7.webp"),
+			getR2Url("/images/work/work8.webp"),
+			getR2Url("/images/feature/feature2.webp"),
+		],
+		category: "Event",
+		tags: ["concert", "corporate", "festival", "party", "performance"],
+		details: [
+			{
+				title: "Real-time Captures",
+				description: "Fast-paced coverage that keeps up with the action.",
+			},
+			{
+				title: "Atmospheric Focus",
+				description: "Emphasis on lighting, energy, and crowd interaction.",
+			},
+			{
+				title: "Fast Delivery",
 			{
 				question: "What about low-light venues?",
 				answer: "We use professional-grade low-light equipment and off-camera lighting to produce stunning results in any environment.",
 			},
 		],
 		galleryImages: [
-			`${R2_URL}/images/work/work1.webp`,
-			`${R2_URL}/images/work/work6.webp`,
-			`${R2_URL}/images/work/work7.webp`,
-			`${R2_URL}/images/work/work8.webp`,
-			`${R2_URL}/images/feature/feature2.webp`,
+			getR2Url("/images/work/work1.webp"),
+			getR2Url("/images/work/work6.webp"),
+			getR2Url("/images/work/work7.webp"),
+			getR2Url("/images/work/work8.webp"),
+			getR2Url("/images/feature/feature2.webp"),
 		],
 		category: "Events",
 		tags: ["corporate", "concert", "gala", "conference", "festival"],
@@ -453,7 +496,7 @@ export const detailedServices: DetailedService[] = [
 		id: "product",
 		title: "Product Photography",
 		tagline: "Elevate your brand, frame by frame",
-		coverImage: `${R2_URL}/images/coverImages/cover2.webp`,
+		coverImage: getR2Url("/images/coverImages/cover2.webp"),
 		icon: "diamond",
 		shortDescription:
 			"High-end product and commercial photography that transforms everyday objects into objects of desire.",
@@ -574,7 +617,7 @@ export const detailedServices: DetailedService[] = [
 		id: "portrait",
 		title: "Portrait Sessions",
 		tagline: "Your story, your light, your moment",
-		coverImage: `${R2_URL}/images/coverImages/cover3.webp`,
+		coverImage: getR2Url("/images/coverImages/cover3.webp"),
 		icon: "person",
 		shortDescription:
 			"Expressive, editorial-style portraits for individuals, couples, families, and creative professionals looking to stand out.",
@@ -687,10 +730,10 @@ export const detailedServices: DetailedService[] = [
 			},
 		],
 		galleryImages: [
-			`${R2_URL}/images/work/work3.webp`,
-			`${R2_URL}/images/work/work5.webp`,
-			`${R2_URL}/images/work/work9.webp`,
-			`${R2_URL}/images/feature/feature3.webp`,
+			getR2Url("/images/work/work3.webp"),
+			getR2Url("/images/work/work5.webp"),
+			getR2Url("/images/work/work9.webp"),
+			getR2Url("/images/feature/feature3.webp"),
 		],
 		category: "Portrait",
 		tags: [

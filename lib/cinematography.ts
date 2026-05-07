@@ -12,16 +12,15 @@
  */
 
 import { MediaItem } from "./portfolio";
-
-const R2_URL = "https://pub-576c3f4676204ddb823a5e2e2e27435e.r2.dev";
+import { getR2Url } from "./r2-config";
 
 export const cinematographyVideos: MediaItem[] = [
 	{
 		id: "cine-1",
 		type: "video",
-		url: `${R2_URL}/videos/portrait-0/portrait0.m3u8`,
-		hlsUrl: `${R2_URL}/videos/portrait-0/portrait0.m3u8`,
-		posterUrl: `${R2_URL}/images/thumbnail/t-portrait-0.webp`,
+		url: getR2Url("/videos/portrait-0/portrait0.m3u8"),
+		hlsUrl: getR2Url("/videos/portrait-0/portrait0.m3u8"),
+		posterUrl: getR2Url("/images/thumbnail/t-portrait-0.webp"),
 		alt: "Wedding highlight reel",
 		width: 9,
 		height: 16,
@@ -30,9 +29,9 @@ export const cinematographyVideos: MediaItem[] = [
 	{
 		id: "cine-2",
 		type: "video",
-		url: `${R2_URL}/videos/landscape-0/landscape0.m3u8`,
-		hlsUrl: `${R2_URL}/videos/landscape-0/landscape0.m3u8`,
-		posterUrl: `${R2_URL}/images/thumbnail/t-landscape-0.webp`,
+		url: getR2Url("/videos/landscape-0/landscape0.m3u8"),
+		hlsUrl: getR2Url("/videos/landscape-0/landscape0.m3u8"),
+		posterUrl: getR2Url("/images/thumbnail/t-landscape-0.webp"),
 		alt: "Cinematic pre-wedding film",
 		width: 16,
 		height: 9,
@@ -41,9 +40,9 @@ export const cinematographyVideos: MediaItem[] = [
 	{
 		id: "cine-3",
 		type: "video",
-		url: `${R2_URL}/videos/portrait-1/portrait1.m3u8`,
-		hlsUrl: `${R2_URL}/videos/portrait-1/portrait1.m3u8`,
-		posterUrl: `${R2_URL}/images/thumbnail/t-portrait-1.webp`,
+		url: getR2Url("/videos/portrait-1/portrait1.m3u8"),
+		hlsUrl: getR2Url("/videos/portrait-1/portrait1.m3u8"),
+		posterUrl: getR2Url("/images/thumbnail/t-portrait-1.webp"),
 		alt: "Editorial fashion reel",
 		width: 9,
 		height: 16,
@@ -52,12 +51,13 @@ export const cinematographyVideos: MediaItem[] = [
 	{
 		id: "cine-4",
 		type: "video",
-		url: `${R2_URL}/videos/landscape-1/landscape1.m3u8`,
-		hlsUrl: `${R2_URL}/videos/landscape-1/landscape1.m3u8`,
-		posterUrl: `${R2_URL}/images/thumbnail/t-landscape-1.webp`,
+		url: getR2Url("/videos/landscape-1/landscape1.m3u8"),
+		hlsUrl: getR2Url("/videos/landscape-1/landscape1.m3u8"),
+		posterUrl: getR2Url("/images/thumbnail/t-landscape-1.webp"),
 		alt: "Event recap video",
 		width: 16,
 		height: 9,
 		duration: "0:33",
 	},
 ];
+

@@ -1,4 +1,4 @@
-const R2_URL = "https://pub-576c3f4676204ddb823a5e2e2e27435e.r2.dev";
+import { getR2Url } from "./r2-config";
 
 export const bioData = {
 	artistName: "Abhi Kansara",
@@ -8,5 +8,6 @@ export const bioData = {
 		"Based in Canada, I’ve spent the last decade documenting love stories for couples who value art, emotion, and cinematic perfection. When I’m not behind the lens, you’ll find me studying classic cinema or chasing the perfect golden hour.",
 	philosophy:
 		"To photograph truthfully and effectively is to see beneath the surfaces and record the qualities of nature and humanity which live or are latent in all things.",
-	portraitImage: `${R2_URL}/images/Abhi.webp`,
+	portraitImage: getR2Url("/images/Abhi.webp"),
 };
+
