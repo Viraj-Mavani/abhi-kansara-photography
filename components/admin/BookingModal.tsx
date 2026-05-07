@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { X, Calendar as CalendarIcon, MapPin, User, AlertCircle, Clock, FileText, Phone, Mail, DollarSign } from "lucide-react";
+import { X, Calendar as CalendarIcon, MapPin, User, AlertCircle, Clock, FileText, Phone, Mail, DollarSign, Trash2, CheckCircle2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
 import { useOverlay } from "@/hooks/useOverlay";
@@ -67,6 +67,7 @@ interface BookingModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSave: (booking: Booking) => Promise<void>;
+  onDelete?: (id: string) => Promise<void>;
   selectedDate: Date | null;
   existingBookings: Booking[];
   editingBooking?: Booking | null;
@@ -76,11 +77,14 @@ export default function BookingModal({
   isOpen,
   onClose,
   onSave,
+  onDelete,
   selectedDate,
   existingBookings,
   editingBooking,
 }: BookingModalProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [conflictWarning, setConflictWarning] = useState<string | null>(null);
 
   const [formData, setFormData] = useState<Booking>({
@@ -103,8 +107,30 @@ export default function BookingModal({
 
   // Pre-fill form when opened
   useEffect(() => {
+    // Reset delete confirmation when modal opens
+    if (isOpen) {
+      setShowDeleteConfirm(false);
+    }
+
     if (editingBooking) {
-      setFormData(editingBooking);
+      // Need to format dates to local timezone so the input shows correctly
+      const formatToLocal = (isoStr: string, isFullDay: boolean) => {
+          if (!isoStr) return "";
+          if (isFullDay) {
+            // For full day, we want to extract just the YYYY-MM-DD in local time
+            const d = new Date(isoStr);
+            const tzOffset = d.getTimezoneOffset() * 60000;
+            return new Date(d.getTime() - tzOffset).toISOString().slice(0, 10);
+          }
+          const d = new Date(isoStr);
+          const tzOffset = d.getTimezoneOffset() * 60000;
+          return new Date(d.getTime() - tzOffset).toISOString().slice(0, 16);
+      }
+      setFormData({
+        ...editingBooking,
+        startDateTime: formatToLocal(editingBooking.startDateTime, editingBooking.isFullDay),
+        endDateTime: editingBooking.endDateTime ? formatToLocal(editingBooking.endDateTime, editingBooking.isFullDay) : "",
+      });
     } else if (selectedDate) {
       // Format to YYYY-MM-DDTHH:mm
       const tzOffset = selectedDate.getTimezoneOffset() * 60000;
@@ -117,7 +143,7 @@ export default function BookingModal({
         location: "",
         startDateTime: localISOTime,
         endDateTime: "",
-        eventType: "Gold",
+        eventType: "Wedding",
         isFullDay: false,
         status: "Inquiry",
         notes: "",
@@ -166,10 +192,23 @@ export default function BookingModal({
     e.preventDefault();
     setIsSubmitting(true);
     
+    // Parse local time back into correct UTC ISO string
+    const parseLocalTime = (dateStr: string, isFullDay: boolean) => {
+        if (!dateStr) return undefined;
+        if (isFullDay) {
+            // Append time so it's parsed as local, not UTC midnight
+            // Use slice(0, 10) to strip existing time if it was previously datetime-local
+            return new Date(`${dateStr.slice(0, 10)}T12:00:00`).toISOString();
+        } else {
+            return new Date(dateStr).toISOString();
+        }
+    }
+
     // Clean up payload (convert empty strings to undefined for API parsing)
     const payload: Booking = {
       ...formData,
-      endDateTime: formData.endDateTime || undefined,
+      startDateTime: parseLocalTime(formData.startDateTime, formData.isFullDay)!,
+      endDateTime: formData.endDateTime ? parseLocalTime(formData.endDateTime, formData.isFullDay) : undefined,
       location: formData.location || undefined,
       notes: formData.notes || undefined,
       phoneNumber: formData.phoneNumber || undefined,
@@ -184,6 +223,20 @@ export default function BookingModal({
       alert("Failed to save booking. Check console for details.");
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!onDelete || !editingBooking?.id) return;
+    setIsDeleting(true);
+    try {
+      await onDelete(editingBooking.id);
+      onClose();
+    } catch (err) {
+      console.error(err);
+      alert("Failed to delete booking.");
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -255,16 +308,18 @@ export default function BookingModal({
                     </select>
                   </div>
                   <div className="space-y-2">
-                    <label className="text-xs font-medium text-white/50 uppercase tracking-wider">Theme / Type</label>
+                    <label className="text-xs font-medium text-white/50 uppercase tracking-wider">Event Type</label>
                     <select
                       value={formData.eventType}
                       onChange={(e) => setFormData({ ...formData, eventType: e.target.value })}
                       className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-sm text-[#c9a96e] focus:border-[#c9a96e]/50 focus:ring-1 focus:ring-[#c9a96e]/50 transition-all outline-none appearance-none"
                       style={{ colorScheme: "dark" }}
                     >
-                      <option value="Gold" className="bg-[#0a0a0f] text-white">Gold (Premium)</option>
-                      <option value="Silver" className="bg-[#0a0a0f] text-white">Silver</option>
-                      <option value="Minimal" className="bg-[#0a0a0f] text-white">Minimal (White)</option>
+                      <option value="Wedding" className="bg-[#0a0a0f] text-white">Wedding</option>
+                      <option value="Events" className="bg-[#0a0a0f] text-white">Events</option>
+                      <option value="Commercial" className="bg-[#0a0a0f] text-white">Commercial</option>
+                      <option value="Portrait" className="bg-[#0a0a0f] text-white">Portrait</option>
+                      <option value="Other" className="bg-[#0a0a0f] text-white">Other</option>
                     </select>
                   </div>
                 </div>
@@ -407,26 +462,64 @@ export default function BookingModal({
 
             {/* Footer Actions */}
             <div className="p-6 border-t border-white/[0.08] bg-white/[0.01] flex gap-3">
-              <button
-                type="button"
-                onClick={onClose}
-                className="flex-1 px-4 py-3 rounded-xl border border-white/10 text-white/70 font-medium text-sm hover:bg-white/5 hover:text-white transition-all"
-              >
-                Cancel
-              </button>
-              <button
-                type="submit"
-                form="booking-form"
-                disabled={isSubmitting}
-                className="flex-1 px-4 py-3 rounded-xl bg-[#c9a96e] text-[#0a0a0f] font-bold text-sm hover:bg-[#d4b881] transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-              >
-                {isSubmitting ? (
-                  <div className="w-4 h-4 border-2 border-[#0a0a0f]/20 border-t-[#0a0a0f] rounded-full animate-spin" />
-                ) : (
-                  <CalendarIcon className="w-4 h-4" />
-                )}
-                {editingBooking ? "Save Changes" : "Create Booking"}
-              </button>
+              {editingBooking && onDelete && showDeleteConfirm ? (
+                <>
+                  <button
+                    type="button"
+                    onClick={() => setShowDeleteConfirm(false)}
+                    className="flex-1 px-4 py-3 rounded-xl border border-white/10 text-white/70 font-medium text-sm hover:bg-white/5 hover:text-white transition-all"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleDelete}
+                    disabled={isDeleting}
+                    className="flex-1 px-4 py-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-500 font-bold text-sm hover:bg-red-500 hover:text-white transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+                  >
+                    {isDeleting ? (
+                      <div className="w-4 h-4 border-2 border-red-500/30 border-t-red-500 rounded-full animate-spin" />
+                    ) : (
+                      <CheckCircle2 className="w-4 h-4" />
+                    )}
+                    Confirm Delete
+                  </button>
+                </>
+              ) : (
+                <>
+                  {editingBooking && onDelete ? (
+                    <button
+                      type="button"
+                      onClick={() => setShowDeleteConfirm(true)}
+                      className="flex-1 px-4 py-3 rounded-xl border border-red-500/20 text-red-500/80 font-medium text-sm hover:bg-red-500/10 hover:text-red-500 hover:border-red-500/50 transition-all flex items-center justify-center gap-2"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                      Delete
+                    </button>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={onClose}
+                      className="flex-1 px-4 py-3 rounded-xl border border-white/10 text-white/70 font-medium text-sm hover:bg-white/5 hover:text-white transition-all"
+                    >
+                      Cancel
+                    </button>
+                  )}
+                  <button
+                    type="submit"
+                    form="booking-form"
+                    disabled={isSubmitting}
+                    className="flex-1 px-4 py-3 rounded-xl bg-[#c9a96e] text-[#0a0a0f] font-bold text-sm hover:bg-[#d4b881] transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                  >
+                    {isSubmitting ? (
+                      <div className="w-4 h-4 border-2 border-[#0a0a0f]/20 border-t-[#0a0a0f] rounded-full animate-spin" />
+                    ) : (
+                      <CalendarIcon className="w-4 h-4" />
+                    )}
+                    {editingBooking ? "Save Changes" : "Create Booking"}
+                  </button>
+                </>
+              )}
             </div>
           </motion.div>
         </motion.div>

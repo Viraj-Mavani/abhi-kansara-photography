@@ -5,7 +5,7 @@ import Link from "next/link";
 import { ChevronLeft, ChevronRight, ArrowLeft, Plus, Calendar as CalendarIcon, Phone, MapPin, DollarSign, Clock } from "lucide-react";
 import { format, addMonths, subMonths, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isSameDay, isToday } from "date-fns";
 import { cn } from "@/lib/utils";
-import { getAllBookings, createBookingAction, updateBookingAction } from "@/app/actions/bookings";
+import { getAllBookings, createBookingAction, updateBookingAction, deleteBookingAction } from "@/app/actions/bookings";
 import BookingModal, { Booking } from "@/components/admin/BookingModal";
 
 // ─────────────────────────────────────────────────────────
@@ -79,6 +79,11 @@ export default function CalendarPage() {
     } else {
       await createBookingAction(bookingData);
     }
+    await loadBookings();
+  };
+
+  const handleDeleteBooking = async (id: string) => {
+    await deleteBookingAction(id);
     await loadBookings();
   };
 
@@ -226,6 +231,7 @@ export default function CalendarPage() {
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onSave={handleSaveBooking}
+        onDelete={handleDeleteBooking}
         selectedDate={selectedDate}
         existingBookings={bookings}
         editingBooking={editingBooking}
