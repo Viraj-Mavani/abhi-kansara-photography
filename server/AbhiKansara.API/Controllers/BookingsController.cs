@@ -45,6 +45,9 @@ public class BookingsController : ControllerBase
     public async Task<ActionResult<Booking>> CreateBooking(Booking booking)
     {
         booking.Id = Guid.NewGuid();
+        booking.StartDateTime = DateTime.SpecifyKind(booking.StartDateTime, DateTimeKind.Utc);
+        if (booking.EndDateTime.HasValue)
+            booking.EndDateTime = DateTime.SpecifyKind(booking.EndDateTime.Value, DateTimeKind.Utc);
         
         // Conflict Check (Optional explicit check, could also just be frontend for now)
         var conflict = await _context.Bookings.AnyAsync(b => 
@@ -74,8 +77,11 @@ public class BookingsController : ControllerBase
         // Update fields
         existing.ClientName = booking.ClientName;
         existing.Location = booking.Location;
-        existing.StartDateTime = booking.StartDateTime;
-        existing.EndDateTime = booking.EndDateTime;
+        existing.StartDateTime = DateTime.SpecifyKind(booking.StartDateTime, DateTimeKind.Utc);
+        if (booking.EndDateTime.HasValue)
+            existing.EndDateTime = DateTime.SpecifyKind(booking.EndDateTime.Value, DateTimeKind.Utc);
+        else
+            existing.EndDateTime = null;
         existing.EventType = booking.EventType;
         existing.IsFullDay = booking.IsFullDay;
         existing.Status = booking.Status;
