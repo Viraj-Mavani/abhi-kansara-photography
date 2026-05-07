@@ -11,7 +11,7 @@
  * For vertical (Reels/Shorts), set width: 9 and height: 16.
  */
 
-import { MediaItem } from "./portfolio";
+import { MediaItem } from "./api";
 import { getR2Url } from "./r2-config";
 
 export const cinematographyVideos: MediaItem[] = [

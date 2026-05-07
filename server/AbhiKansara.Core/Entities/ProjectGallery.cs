@@ -19,6 +19,14 @@ public class ProjectGallery : BaseEntity
     public bool IsFeatured { get; set; }
     public int Order { get; set; }
 
+    // ── SmugMug Integration (optional — populated when linked) ──
+    /// <summary>SmugMug Album ID extracted from the album URL (e.g. "n-AbCd12")</summary>
+    public string? SmugMugAlbumId { get; set; }
+    /// <summary>SmugMug Album Key used in API v2 calls</summary>
+    public string? SmugMugAlbumKey { get; set; }
+    /// <summary>Timestamp of the last successful SmugMug sync (null = never synced)</summary>
+    public DateTimeOffset? LastSmugMugSync { get; set; }
+
     // ── Navigation ──
     public ICollection<MediaItem> Media { get; set; } = new List<MediaItem>();
 }

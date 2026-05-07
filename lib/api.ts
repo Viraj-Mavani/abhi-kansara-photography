@@ -77,11 +77,17 @@ export interface Gallery {
   category: GalleryCategory;
   coverPhotoUrl: string;
   shootDate?: string;
+  /** Alias for shootDate — used in GalleryView */
+  date?: string;
   location?: string;
   description?: string;
   media: MediaItem[];
   isFeatured?: boolean;
   order?: number;
+  // ── SmugMug Integration (future sync) ──
+  smugMugAlbumId?: string;
+  smugMugAlbumKey?: string;
+  lastSmugMugSync?: string;
 }
 
 
@@ -171,6 +177,8 @@ export interface CarouselItem {
   title: string;
   imageUrl: string;
   sortOrder: number;
+  /** Optional destination URL when user clicks the card */
+  link?: string;
 }
 
 export async function getCarouselItems(): Promise<CarouselItem[]> {

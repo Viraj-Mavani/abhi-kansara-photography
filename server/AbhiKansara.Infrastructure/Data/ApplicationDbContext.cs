@@ -121,14 +121,14 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityR
         builder.Entity<HeroBackground>(entity =>
         {
             entity.HasData(
-                new HeroBackground { Id = Guid.NewGuid(), Order = 0, ImageUrl = "https://pub-576c3f4676204ddb823a5e2e2e27435e.r2.dev/images/bg/bg1.webp" },
-                new HeroBackground { Id = Guid.NewGuid(), Order = 1, ImageUrl = "https://pub-576c3f4676204ddb823a5e2e2e27435e.r2.dev/images/bg/bg0.webp" },
-                new HeroBackground { Id = Guid.NewGuid(), Order = 2, ImageUrl = "https://pub-576c3f4676204ddb823a5e2e2e27435e.r2.dev/images/bg/bg2.webp" },
-                new HeroBackground { Id = Guid.NewGuid(), Order = 3, ImageUrl = "https://pub-576c3f4676204ddb823a5e2e2e27435e.r2.dev/images/bg/bg3.webp" },
-                new HeroBackground { Id = Guid.NewGuid(), Order = 4, ImageUrl = "https://pub-576c3f4676204ddb823a5e2e2e27435e.r2.dev/images/bg/bg4.webp" },
-                new HeroBackground { Id = Guid.NewGuid(), Order = 5, ImageUrl = "https://pub-576c3f4676204ddb823a5e2e2e27435e.r2.dev/images/bg/bg5.webp" },
-                new HeroBackground { Id = Guid.NewGuid(), Order = 6, ImageUrl = "https://pub-576c3f4676204ddb823a5e2e2e27435e.r2.dev/images/bg/bg6.webp" },
-                new HeroBackground { Id = Guid.NewGuid(), Order = 7, ImageUrl = "https://pub-576c3f4676204ddb823a5e2e2e27435e.r2.dev/images/bg/bg7.webp" }
+                new HeroBackground { Id = Guid.Parse("b1111111-1111-1111-1111-111111111111"), Order = 0, ImageUrl = "https://pub-576c3f4676204ddb823a5e2e2e27435e.r2.dev/images/bg/bg1.webp" },
+                new HeroBackground { Id = Guid.Parse("b2222222-2222-2222-2222-222222222222"), Order = 1, ImageUrl = "https://pub-576c3f4676204ddb823a5e2e2e27435e.r2.dev/images/bg/bg0.webp" },
+                new HeroBackground { Id = Guid.Parse("b3333333-3333-3333-3333-333333333333"), Order = 2, ImageUrl = "https://pub-576c3f4676204ddb823a5e2e2e27435e.r2.dev/images/bg/bg2.webp" },
+                new HeroBackground { Id = Guid.Parse("b4444444-4444-4444-4444-444444444444"), Order = 3, ImageUrl = "https://pub-576c3f4676204ddb823a5e2e2e27435e.r2.dev/images/bg/bg3.webp" },
+                new HeroBackground { Id = Guid.Parse("b5555555-5555-5555-5555-555555555555"), Order = 4, ImageUrl = "https://pub-576c3f4676204ddb823a5e2e2e27435e.r2.dev/images/bg/bg4.webp" },
+                new HeroBackground { Id = Guid.Parse("b6666666-6666-6666-6666-666666666666"), Order = 5, ImageUrl = "https://pub-576c3f4676204ddb823a5e2e2e27435e.r2.dev/images/bg/bg5.webp" },
+                new HeroBackground { Id = Guid.Parse("b7777777-7777-7777-7777-777777777777"), Order = 6, ImageUrl = "https://pub-576c3f4676204ddb823a5e2e2e27435e.r2.dev/images/bg/bg6.webp" },
+                new HeroBackground { Id = Guid.Parse("b8888888-8888-8888-8888-888888888888"), Order = 7, ImageUrl = "https://pub-576c3f4676204ddb823a5e2e2e27435e.r2.dev/images/bg/bg7.webp" }
             );
         });
 

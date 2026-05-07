@@ -141,6 +141,8 @@ public class GalleriesController : ControllerBase
                     .SetProperty(g => g.Description, updatedGallery.Description)
                     .SetProperty(g => g.IsFeatured, updatedGallery.IsFeatured)
                     .SetProperty(g => g.Order, updatedGallery.Order)
+                    .SetProperty(g => g.SmugMugAlbumId, updatedGallery.SmugMugAlbumId)
+                    .SetProperty(g => g.SmugMugAlbumKey, updatedGallery.SmugMugAlbumKey)
                     .SetProperty(g => g.UpdatedAt, DateTime.UtcNow));
 
             if (rowsAffected == 0) return NotFound();
@@ -196,4 +198,33 @@ public class GalleriesController : ControllerBase
 
         return NoContent();
     }
+
+    /// <summary>
+    /// POST /api/galleries/{id}/smugmug
+    /// Stores SmugMug album credentials for a gallery.
+    /// Phase 1 STUB: saves values only. Full sync worker added post-API purchase.
+    /// </summary>
+    [HttpPost("{id}/smugmug")]
+    [Microsoft.AspNetCore.Authorization.Authorize(Roles = "Admin")]
+    public async Task<IActionResult> LinkSmugMug(Guid id, [FromBody] SmugMugLinkRequest request)
+    {
+        var rowsAffected = await _context.ProjectGalleries
+            .Where(g => g.Id == id)
+            .ExecuteUpdateAsync(s => s
+                .SetProperty(g => g.SmugMugAlbumId, request.AlbumId)
+                .SetProperty(g => g.SmugMugAlbumKey, request.AlbumKey)
+                .SetProperty(g => g.UpdatedAt, DateTime.UtcNow));
+
+        if (rowsAffected == 0) return NotFound();
+
+        return Ok(new
+        {
+            message = "SmugMug album linked. Sync worker is not yet active — purchase API plan to enable.",
+            albumId = request.AlbumId,
+            albumKey = request.AlbumKey
+        });
+    }
 }
+
+/// <summary>Request body for POST /api/galleries/{id}/smugmug</summary>
+public record SmugMugLinkRequest(string? AlbumId, string? AlbumKey);

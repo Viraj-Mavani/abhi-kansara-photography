@@ -29,23 +29,25 @@ export default function PortfolioGrid({ galleries }: { galleries: Gallery[] }) {
               transition={{ duration: 0.6, delay: (index % 3) * 0.1 }}
               className="relative w-full aspect-2/3 overflow-hidden group rounded-sm"
             >
-              <Image
-                src={project.coverPhotoUrl}
-                alt={project.clientName || "Portfolio Project"}
-                fill
-                className="object-cover transition-transform duration-[2s] ease-[cubic-bezier(0.25,1,0.5,1)] group-hover:scale-105"
-                sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
-              />
-              
-              {/* Subtle Hover Overlay */}
-              <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex flex-col justify-end p-6 sm:p-8">
-                <span className="text-accent-gold text-xs uppercase tracking-widest font-bold mb-2 translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
-                  {project.category}
-                </span>
-                <h3 className="text-white font-serif text-2xl sm:text-3xl translate-y-4 group-hover:translate-y-0 transition-transform duration-500 delay-75">
-                  {project.clientName}
-                </h3>
-              </div>
+              <Link href={`/portfolio/clients/${project.slug}`} className="block w-full h-full">
+                <Image
+                  src={project.coverPhotoUrl}
+                  alt={project.clientName || "Portfolio Project"}
+                  fill
+                  className="object-cover transition-transform duration-[2s] ease-[cubic-bezier(0.25,1,0.5,1)] group-hover:scale-105"
+                  sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                />
+                
+                {/* Subtle Hover Overlay */}
+                <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex flex-col justify-end p-6 sm:p-8">
+                  <span className="text-accent-gold text-xs uppercase tracking-widest font-bold mb-2 translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
+                    {project.category}
+                  </span>
+                  <h3 className="text-white font-serif text-2xl sm:text-3xl translate-y-4 group-hover:translate-y-0 transition-transform duration-500 delay-75">
+                    {project.clientName}
+                  </h3>
+                </div>
+              </Link>
             </motion.div>
           ))}
         </div>

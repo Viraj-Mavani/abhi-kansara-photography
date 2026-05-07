@@ -7,7 +7,7 @@ import AdminInput from "@/components/admin/ui/AdminInput";
 import AdminButton from "@/components/admin/ui/AdminButton";
 import { createGallery, updateGallery } from "@/app/actions/galleries";
 import type { Gallery } from "@/lib/api";
-import { Plus, Trash2, GripVertical, ImageIcon, Film } from "lucide-react";
+import { Plus, Trash2, GripVertical, ImageIcon, Film, Zap, Link2, Clock, AlertTriangle } from "lucide-react";
 
 // ─────────────────────────────────────────────────────────
 //  GalleryForm — Gallery + nested MediaItems
@@ -34,6 +34,8 @@ interface GalleryFormValues {
   description: string;
   isFeatured: boolean;
   order: number;
+  smugMugAlbumId: string;
+  smugMugAlbumKey: string;
   media: MediaItemForm[];
 }
 
@@ -73,6 +75,8 @@ export default function GalleryForm({ initialData }: GalleryFormProps) {
             description: initialData.description || "",
             isFeatured: initialData.isFeatured || false,
             order: initialData.order || 0,
+            smugMugAlbumId: initialData.smugMugAlbumId || "",
+            smugMugAlbumKey: initialData.smugMugAlbumKey || "",
             media: (initialData.media || []).map((m, i) => ({
               type: m.type as "photo" | "video",
               url: m.url,
@@ -94,6 +98,8 @@ export default function GalleryForm({ initialData }: GalleryFormProps) {
             description: "",
             isFeatured: false,
             order: 0,
+            smugMugAlbumId: "",
+            smugMugAlbumKey: "",
             media: [],
           },
     });
@@ -126,6 +132,8 @@ export default function GalleryForm({ initialData }: GalleryFormProps) {
       description: formData.description || null,
       isFeatured: formData.isFeatured,
       order: formData.order,
+      smugMugAlbumId: formData.smugMugAlbumId || null,
+      smugMugAlbumKey: formData.smugMugAlbumKey || null,
       media: formData.media.map((m, i) => ({
         type: m.type,
         url: m.url,
@@ -295,6 +303,73 @@ export default function GalleryForm({ initialData }: GalleryFormProps) {
             No media items yet. Add photos or videos above.
           </div>
         )}
+      </div>
+
+      {/* SmugMug Integration */}
+      <div className="rounded-xl border border-dashed border-amber-500/20 bg-amber-500/[0.02] p-5 space-y-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Link2 className="h-4 w-4 text-amber-400/60" />
+            <h2 className="text-sm font-semibold text-white/70">SmugMug Integration</h2>
+          </div>
+          <span className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-[0.2em] text-amber-400/70 bg-amber-400/10 border border-amber-400/20 px-2.5 py-1 rounded-full">
+            <Zap className="h-2.5 w-2.5" />
+            Coming Soon
+          </span>
+        </div>
+
+        <p className="text-xs text-white/30 leading-relaxed">
+          Link this gallery to a SmugMug album. Once you purchase the SmugMug API plan, 
+          the sync button will automatically pull all photos into this gallery.
+        </p>
+
+        <div className="grid grid-cols-2 gap-4">
+          <AdminInput
+            label="Album ID"
+            placeholder="e.g. 12345678"
+            {...register("smugMugAlbumId")}
+          />
+          <AdminInput
+            label="Album Key"
+            placeholder="e.g. AbCd12"
+            {...register("smugMugAlbumKey")}
+          />
+        </div>
+
+        {/* Last Sync Status */}
+        <div className="flex items-center justify-between pt-1">
+          <div className="flex items-center gap-2 text-xs text-white/25">
+            <Clock className="h-3.5 w-3.5" />
+            <span>
+              {initialData?.lastSmugMugSync
+                ? `Last synced: ${new Date(initialData.lastSmugMugSync).toLocaleDateString()}`
+                : "Never synced"}
+            </span>
+          </div>
+
+          {/* Coming Soon Sync Button */}
+          <div className="relative group/sync">
+            <button
+              type="button"
+              disabled
+              className="flex items-center gap-2 px-4 py-2 rounded-lg bg-amber-500/5 border border-amber-500/15 text-amber-400/40 text-xs font-semibold cursor-not-allowed transition-all"
+            >
+              <Zap className="h-3.5 w-3.5" />
+              Sync from SmugMug
+            </button>
+            {/* Tooltip */}
+            <div className="absolute bottom-full right-0 mb-2 w-56 p-3 rounded-lg bg-[#0f0f17] border border-white/10 shadow-xl opacity-0 group-hover/sync:opacity-100 transition-opacity duration-200 pointer-events-none z-50">
+              <div className="flex items-start gap-2">
+                <AlertTriangle className="h-3.5 w-3.5 text-amber-400/70 flex-shrink-0 mt-0.5" />
+                <p className="text-[11px] text-white/50 leading-relaxed">
+                  Requires a SmugMug API plan. Purchase the plan and add your API keys to enable automatic photo sync.
+                </p>
+              </div>
+              {/* Arrow */}
+              <div className="absolute top-full right-4 border-4 border-transparent border-t-[#0f0f17]" />
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Sticky Save Bar */}

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect, useRef, useCallback } from "react";
 import type { Gallery } from "@/lib/api";
 import GalleryHeader from "@/components/portfolio/GalleryHeader";
 import JustifiedGrid from "@/components/portfolio/JustifiedGrid";
@@ -10,7 +10,10 @@ import ShareModal from "@/components/portfolio/ShareModal";
 // ─────────────────────────────────────────────────────────
 //  Gallery View — Full Client Gallery Experience
 //  Cover hero → Action bar → Justified photos → Videos
+//  Implements infinite scroll: 30 photos per page
 // ─────────────────────────────────────────────────────────
+
+const PAGE_SIZE = 30;
 
 interface GalleryViewProps {
 	gallery: Gallery;
@@ -21,6 +24,7 @@ export default function GalleryView({ gallery }: GalleryViewProps) {
 	const [viewerIndex, setViewerIndex] = useState(0);
 	const [isSlideshowMode, setIsSlideshowMode] = useState(false);
 	const [shareOpen, setShareOpen] = useState(false);
+	const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
 
 	// Separate photos and videos
 	const photos = useMemo(
@@ -32,18 +36,48 @@ export default function GalleryView({ gallery }: GalleryViewProps) {
 		[gallery.media]
 	);
 
-	// Combined list for the viewer (photos first, then videos)
+	// Visible slice of photos (infinite scroll)
+	const visiblePhotos = useMemo(
+		() => photos.slice(0, visibleCount),
+		[photos, visibleCount]
+	);
+	const hasMorePhotos = visibleCount < photos.length;
+
+	// Combined list for the viewer (full arrays — viewer always has all items)
 	const allMedia = useMemo(() => [...photos, ...videos], [photos, videos]);
 
+	// ── IntersectionObserver sentinel ──────────────────────────
+	const sentinelRef = useRef<HTMLDivElement>(null);
+
+	const loadMore = useCallback(() => {
+		setVisibleCount((prev) => Math.min(prev + PAGE_SIZE, photos.length));
+	}, [photos.length]);
+
+	useEffect(() => {
+		const sentinel = sentinelRef.current;
+		if (!sentinel) return;
+
+		const observer = new IntersectionObserver(
+			(entries) => {
+				if (entries[0].isIntersecting && hasMorePhotos) {
+					loadMore();
+				}
+			},
+			{ rootMargin: "300px" } // pre-load 300px before the bottom
+		);
+
+		observer.observe(sentinel);
+		return () => observer.disconnect();
+	}, [hasMorePhotos, loadMore]);
+
+	// ── Click handlers ─────────────────────────────────────────
 	const handlePhotoClick = (index: number) => {
-		// Index is relative to photos array — same position in allMedia
 		setIsSlideshowMode(false);
 		setViewerIndex(index);
 		setViewerOpen(true);
 	};
 
 	const handleVideoClick = (index: number) => {
-		// Videos start after all photos in allMedia
 		setIsSlideshowMode(false);
 		setViewerIndex(photos.length + index);
 		setViewerOpen(true);
@@ -71,14 +105,45 @@ export default function GalleryView({ gallery }: GalleryViewProps) {
 				breadcrumbs={breadcrumbs}
 				onShareClick={() => setShareOpen(true)}
 				onSlideshowClick={handleSlideshowStart}
-				date={gallery.date}
+				date={gallery.date || gallery.shootDate}
 				location={gallery.location}
 			/>
 
 			{/* Photo Grid */}
 			{photos.length > 0 && (
 				<section className="px-4 sm:px-8 lg:px-12 pt-8 sm:pt-12">
-					<JustifiedGrid items={photos} onItemClick={handlePhotoClick} />
+					<JustifiedGrid items={visiblePhotos} onItemClick={handlePhotoClick} />
+
+					{/* Infinite scroll sentinel */}
+					<div ref={sentinelRef} className="h-1" aria-hidden />
+
+					{/* Loading shimmer indicator */}
+					{hasMorePhotos && (
+						<div className="flex items-center justify-center gap-3 py-10">
+							<div className="h-px w-12 bg-gradient-to-r from-transparent to-accent-gold/40" />
+							<div className="flex gap-1.5">
+								{[0, 1, 2].map((i) => (
+									<div
+										key={i}
+										className="h-1 w-1 rounded-full bg-accent-gold/50 animate-pulse"
+										style={{ animationDelay: `${i * 150}ms` }}
+									/>
+								))}
+							</div>
+							<div className="h-px w-12 bg-gradient-to-l from-transparent to-accent-gold/40" />
+						</div>
+					)}
+
+					{/* All photos loaded indicator */}
+					{!hasMorePhotos && photos.length > PAGE_SIZE && (
+						<div className="flex items-center justify-center gap-3 py-10">
+							<div className="h-px w-16 bg-white/[0.06]" />
+							<span className="text-[10px] uppercase tracking-[0.25em] text-white/20 font-bold">
+								{photos.length} photos
+							</span>
+							<div className="h-px w-16 bg-white/[0.06]" />
+						</div>
+					)}
 				</section>
 			)}
 

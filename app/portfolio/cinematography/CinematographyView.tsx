@@ -13,8 +13,7 @@ export default function CinematographyView({ initialVideos }: { initialVideos: M
 	const [viewerOpen, setViewerOpen] = useState(false);
 	const [viewerIndex, setViewerIndex] = useState(0);
 
-	const handleVideoClick = (item: MediaItem) => {
-    const index = initialVideos.findIndex(v => v.id === item.id);
+	const handleVideoClick = (index: number) => {
 		setViewerIndex(index);
 		setViewerOpen(true);
 	};

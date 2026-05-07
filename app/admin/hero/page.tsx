@@ -15,14 +15,16 @@ export default async function AdminHeroPage() {
   if (!token) redirect("/admin/login");
 
   // Fetch initial data
-  let backgrounds = [];
-  let homeConfig = null;
+  let backgrounds: any[] = [];
+  let homeConfig: any = null;
 
   try {
-    [backgrounds, homeConfig] = await Promise.all([
+    const results = await Promise.all([
       getHeroBackgrounds(),
       getPageConfig("home"),
     ]);
+    backgrounds = results[0];
+    homeConfig = results[1];
   } catch (error) {
     console.error("Failed to load hero config:", error);
     // Fallback or error UI could go here
