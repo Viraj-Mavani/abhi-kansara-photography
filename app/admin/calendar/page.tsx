@@ -11,6 +11,7 @@ import {
   MapPin,
   Clock,
   Search,
+  CalendarSync,
   LayoutGrid,
   ChevronDown,
   Sparkles,
@@ -189,16 +190,17 @@ export default function CalendarPage() {
           initial={{ opacity: 0, y: -12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.45, delay: 0.08, ease: [0.25, 1, 0.5, 1] }}
-          className="shrink-0 grid grid-cols-3 items-center gap-3"
+          className="shrink-0 grid grid-cols-2 sm:grid-cols-3 items-center gap-y-4 sm:gap-3"
         >
-          {/* Left: Today + future controls */}
-          <div className="flex items-center gap-2">
+          {/* 1. Left: Today + future controls — Order 1 on PC & Mobile */}
+          <div className="flex items-center gap-1 sm:gap-2 order-1 sm:justify-start">
             {/* Today Button */}
             <button
               onClick={handleToday}
               className="px-3 py-1.5 rounded-lg text-sm font-semibold border border-white/[0.08] bg-white/[0.02] text-white/70 hover:text-white hover:bg-white/[0.06] hover:border-white/20 transition-all"
             >
-              Today
+              <CalendarSync className="w-3.5 h-3.5 sm:hidden" />
+              <span className="hidden sm:inline">Today</span>
             </button>
 
             {/* Layout Picker — Disabled (Coming Soon) */}
@@ -243,8 +245,28 @@ export default function CalendarPage() {
             </div>
           </div>
 
-          {/* Center: Month + Year Heading — Typography Option A */}
-          <div className="flex justify-center text-center">
+          {/* 2. Right: Prev / Next arrows — Order 2 on mobile, 3 on PC */}
+          <div className="flex items-center justify-end order-2 sm:order-3">
+            <div className="flex items-center gap-1 bg-white/[0.02] border border-white/[0.06] rounded-xl p-1">
+              <button
+                onClick={handlePrevMonth}
+                className="p-1.5 rounded-lg text-white/50 hover:text-white hover:bg-white/10 transition-all active:scale-90"
+                aria-label="Previous month"
+              >
+                <ChevronLeft className="w-4 h-4" />
+              </button>
+              <button
+                onClick={handleNextMonth}
+                className="p-1.5 rounded-lg text-white/50 hover:text-white hover:bg-white/10 transition-all active:scale-90"
+                aria-label="Next month"
+              >
+                <ChevronRight className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+
+          {/* 3. Center: Month + Year Heading — Order 3 on mobile, 2 on PC */}
+          <div className="col-span-2 sm:col-span-1 flex justify-center text-center order-3 sm:order-2">
             <AnimatePresence mode="wait">
               <motion.h2
                 key={format(currentDate, "yyyy-MM")}
@@ -264,26 +286,6 @@ export default function CalendarPage() {
                 </span>
               </motion.h2>
             </AnimatePresence>
-          </div>
-
-          {/* Right: Prev / Next arrows */}
-          <div className="flex items-center justify-end">
-            <div className="flex items-center gap-1 bg-white/[0.02] border border-white/[0.06] rounded-xl p-1">
-              <button
-                onClick={handlePrevMonth}
-                className="p-1.5 rounded-lg text-white/50 hover:text-white hover:bg-white/10 transition-all active:scale-90"
-                aria-label="Previous month"
-              >
-                <ChevronLeft className="w-4 h-4" />
-              </button>
-              <button
-                onClick={handleNextMonth}
-                className="p-1.5 rounded-lg text-white/50 hover:text-white hover:bg-white/10 transition-all active:scale-90"
-                aria-label="Next month"
-              >
-                <ChevronRight className="w-4 h-4" />
-              </button>
-            </div>
           </div>
         </motion.div>
 
