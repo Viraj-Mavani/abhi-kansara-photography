@@ -3,16 +3,17 @@
 import { useState, useEffect } from "react";
 import { X, Calendar as CalendarIcon, MapPin, User, AlertCircle, Clock, FileText, Phone, Mail, DollarSign, Trash2, CheckCircle2 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { motion, AnimatePresence } from "framer-motion";
+import { EVENT_TYPES, getEventColor } from "@/lib/event-colors";
+import { motion, AnimatePresence, type Variants } from "framer-motion";
 import { useOverlay } from "@/hooks/useOverlay";
 
 // ─── Animation Variants ───
-const backdropVariants = {
+const backdropVariants: Variants = {
   hidden: { opacity: 0 },
   visible: { opacity: 1 },
 };
 
-const modalVariants = {
+const modalVariants: Variants = {
   hidden: { opacity: 0, y: 100 }, // Mobile: slide up
   visible: {
     opacity: 1,
@@ -26,7 +27,7 @@ const modalVariants = {
   },
 };
 
-const pcModalVariants = {
+const pcModalVariants: Variants = {
   hidden: { opacity: 0, scale: 0.95 },
   visible: {
     opacity: 1,
@@ -92,7 +93,7 @@ export default function BookingModal({
     location: "",
     startDateTime: "",
     endDateTime: "",
-    eventType: "Gold",
+    eventType: "Wedding",
     isFullDay: false,
     status: "Inquiry",
     notes: "",
@@ -312,14 +313,14 @@ export default function BookingModal({
                     <select
                       value={formData.eventType}
                       onChange={(e) => setFormData({ ...formData, eventType: e.target.value })}
-                      className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-sm text-[#c9a96e] focus:border-[#c9a96e]/50 focus:ring-1 focus:ring-[#c9a96e]/50 transition-all outline-none appearance-none"
-                      style={{ colorScheme: "dark" }}
+                      className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-sm focus:border-[#c9a96e]/50 focus:ring-1 focus:ring-[#c9a96e]/50 transition-all outline-none appearance-none"
+                      style={{ colorScheme: "dark", color: getEventColor(formData.eventType).color }}
                     >
-                      <option value="Wedding" className="bg-[#0a0a0f] text-white">Wedding</option>
-                      <option value="Events" className="bg-[#0a0a0f] text-white">Events</option>
-                      <option value="Commercial" className="bg-[#0a0a0f] text-white">Commercial</option>
-                      <option value="Portrait" className="bg-[#0a0a0f] text-white">Portrait</option>
-                      <option value="Other" className="bg-[#0a0a0f] text-white">Other</option>
+                      {EVENT_TYPES.map((et) => (
+                        <option key={et.value} value={et.value} className="bg-[#0a0a0f] text-white">
+                          {et.label}
+                        </option>
+                      ))}
                     </select>
                   </div>
                 </div>
