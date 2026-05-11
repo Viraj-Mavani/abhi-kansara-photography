@@ -1,3 +1,4 @@
+using AbhiKansara.Core.Interfaces;
 using AbhiKansara.Infrastructure.Data;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -13,10 +14,17 @@ namespace AbhiKansara.API.Controllers;
 public class GalleriesController : ControllerBase
 {
     private readonly ApplicationDbContext _context;
+    private readonly ISmugMugService _smugMug;
+    private readonly ILogger<GalleriesController> _logger;
 
-    public GalleriesController(ApplicationDbContext context)
+    public GalleriesController(
+        ApplicationDbContext context,
+        ISmugMugService smugMug,
+        ILogger<GalleriesController> logger)
     {
         _context = context;
+        _smugMug = smugMug;
+        _logger = logger;
     }
 
     /// <summary>
@@ -200,11 +208,10 @@ public class GalleriesController : ControllerBase
     }
 
     /// <summary>
-    /// POST /api/galleries/{id}/smugmug
-    /// Stores SmugMug album credentials for a gallery.
-    /// Phase 1 STUB: saves values only. Full sync worker added post-API purchase.
+    /// POST /api/galleries/{id}/smugmug-link
+    /// Stores SmugMug album credentials for a gallery without syncing.
     /// </summary>
-    [HttpPost("{id}/smugmug")]
+    [HttpPost("{id}/smugmug-link")]
     [Microsoft.AspNetCore.Authorization.Authorize(Roles = "Admin")]
     public async Task<IActionResult> LinkSmugMug(Guid id, [FromBody] SmugMugLinkRequest request)
     {
@@ -219,12 +226,104 @@ public class GalleriesController : ControllerBase
 
         return Ok(new
         {
-            message = "SmugMug album linked. Sync worker is not yet active — purchase API plan to enable.",
+            message = "SmugMug album linked successfully.",
             albumId = request.AlbumId,
             albumKey = request.AlbumKey
         });
     }
+
+    /// <summary>
+    /// POST /api/galleries/{id}/smugmug-sync
+    /// Fetches images from a linked SmugMug album and replaces the gallery's media items.
+    /// Requires the gallery to have SmugMugAlbumId and SmugMugAlbumKey set.
+    /// </summary>
+    [HttpPost("{id}/smugmug-sync")]
+    [Microsoft.AspNetCore.Authorization.Authorize(Roles = "Admin")]
+    public async Task<IActionResult> SyncSmugMug(Guid id)
+    {
+        var gallery = await _context.ProjectGalleries.FindAsync(id);
+        if (gallery is null)
+            return NotFound(new { message = "Gallery not found." });
+
+        if (string.IsNullOrEmpty(gallery.SmugMugAlbumKey))
+            return BadRequest(new { message = "No SmugMug album key linked to this gallery. Link an album first." });
+
+        try
+        {
+            _logger.LogInformation("Starting SmugMug sync for gallery {GalleryId} (album {AlbumKey})",
+                id, gallery.SmugMugAlbumKey);
+
+            // 1. Fetch images from SmugMug
+            var smugMugImages = (await _smugMug.GetAlbumImagesAsync(
+                gallery.SmugMugAlbumId ?? "", gallery.SmugMugAlbumKey)).ToList();
+
+            if (smugMugImages.Count == 0)
+                return Ok(new { message = "SmugMug album is empty. No images to sync.", syncedCount = 0 });
+
+            // 2. Clear existing media and replace with SmugMug images
+            _context.ChangeTracker.Clear();
+
+            using var transaction = await _context.Database.BeginTransactionAsync();
+            try
+            {
+                await _context.MediaItems
+                    .Where(m => m.ProjectGalleryId == id)
+                    .ExecuteDeleteAsync();
+
+                foreach (var img in smugMugImages)
+                {
+                    img.Id = Guid.NewGuid();
+                    img.ProjectGalleryId = id;
+                }
+
+                await _context.MediaItems.AddRangeAsync(smugMugImages);
+
+                // Update the gallery's sync timestamp
+                await _context.ProjectGalleries
+                    .Where(g => g.Id == id)
+                    .ExecuteUpdateAsync(s => s
+                        .SetProperty(g => g.LastSmugMugSync, DateTimeOffset.UtcNow)
+                        .SetProperty(g => g.UpdatedAt, DateTime.UtcNow));
+
+                await _context.SaveChangesAsync();
+                await transaction.CommitAsync();
+            }
+            catch
+            {
+                await transaction.RollbackAsync();
+                throw;
+            }
+
+            // 3. Re-fetch the updated gallery to return it
+            var updated = await _context.ProjectGalleries
+                .Where(g => g.Id == id)
+                .Include(g => g.Media.OrderBy(m => m.Order))
+                .AsNoTracking()
+                .FirstAsync();
+
+            _logger.LogInformation("SmugMug sync complete for gallery {GalleryId}: {Count} images synced",
+                id, smugMugImages.Count);
+
+            return Ok(new
+            {
+                message = $"Successfully synced {smugMugImages.Count} images from SmugMug.",
+                syncedCount = smugMugImages.Count,
+                lastSync = updated.LastSmugMugSync,
+                gallery = updated
+            });
+        }
+        catch (HttpRequestException ex)
+        {
+            _logger.LogError(ex, "SmugMug API error during sync for gallery {GalleryId}", id);
+            return StatusCode(502, new { message = $"SmugMug API error: {ex.Message}" });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Unexpected error during SmugMug sync for gallery {GalleryId}", id);
+            return StatusCode(500, new { message = $"Sync failed: {ex.Message}" });
+        }
+    }
 }
 
-/// <summary>Request body for POST /api/galleries/{id}/smugmug</summary>
+/// <summary>Request body for POST /api/galleries/{id}/smugmug-link</summary>
 public record SmugMugLinkRequest(string? AlbumId, string? AlbumKey);

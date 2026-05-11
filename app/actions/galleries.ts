@@ -30,3 +30,16 @@ export async function deleteGallery(id: string) {
   revalidatePath("/portfolio");
   // List updates locally, no redirect needed
 }
+
+export async function syncGalleryFromSmugMug(galleryId: string) {
+  const result = await adminGalleries.smugMugSync(galleryId);
+  revalidatePath("/admin/galleries");
+  revalidatePath("/portfolio");
+  revalidatePath(`/portfolio/clients`);
+  return result;
+}
+
+export async function linkGalleryToSmugMug(galleryId: string, albumId: string, albumKey: string) {
+  await adminGalleries.smugMugLink(galleryId, albumId, albumKey);
+  revalidatePath("/admin/galleries");
+}

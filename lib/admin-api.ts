@@ -90,6 +90,22 @@ export const adminGalleries = {
 
   delete: (id: string) =>
     adminFetch(`/galleries/${id}`, { method: "DELETE" }),
+
+  /** Link a SmugMug album to a gallery (stores IDs only, no sync) */
+  smugMugLink: (id: string, albumId: string, albumKey: string) =>
+    adminFetch(`/galleries/${id}/smugmug-link`, {
+      method: "POST",
+      body: JSON.stringify({ albumId, albumKey }),
+    }),
+
+  /** Sync images from a linked SmugMug album into the gallery */
+  smugMugSync: (id: string) =>
+    adminFetch<{
+      message: string;
+      syncedCount: number;
+      lastSync: string;
+      gallery: unknown;
+    }>(`/galleries/${id}/smugmug-sync`, { method: "POST" }),
 };
 
 // ─────────────────────────────────────────────────────────
