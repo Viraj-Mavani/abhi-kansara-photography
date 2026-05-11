@@ -218,7 +218,7 @@ export default function GalleryForm({ initialData }: GalleryFormProps) {
           </div>
           <AdminInput label="Location" placeholder="Mumbai, India" {...register("location")} />
         </div>
-        <AdminInput label="Cover Photo URL" placeholder="https://..." {...register("coverPhotoUrl", { required: true })} />
+        <AdminInput label="Cover Photo URL" placeholder="https://..." {...register("coverPhotoUrl")} />
         <div>
           <label className="text-[11px] font-bold uppercase tracking-[0.15em] text-white/50 mb-1.5 block">Description</label>
           <textarea
