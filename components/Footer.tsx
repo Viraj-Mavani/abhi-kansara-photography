@@ -62,13 +62,18 @@ export function Footer() {
           
           <div className="order-2 flex flex-col items-center gap-6 md:flex-row md:gap-10">
             <div className="flex gap-8">
-              {["Inquire", "Privacy", "Terms"].map((item) => (
+              {["Inquire", "Privacy", "Terms", "Portal"].map((item) => (
                 <Link
                   key={item}
-                  href={item === "Inquire" ? "/contact" : item === "Privacy" ? "/privacy" : "/terms"}
+                  href={
+                    item === "Inquire" ? "/contact" : 
+                    item === "Privacy" ? "/privacy" : 
+                    item === "Terms" ? "/terms" : 
+                    "/admin/login"
+                  }
                   className="hover:text-accent-gold transition-colors"
                 >
-                  {item}
+                  {item === "Portal" ? "Client Portal" : item}
                 </Link>
               ))}
             </div>
