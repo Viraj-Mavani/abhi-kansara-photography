@@ -9,6 +9,12 @@ const nextConfig: NextConfig = {
 				port: "",
 				pathname: "/**",
 			},
+			{
+				protocol: "https",
+				hostname: "photos.smugmug.com",
+				port: "",
+				pathname: "/**",
+			},
 		],
 	},
 };

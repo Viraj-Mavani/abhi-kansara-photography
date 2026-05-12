@@ -103,11 +103,20 @@ const FETCH_CONFIG: RequestInit = {
 
 /** Ensure API errors throw so we fail fast locally */
 async function fetchWithFailFast<T>(url: string, options?: RequestInit): Promise<T> {
-  const res = await fetch(url, { ...FETCH_CONFIG, ...options });
+  let res;
+  try {
+    res = await fetch(url, { ...FETCH_CONFIG, ...options });
+  } catch (error) {
+    if (error instanceof TypeError) {
+      throw new Error(`Fetch failed for ${url}. Make sure your backend API is running. Details: ${error.message}`);
+    }
+    // Re-throw Next.js control-flow errors (like DynamicServerError) so we don't break the build
+    throw error;
+  }
   
   if (!res.ok) {
     const errorText = await res.text().catch(() => 'No error text');
-    throw new Error(`Admin API error: ${res.status} ${res.statusText} at ${url}\n${errorText}`);
+    throw new Error(`API error: ${res.status} ${res.statusText} at ${url}\n${errorText}`);
   }
   
   return res.json();

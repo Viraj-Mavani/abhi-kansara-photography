@@ -3,7 +3,7 @@
 import { motion } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
-import { Share2, Play, ChevronRight } from "lucide-react";
+import { Share2, Play, ChevronRight, Camera } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 // ─────────────────────────────────────────────────────────
@@ -46,14 +46,23 @@ export default function GalleryHeader({
 	return (
 		<section className="relative w-full h-[60vh] sm:h-[70vh] lg:h-[80vh] overflow-hidden">
 			{/* Cover Photo */}
-			<Image
-				src={coverPhotoUrl}
-				alt={title}
-				fill
-				className="object-cover"
-				quality={85}
-				priority
-			/>
+			{coverPhotoUrl ? (
+				<Image
+					src={coverPhotoUrl}
+					alt={title}
+					fill
+					className="object-cover"
+					quality={85}
+					priority
+				/>
+			) : (
+				<div className="absolute inset-0 bg-gradient-to-br from-[#1a1a24] to-[#0a0a0f] flex items-center justify-center">
+					<div className="relative opacity-10">
+						<Camera className="h-40 w-40 text-white" />
+						<div className="absolute inset-0 bg-accent-gold/20 blur-[100px]" />
+					</div>
+				</div>
+			)}
 
 			{/* Gradient overlays */}
 			<div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/20 to-black/80" />

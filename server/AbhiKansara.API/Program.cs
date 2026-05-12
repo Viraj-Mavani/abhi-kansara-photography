@@ -1,7 +1,10 @@
 using System.Text;
 using System.Text.Json.Serialization;
+using AbhiKansara.Core.Common;
+using AbhiKansara.Core.Interfaces;
 using AbhiKansara.Infrastructure.Data;
 using AbhiKansara.Infrastructure.Identity;
+using AbhiKansara.Infrastructure.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -112,6 +115,10 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
+// ── SmugMug Integration ──
+builder.Services.Configure<SmugMugSettings>(
+    builder.Configuration.GetSection(SmugMugSettings.SectionName));
+builder.Services.AddHttpClient<ISmugMugService, SmugMugService>();
 
 // ── CORS (allow Next.js frontend in development) ──
 builder.Services.AddCors(options =>

@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import type { Gallery } from "@/lib/api";
 import { cn } from "@/lib/utils";
+import { Camera } from "lucide-react";
 
 // ─────────────────────────────────────────────────────────
 //  Gallery Card — Used on the Clients Hub Page
@@ -35,15 +36,27 @@ export default function GalleryCard({ gallery, index }: GalleryCardProps) {
 				className="group block relative overflow-hidden rounded-sm"
 			>
 				{/* Image */}
-				<div className="relative aspect-[4/5] sm:aspect-[3/4] overflow-hidden">
-					<Image
-						src={gallery.coverPhotoUrl}
-						alt={gallery.clientName}
-						fill
-						sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-						className="object-cover transition-transform duration-[1.2s] ease-out group-hover:scale-110"
-						loading="lazy"
-					/>
+				<div className="relative aspect-[4/5] sm:aspect-[3/4] overflow-hidden bg-[#0d0d12]">
+					{gallery.coverPhotoUrl ? (
+						<Image
+							src={gallery.coverPhotoUrl}
+							alt={gallery.clientName}
+							fill
+							sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+							className="object-cover transition-transform duration-[1.2s] ease-out group-hover:scale-110"
+							loading="lazy"
+						/>
+					) : (
+						<div className="absolute inset-0 flex flex-col items-center justify-center p-6 bg-gradient-to-br from-[#1a1a24] to-[#0d0d12]">
+							<div className="relative">
+								<Camera className="h-10 w-10 text-white/5 mb-2 group-hover:text-accent-gold/20 transition-colors duration-700" />
+								<div className="absolute inset-0 bg-accent-gold/20 blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+							</div>
+							<span className="text-[9px] uppercase tracking-[0.4em] font-bold text-white/10 group-hover:text-accent-gold/40 transition-colors duration-700">
+								Coming Soon
+							</span>
+						</div>
+					)}
 
 					{/* Hover gradient */}
 					<div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent opacity-60 group-hover:opacity-90 transition-opacity duration-700" />
