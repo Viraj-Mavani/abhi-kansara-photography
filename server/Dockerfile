@@ -3,7 +3,7 @@ FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 
 # Copy solution and project files first for efficient caching
-COPY ["AbhiKansara.sln", "./"]
+COPY ["AbhiKansaraPhotography.sln", "./"]
 COPY ["AbhiKansara.API/AbhiKansara.API.csproj", "AbhiKansara.API/"]
 COPY ["AbhiKansara.Core/AbhiKansara.Core.csproj", "AbhiKansara.Core/"]
 COPY ["AbhiKansara.Infrastructure/AbhiKansara.Infrastructure.csproj", "AbhiKansara.Infrastructure/"]
