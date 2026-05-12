@@ -107,7 +107,11 @@ async function fetchWithFailFast<T>(url: string, options?: RequestInit): Promise
   try {
     res = await fetch(url, { ...FETCH_CONFIG, ...options });
   } catch (error) {
-    throw new Error(`Fetch failed for ${url}. Make sure your backend API is running. Details: ${error instanceof Error ? error.message : String(error)}`);
+    if (error instanceof TypeError) {
+      throw new Error(`Fetch failed for ${url}. Make sure your backend API is running. Details: ${error.message}`);
+    }
+    // Re-throw Next.js control-flow errors (like DynamicServerError) so we don't break the build
+    throw error;
   }
   
   if (!res.ok) {
