@@ -324,6 +324,48 @@ public class GalleriesController : ControllerBase
             return StatusCode(500, new { message = $"Sync failed: {ex.Message}" });
         }
     }
+
+    /// <summary>
+    /// GET /api/galleries/smugmug-images?albumId=...&albumKey=...
+    /// Fetches all images for a specific SmugMug album WITHOUT requiring a gallery record.
+    /// Used for "instant sync" preview during gallery creation.
+    /// </summary>
+    [HttpGet("smugmug-images")]
+    [Microsoft.AspNetCore.Authorization.Authorize(Roles = "Admin")]
+    public async Task<IActionResult> GetSmugMugImagesStateless([FromQuery] string? albumId, [FromQuery] string albumKey)
+    {
+        try
+        {
+            _logger.LogInformation("Stateless SmugMug image fetch requested for AlbumId: {AlbumId}, AlbumKey: {AlbumKey}", albumId, albumKey);
+            var images = await _smugMug.GetAlbumImagesAsync(albumId ?? "", albumKey);
+            return Ok(images);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error during stateless SmugMug fetch");
+            return StatusCode(500, new { message = $"Failed to fetch images: {ex.Message}" });
+        }
+    }
+
+    /// <summary>
+    /// GET /api/galleries/smugmug-albums
+    /// Lists all available albums from the linked SmugMug account.
+    /// </summary>
+    [HttpGet("smugmug-albums")]
+    [Microsoft.AspNetCore.Authorization.Authorize(Roles = "Admin")]
+    public async Task<IActionResult> ListSmugMugAlbums()
+    {
+        try
+        {
+            var albums = await _smugMug.GetAlbumsAsync();
+            return Ok(albums);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error fetching SmugMug albums");
+            return StatusCode(500, new { message = "Failed to fetch albums from SmugMug." });
+        }
+    }
 }
 
 /// <summary>Request body for POST /api/galleries/{id}/smugmug-link</summary>

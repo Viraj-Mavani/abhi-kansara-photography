@@ -109,7 +109,13 @@ export const adminGalleries = {
 
   /** List all albums in the SmugMug account */
   listSmugMugAlbums: () =>
-    adminFetch<any[]>("/smugmug/albums", { method: "GET" }),
+    adminFetch<any[]>("/galleries/smugmug-albums", { method: "GET" }),
+
+  /** Fetch images directly from a SmugMug album by ID/Key (stateless) */
+  fetchSmugMugImagesDirect: (albumId: string, albumKey: string) =>
+    adminFetch<any[]>(`/galleries/smugmug-images?albumId=${albumId}&albumKey=${albumKey}`, { 
+      method: "GET" 
+    }),
 };
 
 // ─────────────────────────────────────────────────────────

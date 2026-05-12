@@ -47,3 +47,7 @@ export async function linkGalleryToSmugMug(galleryId: string, albumId: string, a
 export async function getSmugMugAlbums() {
   return await adminGalleries.listSmugMugAlbums();
 }
+
+export async function getSmugMugAlbumImagesDirect(albumId: string, albumKey: string) {
+  return await adminGalleries.fetchSmugMugImagesDirect(albumId, albumKey);
+}

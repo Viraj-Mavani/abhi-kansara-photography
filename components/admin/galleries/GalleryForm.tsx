@@ -5,7 +5,7 @@ import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import AdminInput from "@/components/admin/ui/AdminInput";
 import AdminButton from "@/components/admin/ui/AdminButton";
-import { createGallery, updateGallery, syncGalleryFromSmugMug, linkGalleryToSmugMug } from "@/app/actions/galleries";
+import { createGallery, updateGallery, syncGalleryFromSmugMug, linkGalleryToSmugMug, getSmugMugAlbumImagesDirect } from "@/app/actions/galleries";
 import type { Gallery } from "@/lib/api";
 import { Plus, Trash2, GripVertical, ImageIcon, Film, Zap, Link2, Clock, AlertTriangle, CheckCircle2, Loader2, Search, Camera } from "lucide-react";
 import AlbumPicker from "./AlbumPicker";
@@ -315,24 +315,36 @@ export default function GalleryForm({ initialData }: GalleryFormProps) {
 
           <button
             type="button"
-            disabled={!isEditing || !watch("smugMugAlbumKey") || isSyncing}
+            disabled={!watch("smugMugAlbumKey") || isSyncing}
             onClick={async () => {
-              if (!initialData?.id) return;
+              const currentId = watch("smugMugAlbumId") || "";
+              const currentKey = watch("smugMugAlbumKey") || "";
+              if (!currentKey) return;
+
               setIsSyncing(true);
               setSyncMessage(null);
               try {
-                // 1. First link/save the current ID and Key so the backend has them
-                const currentId = watch("smugMugAlbumId") || "";
-                const currentKey = watch("smugMugAlbumKey") || "";
-                await linkGalleryToSmugMug(initialData.id, currentId, currentKey);
+                let images = [];
 
-                // 2. Then trigger the sync
-                const result = await syncGalleryFromSmugMug(initialData.id);
+                if (isEditing && initialData?.id) {
+                  // Standard flow for existing galleries
+                  await linkGalleryToSmugMug(initialData.id, currentId, currentKey);
+                  const result = await syncGalleryFromSmugMug(initialData.id);
+                  images = (result.gallery as any)?.media || [];
+                  setSyncMessage({ type: "success", text: result.message });
+                } else {
+                  // Direct flow for NEW galleries (not in DB yet)
+                  images = await getSmugMugAlbumImagesDirect(currentId, currentKey);
+                  setSyncMessage({ 
+                    type: "success", 
+                    text: `Fetched ${images.length} images. Save the gallery to complete the sync.` 
+                  });
+                }
                 
-                // 3. Update the form state immediately so the user sees the new media
-                if (result.gallery && (result.gallery as any).media) {
-                  const newMedia = (result.gallery as any).media.map((m: any, i: number) => ({
-                    type: m.type,
+                // Update the form state immediately
+                if (images.length > 0) {
+                  const newMedia = images.map((m: any, i: number) => ({
+                    type: m.type || "photo",
                     url: m.url,
                     width: m.width,
                     height: m.height,
@@ -345,13 +357,7 @@ export default function GalleryForm({ initialData }: GalleryFormProps) {
                   mediaField.replace(newMedia);
                 }
 
-                setSyncMessage({
-                  type: "success",
-                  text: result.message,
-                });
-                
-                // Still refresh to sync server components if needed
-                router.refresh();
+                if (isEditing) router.refresh();
               } catch (e: unknown) {
                 setSyncMessage({
                   type: "error",
@@ -362,7 +368,7 @@ export default function GalleryForm({ initialData }: GalleryFormProps) {
               }
             }}
             className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-semibold transition-all ${
-              !isEditing || !watch("smugMugAlbumKey") || isSyncing
+              !watch("smugMugAlbumKey") || isSyncing
                 ? "bg-amber-500/5 border border-amber-500/15 text-amber-400/40 cursor-not-allowed"
                 : "bg-amber-500/10 border border-amber-500/30 text-amber-400 hover:bg-amber-500/20 hover:border-amber-500/40 cursor-pointer"
             }`}
@@ -376,10 +382,10 @@ export default function GalleryForm({ initialData }: GalleryFormProps) {
           </button>
         </div>
 
-        {!isEditing && (
+        {!isEditing && !watch("smugMugAlbumKey") && (
           <p className="text-[11px] text-amber-400/40 flex items-center gap-1.5">
             <AlertTriangle className="h-3 w-3" />
-            Save the gallery first before syncing from SmugMug.
+            Select an album to enable instant synchronization.
           </p>
         )}
       </div>
