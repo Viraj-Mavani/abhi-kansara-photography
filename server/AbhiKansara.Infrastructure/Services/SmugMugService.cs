@@ -7,6 +7,7 @@ using AbhiKansara.Core.Common;
 using AbhiKansara.Core.Entities;
 using AbhiKansara.Core.Enums;
 using AbhiKansara.Core.Interfaces;
+using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
@@ -16,16 +17,19 @@ public class SmugMugService : ISmugMugService
 {
     private readonly HttpClient _httpClient;
     private readonly SmugMugSettings _settings;
+    private readonly IDistributedCache _cache;
     private readonly ILogger<SmugMugService> _logger;
     private const string BaseUrl = "https://api.smugmug.com/api/v2";
 
     public SmugMugService(
         HttpClient httpClient,
         IOptions<SmugMugSettings> settings,
+        IDistributedCache cache,
         ILogger<SmugMugService> logger)
     {
         _httpClient = httpClient;
         _settings = settings.Value;
+        _cache = cache;
         _logger = logger;
 
         _httpClient.DefaultRequestHeaders.Accept.Clear();
@@ -35,6 +39,14 @@ public class SmugMugService : ISmugMugService
 
     public async Task<IEnumerable<MediaItem>> GetAlbumImagesAsync(string albumId, string albumKey)
     {
+        var cacheKey = $"smugmug_images_{albumKey}";
+        var cachedImages = await GetCachedDataAsync<List<MediaItem>>(cacheKey);
+        if (cachedImages != null)
+        {
+            _logger.LogInformation("Returning {Count} cached images for album {AlbumKey}", cachedImages.Count, albumKey);
+            return cachedImages;
+        }
+
         // SmugMug API v2: album key is used in the URI
         // The albumKey is the unique identifier (e.g., "AbCd12")
         // The endpoint fetches all images in the album with ImageSizes expanded
@@ -98,6 +110,10 @@ public class SmugMugService : ISmugMugService
         }
 
         _logger.LogInformation("Fetched {Count} images from SmugMug album {AlbumKey}", allImages.Count, albumKey);
+        
+        // Cache the results for 1 hour
+        await SetCachedDataAsync(cacheKey, allImages, TimeSpan.FromHours(1));
+        
         return allImages;
     }
 
@@ -178,6 +194,14 @@ public class SmugMugService : ISmugMugService
 
     public async Task<IEnumerable<SmugMugAlbumInfo>> GetAlbumsAsync()
     {
+        var cacheKey = "smugmug_albums";
+        var cachedAlbums = await GetCachedDataAsync<List<SmugMugAlbumInfo>>(cacheKey);
+        if (cachedAlbums != null)
+        {
+            _logger.LogInformation("Returning {Count} cached albums", cachedAlbums.Count);
+            return cachedAlbums;
+        }
+
         try
         {
             _logger.LogInformation("Fetching SmugMug user albums for picker");
@@ -250,7 +274,12 @@ public class SmugMugService : ISmugMugService
                 });
             }
 
-            return result.OrderByDescending(a => a.LastUpdated);
+            var sortedAlbums = result.OrderByDescending(a => a.LastUpdated).ToList();
+            
+            // Cache for 30 minutes
+            await SetCachedDataAsync(cacheKey, sortedAlbums, TimeSpan.FromMinutes(30));
+            
+            return sortedAlbums;
         }
         catch (Exception ex)
         {
@@ -328,5 +357,39 @@ public class SmugMugService : ISmugMugService
         return string.Join(", ", oauthParams
             .OrderBy(p => p.Key)
             .Select(p => $"{Uri.EscapeDataString(p.Key)}=\"{Uri.EscapeDataString(p.Value)}\""));
+    }
+
+    // ── Caching Helpers ──
+
+    private async Task<T?> GetCachedDataAsync<T>(string cacheKey)
+    {
+        try
+        {
+            var cachedData = await _cache.GetStringAsync(cacheKey);
+            if (string.IsNullOrEmpty(cachedData)) return default;
+            return JsonSerializer.Deserialize<T>(cachedData);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Failed to retrieve data from cache for key {Key}", cacheKey);
+            return default;
+        }
+    }
+
+    private async Task SetCachedDataAsync<T>(string cacheKey, T data, TimeSpan expiration)
+    {
+        try
+        {
+            var options = new DistributedCacheEntryOptions
+            {
+                AbsoluteExpirationRelativeToNow = expiration
+            };
+            var jsonData = JsonSerializer.Serialize(data);
+            await _cache.SetStringAsync(cacheKey, jsonData, options);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Failed to save data to cache for key {Key}", cacheKey);
+        }
     }
 }

@@ -55,7 +55,7 @@ builder.Services.AddAuthentication(options =>
 .AddJwtBearer(options =>
 {
     options.SaveToken = true;
-    options.RequireHttpsMetadata = false; // Set to true in production
+    options.RequireHttpsMetadata = !builder.Environment.IsDevelopment();
     options.TokenValidationParameters = new TokenValidationParameters
     {
         ValidateIssuer = true,
@@ -120,12 +120,23 @@ builder.Services.Configure<SmugMugSettings>(
     builder.Configuration.GetSection(SmugMugSettings.SectionName));
 builder.Services.AddHttpClient<ISmugMugService, SmugMugService>();
 
-// ── CORS (allow Next.js frontend in development) ──
+// ── Redis Caching ──
+builder.Services.AddStackExchangeRedisCache(options =>
+{
+    options.Configuration = builder.Configuration.GetConnectionString("RedisConnection");
+    options.InstanceName = "AbhiKansara_";
+});
+
+
+// ── CORS (allow Next.js frontend in development and production) ──
 builder.Services.AddCors(options =>
 {
+    var allowedOrigins = builder.Configuration.GetSection("AllowedOrigins").Get<string[]>() 
+                         ?? new[] { "http://localhost:3000", "https://abhikansaraphotography.com", "https://www.abhikansaraphotography.com" };
+
     options.AddPolicy("AllowFrontend", policy =>
     {
-        policy.WithOrigins("http://localhost:3000")
+        policy.WithOrigins(allowedOrigins)
               .AllowAnyHeader()
               .AllowAnyMethod()
               .AllowCredentials();
