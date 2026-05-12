@@ -43,3 +43,7 @@ export async function linkGalleryToSmugMug(galleryId: string, albumId: string, a
   await adminGalleries.smugMugLink(galleryId, albumId, albumKey);
   revalidatePath("/admin/galleries");
 }
+
+export async function getSmugMugAlbums() {
+  return await adminGalleries.listSmugMugAlbums();
+}

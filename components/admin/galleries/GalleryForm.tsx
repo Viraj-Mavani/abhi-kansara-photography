@@ -7,7 +7,8 @@ import AdminInput from "@/components/admin/ui/AdminInput";
 import AdminButton from "@/components/admin/ui/AdminButton";
 import { createGallery, updateGallery, syncGalleryFromSmugMug, linkGalleryToSmugMug } from "@/app/actions/galleries";
 import type { Gallery } from "@/lib/api";
-import { Plus, Trash2, GripVertical, ImageIcon, Film, Zap, Link2, Clock, AlertTriangle, CheckCircle2, Loader2 } from "lucide-react";
+import { Plus, Trash2, GripVertical, ImageIcon, Film, Zap, Link2, Clock, AlertTriangle, CheckCircle2, Loader2, Search, Camera } from "lucide-react";
+import AlbumPicker from "./AlbumPicker";
 
 // ─────────────────────────────────────────────────────────
 //  GalleryForm — Gallery + nested MediaItems
@@ -64,6 +65,7 @@ export default function GalleryForm({ initialData }: GalleryFormProps) {
   const [error, setError] = useState("");
   const [isSyncing, setIsSyncing] = useState(false);
   const [syncMessage, setSyncMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
+  const [pickerOpen, setPickerOpen] = useState(false);
 
   const { register, control, handleSubmit, watch, setValue } =
     useForm<GalleryFormValues>({
@@ -243,6 +245,145 @@ export default function GalleryForm({ initialData }: GalleryFormProps) {
         </div>
       </div>
 
+      {/* SmugMug Integration */}
+      <div className="rounded-xl border border-dashed border-amber-500/20 bg-amber-500/[0.02] p-5 space-y-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Link2 className="h-4 w-4 text-amber-400/60" />
+            <h2 className="text-sm font-semibold text-white/70">SmugMug Integration</h2>
+          </div>
+          <span className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-[0.2em] text-green-400/70 bg-green-400/10 border border-green-400/20 px-2.5 py-1 rounded-full">
+            <Zap className="h-2.5 w-2.5" />
+            Active
+          </span>
+        </div>
+
+        <div className="flex items-start justify-between gap-4">
+          <p className="text-xs text-white/30 leading-relaxed">
+            Link this gallery to a SmugMug album. You can manually enter the ID and Key, or use the browser to pick from your SmugMug account.
+            Syncing will <strong className="text-white/50">replace</strong> all existing media items.
+          </p>
+          <button
+            type="button"
+            onClick={() => setPickerOpen(true)}
+            className="flex-shrink-0 flex items-center gap-2 px-4 py-2 rounded-lg bg-white/5 border border-white/10 text-white/70 hover:text-white hover:bg-white/10 hover:border-amber-500/30 transition-all text-xs font-bold uppercase tracking-wider group"
+          >
+            <Search className="h-3.5 w-3.5 text-amber-500/60 group-hover:text-amber-400" />
+            Browse Albums
+          </button>
+        </div>
+
+        <div className="grid grid-cols-2 gap-4">
+          <AdminInput
+            label="Album ID"
+            placeholder="e.g. 12345678"
+            {...register("smugMugAlbumId")}
+          />
+          <AdminInput
+            label="Album Key"
+            placeholder="e.g. AbCd12"
+            {...register("smugMugAlbumKey")}
+          />
+        </div>
+
+        {/* Sync Result Message */}
+        {syncMessage && (
+          <div className={`rounded-lg px-4 py-3 text-sm flex items-center gap-2 ${
+            syncMessage.type === "success"
+              ? "bg-green-500/8 border border-green-500/15 text-green-400"
+              : "bg-red-500/8 border border-red-500/15 text-red-400"
+          }`}>
+            {syncMessage.type === "success" ? (
+              <CheckCircle2 className="h-4 w-4 flex-shrink-0" />
+            ) : (
+              <AlertTriangle className="h-4 w-4 flex-shrink-0" />
+            )}
+            {syncMessage.text}
+          </div>
+        )}
+
+        {/* Last Sync Status & Sync Button */}
+        <div className="flex items-center justify-between pt-1">
+          <div className="flex items-center gap-2 text-xs text-white/25">
+            <Clock className="h-3.5 w-3.5" />
+            <span>
+              {initialData?.lastSmugMugSync
+                ? `Last synced: ${new Date(initialData.lastSmugMugSync).toLocaleDateString()}`
+                : "Never synced"}
+            </span>
+          </div>
+
+          <button
+            type="button"
+            disabled={!isEditing || !watch("smugMugAlbumKey") || isSyncing}
+            onClick={async () => {
+              if (!initialData?.id) return;
+              setIsSyncing(true);
+              setSyncMessage(null);
+              try {
+                // 1. First link/save the current ID and Key so the backend has them
+                const currentId = watch("smugMugAlbumId") || "";
+                const currentKey = watch("smugMugAlbumKey") || "";
+                await linkGalleryToSmugMug(initialData.id, currentId, currentKey);
+
+                // 2. Then trigger the sync
+                const result = await syncGalleryFromSmugMug(initialData.id);
+                
+                // 3. Update the form state immediately so the user sees the new media
+                if (result.gallery && (result.gallery as any).media) {
+                  const newMedia = (result.gallery as any).media.map((m: any, i: number) => ({
+                    type: m.type,
+                    url: m.url,
+                    width: m.width,
+                    height: m.height,
+                    alt: m.alt || "",
+                    posterUrl: m.posterUrl || "",
+                    hlsUrl: m.hlsUrl || "",
+                    duration: m.duration || "",
+                    order: i,
+                  }));
+                  mediaField.replace(newMedia);
+                }
+
+                setSyncMessage({
+                  type: "success",
+                  text: result.message,
+                });
+                
+                // Still refresh to sync server components if needed
+                router.refresh();
+              } catch (e: unknown) {
+                setSyncMessage({
+                  type: "error",
+                  text: e instanceof Error ? e.message : "Sync failed. Check your API keys and album credentials.",
+                });
+              } finally {
+                setIsSyncing(false);
+              }
+            }}
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-semibold transition-all ${
+              !isEditing || !watch("smugMugAlbumKey") || isSyncing
+                ? "bg-amber-500/5 border border-amber-500/15 text-amber-400/40 cursor-not-allowed"
+                : "bg-amber-500/10 border border-amber-500/30 text-amber-400 hover:bg-amber-500/20 hover:border-amber-500/40 cursor-pointer"
+            }`}
+          >
+            {isSyncing ? (
+              <Loader2 className="h-3.5 w-3.5 animate-spin" />
+            ) : (
+              <Zap className="h-3.5 w-3.5" />
+            )}
+            {isSyncing ? "Syncing..." : "Sync from SmugMug"}
+          </button>
+        </div>
+
+        {!isEditing && (
+          <p className="text-[11px] text-amber-400/40 flex items-center gap-1.5">
+            <AlertTriangle className="h-3 w-3" />
+            Save the gallery first before syncing from SmugMug.
+          </p>
+        )}
+      </div>
+
       {/* Media Items */}
       <div className="rounded-xl border border-white/[0.06] p-5 space-y-4">
         <div className="flex items-center justify-between">
@@ -307,117 +448,6 @@ export default function GalleryForm({ initialData }: GalleryFormProps) {
         )}
       </div>
 
-      {/* SmugMug Integration */}
-      <div className="rounded-xl border border-dashed border-amber-500/20 bg-amber-500/[0.02] p-5 space-y-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Link2 className="h-4 w-4 text-amber-400/60" />
-            <h2 className="text-sm font-semibold text-white/70">SmugMug Integration</h2>
-          </div>
-          <span className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-[0.2em] text-green-400/70 bg-green-400/10 border border-green-400/20 px-2.5 py-1 rounded-full">
-            <Zap className="h-2.5 w-2.5" />
-            Active
-          </span>
-        </div>
-
-        <p className="text-xs text-white/30 leading-relaxed">
-          Link this gallery to a SmugMug album. The <strong className="text-white/50">Album Key</strong> is typically found at the end of your gallery link (e.g., the part after <code className="text-amber-400/60">n-</code>). 
-          Syncing will <strong className="text-white/50">replace</strong> all existing media items.
-        </p>
-
-        <div className="grid grid-cols-2 gap-4">
-          <AdminInput
-            label="Album ID"
-            placeholder="e.g. 12345678"
-            {...register("smugMugAlbumId")}
-          />
-          <AdminInput
-            label="Album Key"
-            placeholder="e.g. AbCd12"
-            {...register("smugMugAlbumKey")}
-          />
-        </div>
-
-        {/* Sync Result Message */}
-        {syncMessage && (
-          <div className={`rounded-lg px-4 py-3 text-sm flex items-center gap-2 ${
-            syncMessage.type === "success"
-              ? "bg-green-500/8 border border-green-500/15 text-green-400"
-              : "bg-red-500/8 border border-red-500/15 text-red-400"
-          }`}>
-            {syncMessage.type === "success" ? (
-              <CheckCircle2 className="h-4 w-4 flex-shrink-0" />
-            ) : (
-              <AlertTriangle className="h-4 w-4 flex-shrink-0" />
-            )}
-            {syncMessage.text}
-          </div>
-        )}
-
-        {/* Last Sync Status & Sync Button */}
-        <div className="flex items-center justify-between pt-1">
-          <div className="flex items-center gap-2 text-xs text-white/25">
-            <Clock className="h-3.5 w-3.5" />
-            <span>
-              {initialData?.lastSmugMugSync
-                ? `Last synced: ${new Date(initialData.lastSmugMugSync).toLocaleDateString()}`
-                : "Never synced"}
-            </span>
-          </div>
-
-          <button
-            type="button"
-            disabled={!isEditing || !watch("smugMugAlbumKey") || isSyncing}
-            onClick={async () => {
-              if (!initialData?.id) return;
-              setIsSyncing(true);
-              setSyncMessage(null);
-              try {
-                // 1. First link/save the current ID and Key so the backend has them
-                const currentId = watch("smugMugAlbumId") || "";
-                const currentKey = watch("smugMugAlbumKey") || "";
-                await linkGalleryToSmugMug(initialData.id, currentId, currentKey);
-
-                // 2. Then trigger the sync
-                const result = await syncGalleryFromSmugMug(initialData.id);
-                setSyncMessage({
-                  type: "success",
-                  text: result.message,
-                });
-                // Refresh the page to show synced media
-                router.refresh();
-              } catch (e: unknown) {
-                setSyncMessage({
-                  type: "error",
-                  text: e instanceof Error ? e.message : "Sync failed. Check your API keys and album credentials.",
-                });
-              } finally {
-                setIsSyncing(false);
-              }
-            }}
-            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-semibold transition-all ${
-              !isEditing || !watch("smugMugAlbumKey") || isSyncing
-                ? "bg-amber-500/5 border border-amber-500/15 text-amber-400/40 cursor-not-allowed"
-                : "bg-amber-500/10 border border-amber-500/30 text-amber-400 hover:bg-amber-500/20 hover:border-amber-500/40 cursor-pointer"
-            }`}
-          >
-            {isSyncing ? (
-              <Loader2 className="h-3.5 w-3.5 animate-spin" />
-            ) : (
-              <Zap className="h-3.5 w-3.5" />
-            )}
-            {isSyncing ? "Syncing..." : "Sync from SmugMug"}
-          </button>
-        </div>
-
-        {!isEditing && (
-          <p className="text-[11px] text-amber-400/40 flex items-center gap-1.5">
-            <AlertTriangle className="h-3 w-3" />
-            Save the gallery first before syncing from SmugMug.
-          </p>
-        )}
-      </div>
-
       {/* Sticky Save Bar */}
       <div className="fixed bottom-0 left-64 right-0 bg-[#0a0a0f]/95 backdrop-blur-xl border-t border-white/[0.06] px-8 py-4 flex items-center justify-between z-50">
         <p className="text-xs text-white/30">
@@ -430,6 +460,16 @@ export default function GalleryForm({ initialData }: GalleryFormProps) {
           </AdminButton>
         </div>
       </div>
+      {/* Album Picker Modal */}
+      <AlbumPicker
+        isOpen={pickerOpen}
+        onClose={() => setPickerOpen(false)}
+        onSelect={(album) => {
+          setValue("smugMugAlbumId", album.albumId || "");
+          setValue("smugMugAlbumKey", album.albumKey || "");
+          setPickerOpen(false);
+        }}
+      />
     </form>
   );
 }

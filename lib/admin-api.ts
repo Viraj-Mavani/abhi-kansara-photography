@@ -106,6 +106,10 @@ export const adminGalleries = {
       lastSync: string;
       gallery: unknown;
     }>(`/galleries/${id}/smugmug-sync`, { method: "POST" }),
+
+  /** List all albums in the SmugMug account */
+  listSmugMugAlbums: () =>
+    adminFetch<any[]>("/smugmug/albums", { method: "GET" }),
 };
 
 // ─────────────────────────────────────────────────────────

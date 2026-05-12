@@ -176,6 +176,89 @@ public class SmugMugService : ISmugMugService
         }
     }
 
+    public async Task<IEnumerable<SmugMugAlbumInfo>> GetAlbumsAsync()
+    {
+        try
+        {
+            _logger.LogInformation("Fetching SmugMug user albums for picker");
+
+            // Step 1: Get the authenticated user's information
+            var authUserEndpoint = $"{BaseUrl}!authuser";
+            var userResponse = await SendAuthenticatedRequestAsync(HttpMethod.Get, authUserEndpoint, null);
+            
+            if (!userResponse.IsSuccessStatusCode)
+            {
+                _logger.LogError("SmugMug API error fetching !authuser: {StatusCode}", (int)userResponse.StatusCode);
+                return Enumerable.Empty<SmugMugAlbumInfo>();
+            }
+
+            var userJson = await userResponse.Content.ReadAsStringAsync();
+            using var userDoc = JsonDocument.Parse(userJson);
+            var userRoot = userDoc.RootElement.GetProperty("Response");
+
+            if (!userRoot.TryGetProperty("User", out var user) || 
+                !user.TryGetProperty("Uris", out var uris) ||
+                !uris.TryGetProperty("UserAlbums", out var userAlbumsUriObj) ||
+                !userAlbumsUriObj.TryGetProperty("Uri", out var albumsUri))
+            {
+                _logger.LogWarning("Could not find UserAlbums URI in !authuser response.");
+                return Enumerable.Empty<SmugMugAlbumInfo>();
+            }
+
+            // Step 2: Fetch albums from the discovered URI
+            // Note: SmugMug URIs are usually absolute from the root (e.g. /api/v2/...), 
+            // so we combine with the base domain if needed, but our SendAuthenticatedRequestAsync 
+            // handles relative paths if we strip the /api/v2 prefix or just use the full absolute URL.
+            var albumsUrl = albumsUri.GetString()!;
+            if (!albumsUrl.StartsWith("http")) 
+            {
+                // If it's a relative path like /api/v2/user/..., we need the full domain
+                albumsUrl = "https://api.smugmug.com" + albumsUrl;
+            }
+
+            var albumsResponse = await SendAuthenticatedRequestAsync(HttpMethod.Get, albumsUrl, null);
+            var albumsJson = await albumsResponse.Content.ReadAsStringAsync();
+
+            if (!albumsResponse.IsSuccessStatusCode)
+            {
+                _logger.LogError("SmugMug API error fetching albums from {Url}: {StatusCode}", albumsUrl, (int)albumsResponse.StatusCode);
+                return Enumerable.Empty<SmugMugAlbumInfo>();
+            }
+
+            using var albumsDoc = JsonDocument.Parse(albumsJson);
+            var albumsRoot = albumsDoc.RootElement.GetProperty("Response");
+
+            if (!albumsRoot.TryGetProperty("Album", out var albums) || 
+                albums.ValueKind != JsonValueKind.Array)
+            {
+                _logger.LogWarning("No albums found in response from {Url}", albumsUrl);
+                return Enumerable.Empty<SmugMugAlbumInfo>();
+            }
+
+            var result = new List<SmugMugAlbumInfo>();
+            foreach (var album in albums.EnumerateArray())
+            {
+                result.Add(new SmugMugAlbumInfo
+                {
+                    AlbumId = album.TryGetProperty("UrlName", out var id) ? id.GetString() : null,
+                    AlbumKey = album.TryGetProperty("AlbumKey", out var key) ? key.GetString() : null,
+                    Title = album.TryGetProperty("Title", out var title) ? title.GetString() : "Untitled Album",
+                    Description = album.TryGetProperty("Description", out var desc) ? desc.GetString() : null,
+                    LastUpdated = album.TryGetProperty("LastUpdated", out var last) ? last.GetString() : null,
+                    ImageCount = album.TryGetProperty("ImageCount", out var count) ? count.GetInt32() : 0,
+                    WebUri = album.TryGetProperty("WebUri", out var uri) ? uri.GetString() : null
+                });
+            }
+
+            return result.OrderByDescending(a => a.LastUpdated);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to list SmugMug albums");
+            return Enumerable.Empty<SmugMugAlbumInfo>();
+        }
+    }
+
     // ─────────────────────────────────────────────────────────
     //  OAuth 1.0a HTTP Request Infrastructure
     // ─────────────────────────────────────────────────────────

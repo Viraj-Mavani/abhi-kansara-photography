@@ -27,6 +27,7 @@ public class GalleriesController : ControllerBase
         _logger = logger;
     }
 
+
     /// <summary>
     /// GET /api/galleries
     /// Returns all galleries ordered by display order, with nested media items.
