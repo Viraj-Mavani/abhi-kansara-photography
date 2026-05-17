@@ -72,6 +72,12 @@ export const adminServices = {
 
   delete: (id: string) =>
     adminFetch(`/services/${id}`, { method: "DELETE" }),
+
+  reorder: (ids: string[]) =>
+    adminFetch("/services/reorder", {
+      method: "PATCH",
+      body: JSON.stringify(ids),
+    }),
 };
 
 // ─────────────────────────────────────────────────────────

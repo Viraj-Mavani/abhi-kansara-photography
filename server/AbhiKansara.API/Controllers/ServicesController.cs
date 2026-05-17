@@ -189,6 +189,38 @@ public class ServicesController : ControllerBase
     }
 
     /// <summary>
+    /// PATCH /api/services/reorder
+    /// Bulk updates the Display Order of photography services in the database.
+    /// </summary>
+    [HttpPatch("reorder")]
+    [Microsoft.AspNetCore.Authorization.Authorize(Roles = "Admin")]
+    public async Task<IActionResult> Reorder([FromBody] List<Guid> ids)
+    {
+        if (ids == null || ids.Count == 0) return BadRequest("IDs list is empty.");
+
+        using var transaction = await _context.Database.BeginTransactionAsync();
+        try
+        {
+            for (int i = 0; i < ids.Count; i++)
+            {
+                var id = ids[i];
+                await _context.Services
+                    .Where(s => s.Id == id)
+                    .ExecuteUpdateAsync(setter => setter.SetProperty(s => s.Order, i));
+            }
+
+            await transaction.CommitAsync();
+            return NoContent();
+        }
+        catch (Exception ex)
+        {
+            await transaction.RollbackAsync();
+            Console.WriteLine($"Error reordering Services: {ex.Message}");
+            return StatusCode(500, new { message = "An error occurred during reordering.", detail = ex.Message });
+        }
+    }
+
+    /// <summary>
     /// DELETE /api/services/{id}
     /// Deletes a service (cascade deletes children due to DB setup).
     /// </summary>
