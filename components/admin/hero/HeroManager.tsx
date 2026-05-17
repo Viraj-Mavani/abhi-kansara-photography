@@ -21,6 +21,8 @@ import {
   useSensor,
   useSensors,
   DragEndEvent,
+  DragStartEvent,
+  DragOverlay,
 } from "@dnd-kit/core";
 import {
   arrayMove,
@@ -49,6 +51,7 @@ function SortableBackground({
   bg, 
   isConfirming, 
   isPending, 
+  isDragOverlay,
   onDeleteClick, 
   onConfirmDelete, 
   onCancelDelete 
@@ -56,6 +59,7 @@ function SortableBackground({
   bg: HeroBackground;
   isConfirming: boolean;
   isPending: boolean;
+  isDragOverlay?: boolean;
   onDeleteClick: (id: string) => void;
   onConfirmDelete: () => void;
   onCancelDelete: () => void;
@@ -76,11 +80,20 @@ function SortableBackground({
     opacity: isDragging ? 0.3 : 1,
   };
 
+  const overlayStyle = isDragOverlay
+    ? {
+        boxShadow: "0 20px 60px rgba(0,0,0,0.5), 0 0 0 1px rgba(201,169,110,0.3)",
+        transform: "scale(1.02)",
+        zIndex: 100,
+      }
+    : {};
+
   return (
     <div 
       ref={setNodeRef}
-      style={style}
+      style={{ ...style, ...overlayStyle }}
       className={`group relative aspect-[16/9] rounded-lg overflow-hidden border transition-all duration-300 ${
+        isDragOverlay ? "border-[#c9a96e]/50 shadow-2xl ring-2 ring-[#c9a96e]/50" :
         isConfirming ? "border-red-500/50 bg-red-500/5 shadow-lg shadow-red-500/10" : "border-white/10 bg-black/40"
       } ${isDragging ? "shadow-2xl ring-2 ring-[#c9a96e]/50" : ""}`}
     >
@@ -148,6 +161,7 @@ export default function HeroManager({ initialBackgrounds, homeConfig }: HeroMana
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
+  const [activeId, setActiveId] = useState<string | null>(null);
 
   // Sync state if props change
   useEffect(() => {
@@ -163,8 +177,14 @@ export default function HeroManager({ initialBackgrounds, homeConfig }: HeroMana
     })
   );
 
+  const handleDragStart = (event: DragStartEvent) => {
+    setActiveId(event.active.id as string);
+  };
+
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
+    setActiveId(null);
+
     if (!over || active.id === over.id) return;
 
     console.log(`Dragging ${active.id} over ${over.id}`);
@@ -338,6 +358,7 @@ export default function HeroManager({ initialBackgrounds, homeConfig }: HeroMana
         <DndContext
           sensors={sensors}
           collisionDetection={closestCenter}
+          onDragStart={handleDragStart}
           onDragEnd={handleDragEnd}
         >
           <SortableContext
@@ -364,6 +385,23 @@ export default function HeroManager({ initialBackgrounds, homeConfig }: HeroMana
               )}
             </div>
           </SortableContext>
+          
+          <DragOverlay dropAnimation={{
+            duration: 200,
+            easing: "cubic-bezier(0.18, 0.67, 0.6, 1.22)",
+          }}>
+            {activeId ? (
+              <SortableBackground
+                bg={backgrounds.find((bg) => bg.id === activeId)!}
+                isConfirming={false}
+                isPending={false}
+                isDragOverlay
+                onDeleteClick={() => {}}
+                onConfirmDelete={() => {}}
+                onCancelDelete={() => {}}
+              />
+            ) : null}
+          </DragOverlay>
         </DndContext>
       </section>
     </div>

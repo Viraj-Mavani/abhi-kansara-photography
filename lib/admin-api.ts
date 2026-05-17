@@ -134,6 +134,12 @@ export const adminCarousel = {
 
   delete: (id: string) =>
     adminFetch(`/carousel/${id}`, { method: "DELETE" }),
+
+  reorder: (ids: string[]) =>
+    adminFetch("/carousel/reorder", {
+      method: "PATCH",
+      body: JSON.stringify(ids),
+    }),
 };
 
 // ─────────────────────────────────────────────────────────
