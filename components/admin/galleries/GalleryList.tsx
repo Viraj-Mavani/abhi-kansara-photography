@@ -470,7 +470,19 @@ export default function GalleryList({ initialGalleries }: GalleryListProps) {
             
             {/* Drag Overlay for smooth premium dragging effect */}
             {isMounted && (
-              <DragOverlay dropAnimation={defaultDropAnimationSideEffects({ duration: 250, easing: "cubic-bezier(0.18, 0.67, 0.6, 1.22)" })}>
+              <DragOverlay
+                dropAnimation={{
+                  duration: 250,
+                  easing: "cubic-bezier(0.18, 0.67, 0.6, 1.22)",
+                  sideEffects: defaultDropAnimationSideEffects({
+                    styles: {
+                      active: {
+                        opacity: "0.4",
+                      },
+                    },
+                  }),
+                }}
+              >
                 {activeGallery ? (
                   <div className="rounded-2xl border border-[#c9a96e]/40 bg-black shadow-2xl shadow-[#c9a96e]/20 opacity-90 scale-105 transition-transform overflow-hidden cursor-grabbing">
                     <div className="relative h-48 w-full overflow-hidden">

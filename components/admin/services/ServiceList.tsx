@@ -215,11 +215,11 @@ interface ServiceListProps {
 
 export default function ServiceList({ initialServices }: ServiceListProps) {
   const [services, setServices] = useState(() =>
-    [...initialServices].sort((a, b) => a.order - b.order)
+    [...initialServices].sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
   );
 
   useEffect(() => {
-    setServices([...initialServices].sort((a, b) => a.order - b.order));
+    setServices([...initialServices].sort((a, b) => (a.order ?? 0) - (b.order ?? 0)));
   }, [initialServices]);
 
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
