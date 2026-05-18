@@ -270,9 +270,8 @@ export default function ServiceForm({ initialData }: ServiceFormProps) {
         </div>
         
         {/* Consolidated Metadata Fields */}
-        <div className="grid grid-cols-3 gap-4 border-t border-white/[0.06] pt-4 mt-2">
+        <div className="grid grid-cols-2 gap-4 border-t border-white/[0.06] pt-4 mt-2">
           <AdminInput label="Category" placeholder="Wedding" {...register("category")} />
-          <AdminInput label="Display Order" type="number" {...register("order", { valueAsNumber: true })} />
           <div className="flex flex-col gap-1.5">
             <label className="text-[11px] font-bold uppercase tracking-[0.15em] text-white/50">Featured</label>
             <div className="flex items-center h-11">

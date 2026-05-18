@@ -72,6 +72,12 @@ export const adminServices = {
 
   delete: (id: string) =>
     adminFetch(`/services/${id}`, { method: "DELETE" }),
+
+  reorder: (ids: string[]) =>
+    adminFetch("/services/reorder", {
+      method: "PATCH",
+      body: JSON.stringify(ids),
+    }),
 };
 
 // ─────────────────────────────────────────────────────────
@@ -116,6 +122,13 @@ export const adminGalleries = {
     adminFetch<any[]>(`/galleries/smugmug-images?albumId=${albumId}&albumKey=${albumKey}`, { 
       method: "GET" 
     }),
+
+  /** Reorder featured galleries */
+  reorder: (ids: string[]) =>
+    adminFetch("/galleries/reorder", {
+      method: "PATCH",
+      body: JSON.stringify(ids),
+    }),
 };
 
 // ─────────────────────────────────────────────────────────
@@ -134,6 +147,12 @@ export const adminCarousel = {
 
   delete: (id: string) =>
     adminFetch(`/carousel/${id}`, { method: "DELETE" }),
+
+  reorder: (ids: string[]) =>
+    adminFetch("/carousel/reorder", {
+      method: "PATCH",
+      body: JSON.stringify(ids),
+    }),
 };
 
 // ─────────────────────────────────────────────────────────

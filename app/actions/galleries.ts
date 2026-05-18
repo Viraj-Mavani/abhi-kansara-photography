@@ -31,6 +31,12 @@ export async function deleteGallery(id: string) {
   // List updates locally, no redirect needed
 }
 
+export async function reorderGalleries(ids: string[]) {
+  await adminGalleries.reorder(ids);
+  revalidatePath("/admin/galleries");
+  revalidatePath("/portfolio");
+}
+
 export async function syncGalleryFromSmugMug(galleryId: string) {
   const result = await adminGalleries.smugMugSync(galleryId);
   revalidatePath("/admin/galleries");

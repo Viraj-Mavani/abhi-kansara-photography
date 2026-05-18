@@ -36,7 +36,9 @@ public class GalleriesController : ControllerBase
     public async Task<IActionResult> GetAll()
     {
         var galleries = await _context.ProjectGalleries
-            .OrderBy(g => g.Order)
+            .OrderByDescending(g => g.IsFeatured)
+            .ThenBy(g => g.IsFeatured ? g.Order : 0)
+            .ThenByDescending(g => g.UpdatedAt)
             .Include(g => g.Media.OrderBy(m => m.Order))
             .AsNoTracking()
             .ToListAsync();
@@ -364,6 +366,38 @@ public class GalleriesController : ControllerBase
         {
             _logger.LogError(ex, "Error fetching SmugMug albums");
             return StatusCode(500, new { message = "Failed to fetch albums from SmugMug." });
+        }
+    }
+
+    /// <summary>
+    /// PATCH /api/galleries/reorder
+    /// Bulk updates the sort order of featured galleries.
+    /// </summary>
+    [HttpPatch("reorder")]
+    [Microsoft.AspNetCore.Authorization.Authorize(Roles = "Admin")]
+    public async Task<IActionResult> Reorder([FromBody] List<Guid> galleryIds)
+    {
+        if (galleryIds == null || !galleryIds.Any())
+            return BadRequest(new { message = "No gallery IDs provided for reordering." });
+
+        using var transaction = await _context.Database.BeginTransactionAsync();
+        try
+        {
+            for (int i = 0; i < galleryIds.Count; i++)
+            {
+                await _context.ProjectGalleries
+                    .Where(g => g.Id == galleryIds[i])
+                    .ExecuteUpdateAsync(s => s.SetProperty(g => g.Order, i));
+            }
+
+            await transaction.CommitAsync();
+            return NoContent();
+        }
+        catch (Exception ex)
+        {
+            await transaction.RollbackAsync();
+            _logger.LogError(ex, "Failed to reorder galleries.");
+            return StatusCode(500, new { message = "An error occurred while reordering galleries." });
         }
     }
 }

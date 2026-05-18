@@ -60,6 +60,33 @@ public class CarouselController : ControllerBase
     }
 
     [Authorize(Roles = "Admin")]
+    [HttpPatch("reorder")]
+    public async Task<IActionResult> Reorder([FromBody] List<string> ids)
+    {
+        if (ids == null || ids.Count == 0) return BadRequest("IDs list is empty.");
+
+        using var transaction = await _context.Database.BeginTransactionAsync();
+        try
+        {
+            for (int i = 0; i < ids.Count; i++)
+            {
+                var id = ids[i];
+                await _context.CarouselItems
+                    .Where(c => c.Id == id)
+                    .ExecuteUpdateAsync(s => s.SetProperty(c => c.SortOrder, i));
+            }
+
+            await transaction.CommitAsync();
+            return NoContent();
+        }
+        catch (Exception ex)
+        {
+            await transaction.RollbackAsync();
+            return StatusCode(500, new { message = "Reorder failed.", detail = ex.Message });
+        }
+    }
+
+    [Authorize(Roles = "Admin")]
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteCarouselItem(string id)
     {

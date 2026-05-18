@@ -20,3 +20,9 @@ export async function deleteCarouselItem(id: string) {
   revalidatePath("/admin/carousel");
   revalidatePath("/");
 }
+
+export async function reorderCarouselItems(ids: string[]) {
+  await adminCarousel.reorder(ids);
+  revalidatePath("/admin/carousel");
+  revalidatePath("/");
+}

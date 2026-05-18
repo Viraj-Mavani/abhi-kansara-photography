@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import {
   adminServices,
 } from "@/lib/admin-api";
+import { getServices } from "@/lib/api";
 
 // ─────────────────────────────────────────────────────────
 //  Service Server Actions
@@ -12,7 +13,13 @@ import {
 //  avoid the "NEXT_REDIRECT" error in try..catch blocks.
 // ─────────────────────────────────────────────────────────
 
-export async function createService(data: unknown) {
+export async function createService(data: any) {
+  try {
+    const services = await getServices();
+    data.order = services.length;
+  } catch {
+    data.order = 0;
+  }
   await adminServices.create(data);
   revalidatePath("/admin/services");
   revalidatePath("/services");
@@ -31,4 +38,10 @@ export async function deleteService(id: string) {
   revalidatePath("/admin/services");
   revalidatePath("/services");
   // List updates locally, no redirect needed
+}
+
+export async function reorderServices(ids: string[]) {
+  await adminServices.reorder(ids);
+  revalidatePath("/admin/services");
+  revalidatePath("/services");
 }
