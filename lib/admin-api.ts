@@ -122,6 +122,13 @@ export const adminGalleries = {
     adminFetch<any[]>(`/galleries/smugmug-images?albumId=${albumId}&albumKey=${albumKey}`, { 
       method: "GET" 
     }),
+
+  /** Reorder featured galleries */
+  reorder: (ids: string[]) =>
+    adminFetch("/galleries/reorder", {
+      method: "PATCH",
+      body: JSON.stringify(ids),
+    }),
 };
 
 // ─────────────────────────────────────────────────────────
