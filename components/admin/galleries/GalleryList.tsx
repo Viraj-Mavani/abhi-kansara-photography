@@ -429,12 +429,19 @@ export default function GalleryList({ initialGalleries }: GalleryListProps) {
 
       {/* Featured Section */}
       <section className="space-y-6">
-        <div className="flex items-center justify-between pb-2 border-b border-white/[0.06]">
-          <div>
-            <h2 className="text-lg font-bold text-white tracking-wide">Featured Galleries</h2>
-            <p className="text-xs text-white/40 mt-1">Displayed on the landing page and portfolio top. Drag to reorder.</p>
+        <div className="flex items-center justify-between pb-4 border-b border-white/[0.06]">
+          <div className="flex items-center gap-3">
+            <div className="w-1 h-8 rounded-full bg-gradient-to-b from-[#c9a96e] to-[#7a6236]" />
+            <div>
+              <h2 className="text-lg font-bold tracking-wider uppercase bg-gradient-to-r from-white via-white to-[#c9a96e] bg-clip-text text-transparent">
+                Featured Galleries
+              </h2>
+              <p className="text-xs text-white/40 mt-0.5 font-medium">
+                Displayed on the landing page and portfolio top. Drag to reorder.
+              </p>
+            </div>
           </div>
-          <span className="text-xs font-mono text-[#c9a96e] bg-[#c9a96e]/10 px-2 py-1 rounded">
+          <span className="text-[10px] font-bold uppercase tracking-wider text-[#c9a96e] bg-[#c9a96e]/5 border border-[#c9a96e]/15 px-3 py-1 rounded-full shadow-inner">
             {featuredGalleries.length} items
           </span>
         </div>
@@ -463,7 +470,19 @@ export default function GalleryList({ initialGalleries }: GalleryListProps) {
             
             {/* Drag Overlay for smooth premium dragging effect */}
             {isMounted && (
-              <DragOverlay dropAnimation={defaultDropAnimationSideEffects({ duration: 250, easing: "cubic-bezier(0.18, 0.67, 0.6, 1.22)" })}>
+              <DragOverlay
+                dropAnimation={{
+                  duration: 250,
+                  easing: "cubic-bezier(0.18, 0.67, 0.6, 1.22)",
+                  sideEffects: defaultDropAnimationSideEffects({
+                    styles: {
+                      active: {
+                        opacity: "0.4",
+                      },
+                    },
+                  }),
+                }}
+              >
                 {activeGallery ? (
                   <div className="rounded-2xl border border-[#c9a96e]/40 bg-black shadow-2xl shadow-[#c9a96e]/20 opacity-90 scale-105 transition-transform overflow-hidden cursor-grabbing">
                     <div className="relative h-48 w-full overflow-hidden">
@@ -519,12 +538,19 @@ export default function GalleryList({ initialGalleries }: GalleryListProps) {
 
       {/* Standard Galleries Section */}
       <section className="space-y-6 pt-6">
-        <div className="flex items-center justify-between pb-2 border-b border-white/[0.06]">
-          <div>
-            <h2 className="text-lg font-bold text-white tracking-wide">Standard Galleries</h2>
-            <p className="text-xs text-white/40 mt-1">Organized by last updated date.</p>
+        <div className="flex items-center justify-between pb-4 border-b border-white/[0.06]">
+          <div className="flex items-center gap-3">
+            <div className="w-1 h-8 rounded-full bg-gradient-to-b from-white/40 to-white/20" />
+            <div>
+              <h2 className="text-lg font-bold tracking-wider uppercase bg-gradient-to-r from-white to-white/50 bg-clip-text text-transparent">
+                Standard Galleries
+              </h2>
+              <p className="text-xs text-white/40 mt-0.5 font-medium">
+                Organized by last updated date.
+              </p>
+            </div>
           </div>
-          <span className="text-xs font-mono text-white/30 bg-white/5 px-2 py-1 rounded">
+          <span className="text-[10px] font-bold uppercase tracking-wider text-white/40 bg-white/[0.02] border border-white/[0.06] px-3 py-1 rounded-full">
             {standardGalleries.length} items
           </span>
         </div>
