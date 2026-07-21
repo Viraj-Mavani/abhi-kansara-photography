@@ -108,5 +108,4 @@ dotnet run --project AbhiKansara.API
 
 ## License
 MIT © 2026 Viraj Mavani
-
 Designed and Engineered with precision for **Abhi Kansara Photography**.
